@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    nav > ul{
+        display: flex;
+        text-decoration: none;
+        list-style: none;
+    }
+    nav > ul > li{
+        margin-right: 10px;
+    }
+    nav > ul > li > a{
+        text-decoration: none;
+        color: black;
+        cursor: pointer;
+    }
+</style>
+<body>
+    <div class="wrapper">
+        <nav class="nav_container">
+            <ul class="nav_list">
+                <li class="nav_item"><a href="/" class="link">Home</a></li>
+                <li class="nav_item"><a href="/about" class="link">About</a></li>
+                <li class="nav_item"><a href="/contact" class="link">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div id="app"></div>
+    <script src="router/router.js"></script>
+</body>
+</html>
