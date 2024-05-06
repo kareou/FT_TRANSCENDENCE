@@ -1,3 +1,8 @@
+import Chat from '../pages/chat.js';
+import Dashboard from '../pages/dashboard.js';
+import SideBar from '../components/sidebar.js';
+import TopBar from '../components/notification.js';
+
 window.history.pushState({}, {}, window.location.origin);
 
 const app = document.querySelector('#app');
