@@ -8,10 +8,11 @@ export default class SideBar extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = `
+    this.innerHTML = /*HTML*/`
     <div class="sidebar_wrapper">
     <div class="logo_wrapper">
         <img src="assets/gamelogo.png" alt="game logo" class="icon_side_bar">
+
     </div>
     <div class="dash_logos_wrapper">
         <img src="assets/Dashboard.png" alt="Dashboard logo" class="icon_side_bar">

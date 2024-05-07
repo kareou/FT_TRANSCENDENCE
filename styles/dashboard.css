@@ -1,32 +1,46 @@
+@font-face {
+    font-family: "Coolvetica";
+    src: url("../assets/fonts/coolvetica\ rg.otf");
+}
+
 .dashboard_wrapper{
     display: flex;
-    justify-content: center;
-    align-items: center;
+    /* justify-content: center; */
+    /* align-items: center; */
 }
 
 .profile_game_wraper{
     display: flex;
-    justify-content: center;
-    align-items: center;
+    /* justify-content: center; */
+    /* align-items: center; */
     flex-direction: column;
-    margin: 25px;
+}
+
+.profile_image_wrapper{
+    height: 100%;
+    width: 50%;
+    clip-path: polygon(0 0, 54% 0, 85% 100%, 0% 100%);
+}
+
+.profile_image_wrapper img{
+    height: 100%;
+    width: 100%;
+    border-radius: 10px;
+
 }
 
 .profile_wrapper{
     display: flex;
-    justify-content: center;
     align-items: center;
-    flex-direction: column;
     margin: 25px;
     border: 1px solid #778FB8;
     border-radius: 10px;
+    backdrop-filter: blur(10px);
 }
 
 .game_wrapper{
     position: relative;
     display: flex;
-    justify-content:end;
-    align-items:end;
     flex-direction: column;
     margin: 25px;
     border: 1px solid #778FB8;
@@ -56,4 +70,25 @@
     padding: 5px;
     cursor: pointer;
     border-radius: 20px;
+    filter: drop-shadow(rgba(2,115,94,0.3) 0px 5px 5px);
+    transition: ease-in-out .5s;
+}
+
+.game_wrapper button:hover{
+    background-color: #047e5c;
+    filter: drop-shadow(rgba(2,115,94,0.3) 0px 5px 5px);
+}
+
+.online_friend{
+    height: 100vh;
+}
+
+#login{
+    font-family: "Coolvetica";
+    color: rgba(149, 149, 149, 0.36);
+}
+
+#user_name{
+    color: #04BF8A;
+    font-family: "Coolvetica";
 }

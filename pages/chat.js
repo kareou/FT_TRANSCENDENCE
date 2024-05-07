@@ -8,7 +8,7 @@ export default class Chat extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = `
+    this.innerHTML = /*HTML*/`
         <div class="body_wrapper">
         <side-bar></side-bar>
         <div class="second_content_chat_wrapper">
