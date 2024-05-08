@@ -3,46 +3,71 @@
     src: url("../assets/fonts/coolvetica\ rg.otf");
 }
 
+h1{
+    color: white;
+    font-family: "Coolvetica";
+    font-size: larger;
+    font-weight: normal;
+}
+
 .dashboard_wrapper{
+    padding: 10px;
     display: flex;
-    /* justify-content: center; */
-    /* align-items: center; */
-}
-
-.profile_game_wraper{
-    display: flex;
-    /* justify-content: center; */
-    /* align-items: center; */
     flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
 }
 
-.profile_image_wrapper{
+.game_n_friends,
+.profile_n_rank{
+    
+    display: flex;
+    gap: 50px;
+    justify-content: space-around;
+    /* justify-content: center; */
+    /* align-items: center; */
+
+}
+.profile{
+    height: 300px;
+    width: 1100px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #778FB8;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.rank{
+    width: 500px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #778FB8;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.profile_img{
     height: 100%;
     width: 50%;
-    clip-path: polygon(0 0, 54% 0, 85% 100%, 0% 100%);
+    clip-path: polygon(0 0, 54% 0, 100% 100%, 0% 100%);
 }
 
-.profile_image_wrapper img{
+.profile_img img{
     height: 100%;
     width: 100%;
     border-radius: 10px;
 
 }
 
-.profile_wrapper{
-    display: flex;
-    align-items: center;
-    margin: 25px;
-    border: 1px solid #778FB8;
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-}
 
 .game_wrapper{
+    width: 1100px;
+    height: 450px;
     position: relative;
-    display: flex;
-    flex-direction: column;
-    margin: 25px;
+    /* margin: 25px; */
+    margin-top: 10px;
     border: 1px solid #778FB8;
     border-radius: 10px;
     backdrop-filter: blur(10px);
@@ -80,7 +105,16 @@
 }
 
 .online_friend{
-    height: 100vh;
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+
+    /* margin: 25px; */
+    width: 500px;
+    height: 450px;
+    border: 1px solid #778FB8;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
 }
 
 #login{
@@ -91,4 +125,8 @@
 #user_name{
     color: #04BF8A;
     font-family: "Coolvetica";
+}
+
+.profile_info{
+    width: 100%;
 }

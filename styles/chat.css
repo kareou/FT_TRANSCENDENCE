@@ -75,6 +75,7 @@ body{
 
 .second_content_chat_wrapper{
     display: flex;
+    
     flex-direction: column;
 }
 
