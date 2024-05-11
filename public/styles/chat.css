@@ -463,13 +463,6 @@ body{
     color: gray;
 }
 
-.container{
-    max-width: 1536px; /* Match the min-width of the 2xl breakpoint */
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 1rem; /* Example padding, adjust as needed */
-    padding-right: 1rem;
-}
 
 /*
 

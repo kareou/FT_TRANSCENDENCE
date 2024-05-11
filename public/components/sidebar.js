@@ -15,7 +15,7 @@ export default class SideBar extends HTMLElement {
 
   </div>
   <div class="dash_logos_wrapper">
-    <co-link href="/test">
+    <co-link href="/dashboard">
       <i class="fa-thin fa-objects-column fa-2xl icon_side_bar" style="color: #ffffff;"></i>
     </co-link>
     <i class="fa-light fa-gamepad-modern fa-2xl icon_side_bar" style="color: #ffffff;"></i>
