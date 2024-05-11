@@ -5,16 +5,21 @@
 }
 
 body{
-    background-image: 
-        linear-gradient(130deg, rgba(29,41,72,1) 10%, rgba(20,29,51,1) 25%, rgba(15,22,40,1) 38%, rgba(5,10,22,1) 100%);
-    /* /* width: 100vw; */
+    /* background-image:
+        linear-gradient(130deg, rgba(29,41,72,1) 10%, rgba(20,29,51,1) 25%, rgba(15,22,40,1) 38%, rgba(5,10,22,1) 100%); */
+    background-image: url("../assets/bg_img.png");
+    background-size:cover;
+    background-position-y: bottom;
+    background-repeat: no-repeat;
+    background-position: center;
+        /* /* width: 100vw; */
     /* height: 100vh;  */
     overflow: hidden;
 }
 
-/* 
+/*
     background: rgb(244,63,233);
-    background: linear-gradient(90deg, rgba(244,63,233,1) 0%, rgba(4,217,139,1) 100%); 
+    background: linear-gradient(90deg, rgba(244,63,233,1) 0%, rgba(4,217,139,1) 100%);
     background-color: #1BA7A0
 */
 
@@ -28,6 +33,7 @@ body{
     border: 1px solid #778FB8;
     width: 100%;
     border-radius: 15px;
+    height: 90vh;
 }
 
 /* .sidebar_wrapper::after {
@@ -65,20 +71,17 @@ body{
 }
 
 .body_wrapper{
-    background-image: url("../assets/bg_img.png");
-    background-size:contain;
-    background-position-y: bottom;
-    background-repeat: no-repeat;
-    background-position: center;
-    padding: 40px 35px;
+
     display: grid;
-    grid-template-columns: .2fr 1fr 1fr;
-    grid-template-rows: .1fr 1fr ;
-    grid-template-areas: 
+    margin-top: 1rem;
+    padding: 30px 45px;
+    grid-template-columns: .01fr 1fr 1fr;
+    grid-template-rows: .01fr 6fr ;
+    grid-template-areas:
         'sidebar nav nav'
         'sidebar main main';
     grid-gap: 1rem;
-    /* height: 100vh; */
+    height: 100vh;
 }
 
 .item{
@@ -115,7 +118,7 @@ body{
     border-radius: 20px;
     margin: 0 180px 0 0;
 }
-/* 
+/*
 .second_content_chat_wrapper{
     width: 100%;
     height: 90vh;
@@ -459,3 +462,19 @@ body{
 .search_chat{
     color: gray;
 }
+
+.container{
+    max-width: 1536px; /* Match the min-width of the 2xl breakpoint */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem; /* Example padding, adjust as needed */
+    padding-right: 1rem;
+}
+
+/*
+
+sm: '2rem',
+        `lg: '4rem',
+        xl: '5rem',
+        '2xl': '6rem',
+        */

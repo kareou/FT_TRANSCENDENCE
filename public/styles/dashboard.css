@@ -20,16 +20,16 @@ h1{
     display: grid;
     grid-template-columns: 2fr 1fr;
     grid-template-rows: 1fr 2fr;
-    grid-template-areas: 
+    grid-template-areas:
         'profile rank'
         'game friends';
     grid-gap: 1rem;
-    /* height: 90vh!important; */
+    height: 85vh;
 }
 
 .game_n_friends,
 .profile_n_rank{
-    
+
     display: flex;
     gap: 50px;
     /* width: 100%;
@@ -175,7 +175,7 @@ h1{
 .achievement img{
     height: 80%;
     width: 80%;
-    border-radius: 1rem;    
+    border-radius: 1rem;
 }
 
 .level-bar{

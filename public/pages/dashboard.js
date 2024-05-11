@@ -10,11 +10,7 @@ this.render();
 
 render() {
 this.innerHTML = /*HTML*/ `
-<div class="body_wrapper">
-  <side-bar class="item-1"></side-bar>
-  <top-bar class="item-2"></top-bar>
-  <div class="dashboard_wrapper item-3">
-
+  <div class="dashboard_wrapper">
     <div class="profile" >
       <div class="profile_img" style="background-image: url('/public/assets/test.jpg');">
         <!-- <img src="/public/assets/test.jpg" class="profile_img" alt="profile"> -->
@@ -63,7 +59,6 @@ this.innerHTML = /*HTML*/ `
       <h1>Friends</h1>
     </div>
   </div>
-</div>
 `;
 }
 }

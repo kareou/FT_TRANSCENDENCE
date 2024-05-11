@@ -4,6 +4,8 @@ import Dashboard from '../pages/dashboard.js';
 import SideBar from '../components/sidebar.js';
 import TopBar from '../components/notification.js';
 import Link from '../components/link.js';
+import {routes} from './routes.js';
+
 
 // window.history.pushState({}, {}, window.location.origin);
 
@@ -29,6 +31,22 @@ import Link from '../components/link.js';
 //         console.log(href);
 //     })
 // });
+
+// const navigateTo = (url) => {
+// 	window.history.pushState({}, '', url);
+// 	router();
+// };
+
+// window.onload = () => {
+// 	document.addEventListener('click', (e) => {
+// 		if (e.target.matches('co-link') || e.target.parentElement.matches('co-link')){
+// 			// e.preventDefault();
+// 			// navigateTo(e.target.href);
+// 			console.log(window.history.state);
+// 		}
+// 	}
+// 	);
+// };
 
 
 // console.log("hello from router.js");

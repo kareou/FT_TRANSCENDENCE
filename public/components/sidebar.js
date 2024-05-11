@@ -1,22 +1,21 @@
 export default class SideBar extends HTMLElement {
-constructor() {
-super();
-}
+  constructor() {
+    super();
+  }
 
-connectedCallback() {
-this.render();
-}
+  connectedCallback() {
+    this.render();
+  }
 
-render() {
-this.innerHTML = /*HTML*/ `
+  render() {
+    this.innerHTML = /*HTML*/ `
 <div class="sidebar_wrapper">
   <div class="logo_wrapper">
     <img src="/public/assets/gamelogo.png" alt="game logo" class="icon_side_bar">
 
   </div>
   <div class="dash_logos_wrapper">
-    <co-link>
-
+    <co-link href="/test">
       <i class="fa-thin fa-objects-column fa-2xl icon_side_bar" style="color: #ffffff;"></i>
     </co-link>
     <i class="fa-light fa-gamepad-modern fa-2xl icon_side_bar" style="color: #ffffff;"></i>
@@ -28,6 +27,6 @@ this.innerHTML = /*HTML*/ `
   </div>
 </div>
 `;
-}
+  }
 }
 customElements.define("side-bar", SideBar);
