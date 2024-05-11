@@ -48,7 +48,7 @@ body {
     cursor: pointer;
 }
 .signin-singup-div{
-    background-image: url(../images/signIn&signUp-template.svg);
+    background-image: url(../images/bg_img.png);
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -59,6 +59,7 @@ body {
     align-items: center;
     height: 100vh;
     overflow: hidden;
+    backdrop-filter: blur(10px);
 }
 
 .container {
@@ -74,7 +75,7 @@ body {
     border-radius: 30px;
     border: solid 1px #b072d29f;
     background-clip:border-box;
-
+    backdrop-filter: blur(15px);
 }
 
 
