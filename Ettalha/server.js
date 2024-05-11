@@ -7,7 +7,7 @@ const port = 3000;
 app.use('/js',express.static('js'))
 app.use('/css',express.static('css'))
 app.use('/images',express.static('images'))
-app.use('Components', express.static('Components'))
+app.use('/Components', express.static('Components'))
 
 app.get('/', (req, res) => {
     res.sendFile(path.resolve(__dirname, "./", "index.html"));
