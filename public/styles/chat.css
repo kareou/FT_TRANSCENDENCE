@@ -125,8 +125,14 @@ body{
     justify-content: space-between;
 } */
 
+@font-face {
+    font-family: "Actor";
+    src: url("../assets/fonts/Actor-Regular.ttf");
+}
+
 .chat_wrapper_{
     height: 85vh;
+    font-family: "Actor";
 }
 /* end chat side-bar style */
 

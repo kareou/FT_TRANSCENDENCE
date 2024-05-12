@@ -8,11 +8,11 @@ export default class Link extends HTMLAnchorElement {
 
     static async navigateTo(url) {
         console.log("navigating to ", url);
-        if (url !== window.location.pathname) 
+        if (url !== window.location.pathname)
             window.history.pushState({}, '', url);
         // window.dispatchEvent(new PopStateEvent('popstate'));
         const route = routes.find(r => r.path === url);
-        if (!route) 
+        if (!route)
             route = routes[0];
         const root = document.getElementById('app');
         try{
@@ -29,7 +29,10 @@ export default class Link extends HTMLAnchorElement {
     connectedCallback() {
         this.addEventListener('click', (e) => {
             e.preventDefault();
+            console.log("clicked");
             const href = this.getAttribute('href');
+            // const text = this.getAttribute('text') || this.innerHTML;
+            // this.innerHTML = text;
             window.history.pushState({}, '', href);
             Link.navigateTo(href);
             // window.dispatchEvent(new PopStateEvent('popstate'));

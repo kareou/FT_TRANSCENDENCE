@@ -12,7 +12,7 @@ export default class Welcome extends HTMLElement {
     this.innerHTML = /*HTML*/ `
         <div class="lets-start-div">
     <h1 class="welcome-text">Welcome To Our <br> Trancendence</h1>
-    <co-link href="/signin" class="lets-start-btn">Let's start</co-link>
+    <a is="co-link" href="/signin" class="lets-start-btn">Let's start</a>
   </div>
         `;
   }

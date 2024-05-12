@@ -8,7 +8,9 @@ export default class TopBar extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = `
+    if (window.location.pathname === "/signin" || window.location.pathname === "/signup" || window.location.pathname === "/")
+      return;
+    this.innerHTML = /*HTML*/ `
         <div class="chat_notification_bar_wrapper">
                 <div class="search_input_wrapper">
                     <input type="text" name="search" id="search_chat" class="search_chat"

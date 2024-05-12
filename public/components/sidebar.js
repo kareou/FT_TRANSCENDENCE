@@ -4,6 +4,8 @@ export default class SideBar extends HTMLElement {
   }
 
   connectedCallback() {
+    if (window.location.pathname === "/signin" || window.location.pathname === "/signup" || window.location.pathname === "/")
+      return;
     this.render();
   }
 
@@ -15,9 +17,9 @@ export default class SideBar extends HTMLElement {
 
   </div>
   <div class="dash_logos_wrapper">
-    <co-link href="/dashboard">
+    <a is="co-link" href="/dashboard">
       <i class="fa-thin fa-objects-column fa-2xl icon_side_bar" style="color: #ffffff;"></i>
-    </co-link>
+    </a>
     <i class="fa-light fa-gamepad-modern fa-2xl icon_side_bar" style="color: #ffffff;"></i>
     <i class="fa-light fa-message-dots fa-2xl icon_side_bar" style="color: #04D98B;"></i>
     <i class="fa-light fa-gear fa-2xl icon_side_bar" style="color: #ffffff;"></i>
