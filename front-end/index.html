@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="public/styles/chat.css" />
+    <link rel="stylesheet" href="public/styles/game.css" />
+    <link rel="stylesheet" href="public/styles/dashboard.css" />
+    <link rel="stylesheet" href="public/styles/all.min.css" />
+    <link rel="stylesheet" href="public/styles/fontawesome.min.css" />
+    <link rel="stylesheet" href="public/styles/duotone.css" />
+    <link rel="stylesheet" href="public/styles/duotone.min.css" />
+    <link rel="stylesheet" href="public/styles/sharp-light.css" />
+    <link rel="stylesheet" href="public/styles/landing_n_sign.css" />
+
+    <title>Document</title>
+  </head>
+  <style>
+    nav > ul {
+      display: flex;
+      text-decoration: none;
+      list-style: none;
+    }
+
+    nav > ul > li {
+      margin-right: 10px;
+    }
+
+    nav > ul > li > a {
+      text-decoration: none;
+      color: black;
+      cursor: pointer;
+    }
+  </style>
+
+  <body>
+    <div class="body_wrapper">
+      <side-bar class="item-1"></side-bar>
+      <top-bar class="item-2"></top-bar>
+      <!-- <chat-page class="item-3"></chat-page> -->
+      <div id="app" class="item-3"></div>
+      <!-- <dashboard-page class="item-3"></dashboard-page> -->
+      <!-- <co-game></co-game> -->
+      <!-- <script src="pages/chat.js" type="module"></script> -->
+    </div>
+    <script src="/public/router/router.js" type="module"></script>
+  </body>
+</html>

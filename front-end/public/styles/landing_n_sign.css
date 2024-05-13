@@ -92,7 +92,7 @@ body {
     height: 100%;
 }
 
-label {
+.sign_in_up>label {
     font-size: 30px;
     color: white;
     font-family: jolly lodger;
@@ -101,7 +101,7 @@ label {
     width: 559px;
 }
 
-input{
+.sign_in_up > input{
     width: 559px;
     height: 60px;
     border: solid 2px #04BF8A;
@@ -213,7 +213,7 @@ p {
         padding: 10px;
     }
 
-    label, input {
+    .sign_in_up>label, .sign_in_up > input {
         width: 90%;
     }
 
@@ -230,11 +230,11 @@ p {
         font-size: 2em;
     }
 
-    label {
+    .sign_in_up>label {
         font-size: 20px;
     }
 
-    input {
+    .sign_in_up > input {
         height: 40px;
         font-size: 16px;
     }
