@@ -2,6 +2,8 @@ import Game from "../pages/game.js";
 import SideBar from "../components/sidebar.js";
 import TopBar from "../components/notification.js";
 import Link from "../components/link.js";
+import Game_Option from "../components/game_option.js";
+import Game_Starter from "../components/game_starter.js";
 
 export const routes = [
   {
@@ -26,6 +28,13 @@ export const routes = [
   },
   {
     path: "/game",
-    component: () => import("../pages/game.js"),
+    component: () => import("../pages/game_page.js"),
   },
+  {
+    path: "/gameplaye",
+    component: () => import("../pages/game.js"),
+  },{
+    path: "/brackets",
+    component: () => import("../components/brackets.js"),
+  }
 ];

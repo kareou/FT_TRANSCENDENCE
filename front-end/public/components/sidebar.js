@@ -4,9 +4,13 @@ export default class SideBar extends HTMLElement {
   }
 
   connectedCallback() {
-    if (window.location.pathname === "/signin" || window.location.pathname === "/signup" || window.location.pathname === "/")
+    if (window.location.pathname === "/signin" || window.location.pathname === "/signup" || window.location.pathname === "/" || window.location.pathname === "/gameplaye")
       return;
     this.render();
+  }
+
+  disconnectedCallback() {
+    console.log("disconnected");
   }
 
   render() {

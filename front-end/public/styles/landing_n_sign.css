@@ -165,7 +165,7 @@ body {
     cursor: pointer;
 }
 
-p {
+.sign_in_up > p {
     color: white;
     font-family: jolly lodger;
     font-size: 20px;
