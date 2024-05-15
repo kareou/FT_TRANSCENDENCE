@@ -15,3 +15,5 @@ yarn-error.log
 # Express
 .env
 .DS_Store
+
+#django

@@ -1,5 +1,5 @@
-import { PlayerClassic, PlayerTest } from "../game_objects/player.js";
-import { Ball } from "../game_objects/ball.js";
+import { PlayerClassic, PlayerTest } from "./game_objects/player.js";
+import { Ball } from "./game_objects/ball.js";
 
 export default class Game extends HTMLElement {
     constructor() {
@@ -79,7 +79,6 @@ export default class Game extends HTMLElement {
         this.#drawPaddles(ctx);
         this.ball.move(this.player1, this.player2);
         if (this.#marked(ctx)){
-            console.log("marked");
             this.ball.resetPosition();
             this.player1.resetPosition();
             this.player2.resetPosition();

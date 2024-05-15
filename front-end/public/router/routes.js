@@ -1,4 +1,3 @@
-import Game from "../pages/game.js";
 import SideBar from "../components/sidebar.js";
 import TopBar from "../components/notification.js";
 import Link from "../components/link.js";
@@ -32,9 +31,10 @@ export const routes = [
   },
   {
     path: "/gameplaye",
-    component: () => import("../pages/game.js"),
-  },{
+    component: () => import("../pages/game/online_game.js"),
+  },
+  {
     path: "/brackets",
     component: () => import("../components/brackets.js"),
-  }
+  },
 ];
