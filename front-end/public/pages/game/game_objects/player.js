@@ -1,9 +1,9 @@
 export class PlayerClassic{
 	constructor(id, ctx){
 		this.id = id;
-		this.x = id === 0 ? 10 : ctx.canvas.width - 60;
-		this.y = ctx.canvas.height / 2 - 50;
+		this.x = id === 0 ? 10 : ctx.canvas.width - 20;
 		this.width = 10;
+		this.y = ctx.canvas.height / 2 - 50;
 		this.height = 100;
 		this.color = "white";
 		this.power = 5;
@@ -36,7 +36,7 @@ export class PlayerClassic{
 	stopPlayer(){
 		this.velocityY = 0;
 	}
-	
+
 	resetPosition(){
 		this.y = this.ctx.canvas.height / 2 - 50;
 	}

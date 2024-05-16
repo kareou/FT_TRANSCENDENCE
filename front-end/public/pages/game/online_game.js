@@ -11,44 +11,69 @@ export default class OnlineGame extends HTMLElement {
     this.role = null;
     this.game_id = null;
     this.game_started = false;
+    this.game_state = {
+      player1: {
+        y: 0,
+        score: 0,
+      },
+      player2: {
+        y: 0,
+        score: 0,
+      },
+      ball: {
+        x: 0,
+        y: 0,
+        dx: 0,
+        dy: 0,
+      },
+    }
   }
 
   connectedCallback() {
-    this.websocket = new WebSocket("ws://localhost:8000/ws/gamematch/game/");
+    this.websocket = new WebSocket("ws://10.11.3.5:8000/ws/gamematch/game/");
     this.render();
-    this.#timeCountUp();
     const canvas = this.querySelector(".board");
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
     const ctx = canvas.getContext("2d");
+    this.player1 = new PlayerClassic(0, ctx);
+    this.player2 = new PlayerTest(1, ctx);
+    this.ball = new Ball(ctx, "beach");
     this.websocket.onmessage = (e) => {
       const data = JSON.parse(e.data);
       if (data.role) {
         this.role = data.role;
         this.game_id = data.game_id;
       }
-      if (data.move) {
-        this.#updatePaddels(data);
+      if (data.state) {
+        this.game_state = data.state;
+        if (this.role !== "player1")
+          this.player1.y = this.game_state.player1.y;
+        if (this.role !== "player2")
+          this.player2.y = this.game_state.player2.y;
+        this.ball.x = this.game_state.ball.x;
+        this.ball.y = this.game_state.ball.y;
+        this.ball.dx = this.game_state.ball.dx;
+        this.ball.dy = this.game_state.ball.dy;
       }
       if (data.message) {
         if (data.message === "Game is starting") {
           this.game_started = true;
+          this.#timeCountUp();
           this.#update(ctx);
         }
       }
     };
-    this.player1 = new PlayerClassic(0, ctx);
-    this.player2 = new PlayerTest(1, ctx);
-    this.ball = new Ball(ctx, "beach");
+    this.game_state.player1.y = this.player1.y;
+    this.game_state.player2.y = this.player2.y;
     this.#drawBoard(ctx);
     this.#drawPaddles(ctx);
     this.ball.draw();
     document.addEventListener("keydown", this.#movePaddels.bind(this));
     document.addEventListener("keyup", (e) => {
       if (e.code == "KeyW" || e.code == "KeyS") {
-        if (this.player1) this.player1.stopPlayer();
+        if (this.role === "player1") this.player1.stopPlayer();
         else this.player2.stopPlayer();
-        this.websocket.send(JSON.stringify({ move: "stop" }));
       }
     });
   }
@@ -61,36 +86,28 @@ export default class OnlineGame extends HTMLElement {
   render() {
     this.innerHTML = /*html*/ `
     <div class="game_container">
-    <div class="game">
-        <div class="player_1">
-            <div class="p_info">
-                <img id="player_img" src="/public/assets/bg_img.png" alt="">
-                <h1>player_1</h1>
+            <div class="game">
+                <div class="players">
+
+                <div class="p_info">
+                    <img id="player_img" src="/public/assets/bg_img.png" alt="">
+                    <h1>player_1</h1>
+                    <h1 id="p1_score">0</h1>
+                </div>
+                <div class="slash">
+                    <h1 class ="timer">
+                    <label id="minutes">00</label>:<label id="seconds">00</label>
+                    </h1>
+                </div>
+                    <div class="p_info">
+                        <h1 id="p2_score">0</h1>
+                        <h1>player_2</h1>
+                        <img id="player_img" src="/public/assets/bg_img.png" alt="">
+                    </div>
+                </div>
+                <canvas class="board"></canvas>
             </div>
-            <h1 id="p1_score">0</h1>
         </div>
-        <canvas class="board"></canvas>
-        <div class="player_2" >
-            <div class="p_info">
-                <img id="player_img" src="/public/assets/bg_img.png" alt="">
-                <h1>player_2</h1>
-            </div>
-            <h1 id="p2_score">0</h1>
-        </div>
-    </div>
-    <div class="chat_tab">
-        <div class="stats">
-            <h1>
-                Time: <label id="minutes">00</label>:<label id="seconds">00</label> 
-            </h1>
-        </div>
-        <div class="chating_area"></div>
-        <div class="message_input">
-            <input type="text" placeholder="your message">
-            <i class="fa-solid fa-paper-plane-top"></i>
-        </div>
-    </div>
-</div>
     `;
   }
 
@@ -105,11 +122,13 @@ export default class OnlineGame extends HTMLElement {
       this.player1.resetPosition();
       this.player2.resetPosition();
     }
+    this.#update_game_state();
+    this.ball.draw();
   }
 
   #drawPaddles(ctx) {
-    if (this.player1) this.player1.draw();
-    if (this.player2) this.player2.draw();
+    this.player1.draw();
+    this.player2.draw();
   }
 
   #drawBoard(ctx) {
@@ -121,27 +140,20 @@ export default class OnlineGame extends HTMLElement {
     if (e.code == "KeyW") {
       if (this.role === "player1") this.player1.movePlayer("up");
       else this.player2.movePlayer("up");
-      this.websocket.send(JSON.stringify({ move: "up" }));
     } else if (e.code == "KeyS") {
       if (this.role === "player1") this.player1.movePlayer("down");
       else this.player2.movePlayer("down");
-      this.websocket.send(JSON.stringify({ move: "down" }));
     }
   }
 
-  #updatePaddels(data) {
-    if (data.sender !== this.game_id) {
-      if (data.move === "up") {
-        if (this.role === "player1") this.player2.movePlayer("up");
-        else this.player1.movePlayer("up");
-      } else if (data.move === "down") {
-        if (this.role === "player1") this.player2.movePlayer("down");
-        else this.player1.movePlayer("down");
-      } else if (data.move === "stop") {
-        if (this.role === "player1") this.player2.stopPlayer();
-        else this.player1.stopPlayer();
-      }
-    }
+  #update_game_state() {
+    this.game_state.player1.y = this.player1.y;
+    this.game_state.player2.y = this.player2.y;
+    this.game_state.ball.x = this.ball.x;
+    this.game_state.ball.y = this.ball.y;
+    this.game_state.ball.dx = this.ball.dx;
+    this.game_state.ball.dy = this.ball.dy;
+    this.websocket.send(JSON.stringify({ state: this.game_state, game_id: this.game_id }));
   }
 
   #marked(ctx) {

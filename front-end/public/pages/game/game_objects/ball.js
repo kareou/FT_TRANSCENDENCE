@@ -27,7 +27,6 @@ export class Ball {
     this.#detectPlayerCollision(player1, player2);
     this.x += this.dx;
     this.y += this.dy;
-    this.draw();
   }
   #hitWall() {
     if (this.y + this.size > this.ctx.canvas.height || this.y - this.size < 0) {
