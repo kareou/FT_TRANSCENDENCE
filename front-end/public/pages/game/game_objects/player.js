@@ -1,7 +1,7 @@
 export class PlayerClassic{
-	constructor(id, ctx){
+	constructor(id, ctx,game_theme){
 		this.id = id;
-		this.x = id === 0 ? 10 : ctx.canvas.width - 20;
+		this.x = id === 0 ? 40 : ctx.canvas.width - 50;
 		this.width = 10;
 		this.y = ctx.canvas.height / 2 - 50;
 		this.height = 100;
@@ -11,6 +11,8 @@ export class PlayerClassic{
 		this.velocityY = 0;
 		this.ctx = ctx;
 		this.score = 0;
+		this.game_theme = game_theme;
+		console.log(this.game_theme);
 	}
 
 	draw(){
@@ -19,8 +21,9 @@ export class PlayerClassic{
 		if(new_y > 0 && new_y < this.ctx.canvas.height - this.height){
 			this.y = new_y;
 		}
+		let radius = (this.game_theme === "classic" ? 0 : 5);
 		this.ctx.beginPath();
-        this.ctx.roundRect(this.x, this.y, this.width, this.height,5);
+        this.ctx.roundRect(this.x, this.y, this.width, this.height, radius);
         this.ctx.fill();
         this.ctx.closePath();
 	}
@@ -44,25 +47,20 @@ export class PlayerClassic{
 
 
 export class PlayerTest extends PlayerClassic{
-	constructor(id, ctx){
-		super(id, ctx);
+	constructor(id, ctx,game_theme){
+		super(id, ctx,game_theme);
 		this.color = "lightpink";
-		this.power = 1;
+		this.power = 4;
+		this.speed = 12;
+		
 	}
 }
 
 export class PlayerTest2 extends PlayerClassic{
-	constructor(id, ctx){
-		super(id, ctx);
+	constructor(id, ctx,game_theme){
+		super(id, ctx,game_theme);
 		this.color = "red";
-		this.power = 10;
-	}
-}
-
-export class PlayerTest3 extends PlayerClassic{
-	constructor(id, ctx){
-		super(id, ctx);
-		this.color = "green";
-		this.power = 15;
+		this.power = 7;
+		this.speed = 8;
 	}
 }

@@ -1,8 +1,5 @@
 export class Ball {
-  theme = {
-    "8ball": "black",
-    beach: "white",
-  };
+
   constructor(ctx, theme) {
     this.x = ctx.canvas.width / 2;
     this.y = ctx.canvas.height / 2;
@@ -11,15 +8,21 @@ export class Ball {
     this.dx = 4;
     this.dy = -4;
     this.ctx = ctx;
-    this.color = this.theme[theme] || "black";
+    this.theme = theme;
+    this.color = this.theme === "sky"? "#FDFD96":"white";
   }
 
   draw() {
     this.ctx.fillStyle = this.color;
-    this.ctx.beginPath();
-    this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    this.ctx.closePath();
-    this.ctx.fill();
+    if (this.theme === "classic") {
+      this.ctx.fillRect(this.x - this.size, this.y - this.size, this.size *2, this.size * 2);
+    }else{
+
+      this.ctx.beginPath();
+      this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      this.ctx.closePath();
+      this.ctx.fill();
+    }
   }
 
   move(player1, player2) {

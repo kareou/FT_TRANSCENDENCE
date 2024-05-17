@@ -16,13 +16,6 @@ this.innerHTML = `
         <button id="tournament">Tournament (coming soon...)</button>
     </div>
     <div class="game_params">
-        <div class="game_options">
-            <game-option type="Time" incId="time_increment" decId="time_decrement" text="set game length"></game-option>
-            <game-option type="Score" incId="score_increment" decId="score_decrement" text="max to score to win"></game-option>
-        </div>
-        <div class="players_choice">
-            
-        </div>
     </div>
     <game-starter></game-starter>
 </div>

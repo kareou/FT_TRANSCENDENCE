@@ -30,8 +30,8 @@ export const routes = [
     component: () => import("../pages/game_page.js"),
   },
   {
-    path: "/gameplaye",
-    component: () => import("../pages/game/online_game.js"),
+    path: "/gameplay",
+    component: () => import("../pages/game/local_game.js"),
   },
   {
     path: "/brackets",
