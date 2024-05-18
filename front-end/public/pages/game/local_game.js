@@ -43,7 +43,7 @@ export default class Game extends HTMLElement {
         <div class="game_container">
                 <div class="game">
                     <div class="players">
-    
+
                     <div class="p_info">
                         <img id="player_img" src="/public/assets/bg_img.png" alt="">
                         <h1>player_1</h1>

@@ -8,7 +8,6 @@
 .game_option_content{
     display: flex;
     justify-content: space-around;
-    width: ;
 }
 
 .game_option_content button{
@@ -24,3 +23,37 @@
     font-size: 1.5em;
 }
 
+.paddle_option{
+    display: flex;
+    justify-content: space-around;
+    gap: 2rem;
+    margin-top: 20px;
+
+}
+
+.paddle_type{
+    width: 7rem;
+    height: 7rem;
+    border-radius: 1rem;
+    background-color: rgba(127, 255, 212, 0.05);
+    backdrop-filter: blur(1rem);
+    gap: 1rem;
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    border-color: rgba(240, 248, 255, 0.251);
+}
+
+.paddle{
+    width: .7em;
+    height: 5em;
+    align-self: center;
+}
+
+.paddle_type.activate{
+    background: red;
+}

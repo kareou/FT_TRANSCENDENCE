@@ -12,7 +12,6 @@ export class PlayerClassic{
 		this.ctx = ctx;
 		this.score = 0;
 		this.game_theme = game_theme;
-		console.log(this.game_theme);
 	}
 
 	draw(){
@@ -23,6 +22,8 @@ export class PlayerClassic{
 		}
 		let radius = (this.game_theme === "classic" ? 0 : 5);
 		this.ctx.beginPath();
+		// this.ctx.shadowBlur = 20;
+		// this.ctx.shadowColor = "white";
         this.ctx.roundRect(this.x, this.y, this.width, this.height, radius);
         this.ctx.fill();
         this.ctx.closePath();
@@ -52,7 +53,7 @@ export class PlayerTest extends PlayerClassic{
 		this.color = "lightpink";
 		this.power = 4;
 		this.speed = 12;
-		
+
 	}
 }
 

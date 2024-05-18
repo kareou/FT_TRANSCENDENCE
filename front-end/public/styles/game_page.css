@@ -1,46 +1,79 @@
+@import url("./dashboard.css");
+
 .game_page{
     /* background: rgba(27, 167, 160, 0.05); */
     border-radius: 1rem;
     backdrop-filter: blur(1rem);
-    height: 100%;
+    height: 85vh;
     width: 100%;
     border: 1px solid #778FB8;
-}
-
-.game_page .modes{
-    display: flex;
+    display: grid;
     justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
 }
 
-.game_page .modes > button{
-    background: #778FB8;
+.game_page h1{
+    font-family: "Actor";
+}
+
+.players_info{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 20px;
+    color: white;
+}
+
+.player1, .player2{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.player1 input, .player2 input{
+    width: 100%;
+    height: 3rem;
+    border-radius: .5rem;
+}
+
+.game_theme button{
     border: none;
     color: white;
-    width: 10rem;
-    height: 10rem;
-    border-radius: 1rem;
-    margin: 1rem;
+    width: 20rem;
+    height: 12rem;
+    border-radius: .5rem;
     font-size: 1.5em;
     cursor: pointer;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
-#normal{
-    background: linear-gradient(220deg, rgba(244, 63, 232, 0) 0%, rgba(244, 63, 232, 0.2) 100%);
-    backdrop-filter: blur(1rem);
-    border: 1px solid #778fb86d;
-    backdrop-filter: shadow(5rem);
+.game_theme{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
 }
 
-#tournament{
-    background: linear-gradient(220deg, rgba(4, 217, 139, 0) 0%, rgba(4, 217, 139, 0.2) 100%);
-    backdrop-filter: blur(1rem);
-    border: 1px solid #778fb86d;
-    backdrop-filter: shadow(5rem);
+.game_theme h1{
+    font-size: x-large;
+    font-weight: 100;
+
 }
 
-.game_page  a{
-    text-decoration: none;
-    color: white;
+#classic{
+    background-image: url("../assets/game_theme/classic.png");
+}
+
+#mod{
+    background-image: url("../assets/game_theme/mod.png");
+}
+
+#sky{
+    background-image: url("../assets/game_theme/sky.png");
+}
+
+.themes{
+    display: flex;
+    gap: 2rem;
 }
