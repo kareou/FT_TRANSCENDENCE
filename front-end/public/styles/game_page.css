@@ -77,3 +77,7 @@
     display: flex;
     gap: 2rem;
 }
+
+.selected_paddle{
+    border: 2px solid #1358ce!important;
+}

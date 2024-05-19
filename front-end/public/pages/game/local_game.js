@@ -31,6 +31,15 @@ export default class Game extends HTMLElement {
       else if (e.code == "ArrowUp" || e.code == "ArrowDown")
         this.player2.stopPlayer();
     });
+
+    // dynamic data part of the game
+      let data = localStorage.getItem("state");
+    
+      data = JSON.parse(data);
+    
+      console.log(data);
+    // end dynamic data part
+
     // this.#update(ctx);
   }
 
