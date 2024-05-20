@@ -1,4 +1,4 @@
-export class PlayerClassic{
+export class ClassicPaddle{
 	constructor(id, ctx,game_theme){
 		this.id = id;
 		this.x = id === 0 ? 40 : ctx.canvas.width - 50;
@@ -47,7 +47,7 @@ export class PlayerClassic{
 }
 
 
-export class PlayerTest extends PlayerClassic{
+export class BlossomPaddle extends ClassicPaddle{
 	constructor(id, ctx,game_theme){
 		super(id, ctx,game_theme);
 		this.color = "lightpink";
@@ -57,11 +57,27 @@ export class PlayerTest extends PlayerClassic{
 	}
 }
 
-export class PlayerTest2 extends PlayerClassic{
+export class LightSaber extends ClassicPaddle{
 	constructor(id, ctx,game_theme){
 		super(id, ctx,game_theme);
 		this.color = "red";
 		this.power = 7;
 		this.speed = 8;
+	}
+
+	draw(){
+		this.ctx.fillStyle = this.color;
+		let new_y = this.y + this.velocityY;
+		if(new_y > 0 && new_y < this.ctx.canvas.height - this.height){
+			this.y = new_y;
+		}
+		let radius = (this.game_theme === "classic" ? 0 : 5);
+		this.ctx.beginPath();
+		this.ctx.shadowBlur = 20;
+		this.ctx.shadowColor = this.color;
+        this.ctx.roundRect(this.x, this.y, this.width, this.height, radius);
+        this.ctx.fill();
+        this.ctx.closePath();
+		this.ctx.shadowBlur = 0;
 	}
 }

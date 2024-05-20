@@ -1,6 +1,15 @@
-import { PlayerClassic, PlayerTest } from "./game_objects/player.js";
+import { ClassicPaddle, BlossomPaddle, LightSaber} from "./game_objects/player.js";
 import { Ball } from "./game_objects/ball.js";
 import { Board } from "./game_objects/board.js";
+
+const getPlayerObject = (paddle_name, player_num,ctx, theme ) => {
+  if (paddle_name === "classic")
+    return new ClassicPaddle(player_num,ctx,theme);
+  else if (paddle_name === "blossom")
+    return new BlossomPaddle(player_num,ctx,theme);
+  else if (paddle_name === "lightsaber")
+    return new LightSaber(player_num,ctx,theme);
+}
 
 export default class Game extends HTMLElement {
   constructor() {
@@ -9,17 +18,23 @@ export default class Game extends HTMLElement {
     this.player2;
     this.ball;
     this.board;
-    this.theme = "mod";
+    this.theme;
+    this.data;
   }
   connectedCallback() {
+    let data = localStorage.getItem("state");
+    data = JSON.parse(data);
+    console.log(data);
+    this.data = data[0]
+    this.theme = this.data['table_theme'];
     this.render();
     this.#timeCountUp();
     const canvas = this.querySelector(".board");
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
     const ctx = canvas.getContext("2d");
-    this.player1 = new PlayerClassic(0, ctx, this.theme);
-    this.player2 = new PlayerClassic(1, ctx, this.theme);
+    this.player1 = getPlayerObject(this.data.player1.paddle_theme, 0, ctx, this.theme);
+    this.player2 = getPlayerObject(this.data.player2.paddle_theme, 1, ctx, this.theme);
     this.ball = new Ball(ctx, this.theme);
     this.board = new Board(ctx, this.theme);
     this.board.draw();
@@ -31,14 +46,6 @@ export default class Game extends HTMLElement {
       else if (e.code == "ArrowUp" || e.code == "ArrowDown")
         this.player2.stopPlayer();
     });
-
-    // dynamic data part of the game
-      let data = localStorage.getItem("state");
-    
-      data = JSON.parse(data);
-    
-      console.log(data);
-    // end dynamic data part
 
     // this.#update(ctx);
   }
@@ -55,7 +62,7 @@ export default class Game extends HTMLElement {
 
                     <div class="p_info">
                         <img id="player_img" src="/public/assets/bg_img.png" alt="">
-                        <h1>player_1</h1>
+                        <h1>${this.data.player1.name}</h1>
                         <h1 id="p1_score">0</h1>
                     </div>
                     <div class="slash">
@@ -65,7 +72,7 @@ export default class Game extends HTMLElement {
                     </div>
                         <div class="p_info">
                             <h1 id="p2_score">0</h1>
-                            <h1>player_2</h1>
+                            <h1>${this.data.player2.name}</h1>
                             <img id="player_img" src="/public/assets/bg_img.png" alt="">
                         </div>
                     </div>

@@ -9,6 +9,7 @@
     border: 1px solid #778FB8;
     display: grid;
     justify-content: center;
+    align-items: center;
 }
 
 .game_page h1{
@@ -27,12 +28,30 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 1rem;
+    font-size: 1em;
 }
 
-.player1 input, .player2 input{
+#player_1_input,#player_2_input{
     width: 100%;
     height: 3rem;
     border-radius: .5rem;
+    background: rgba(119, 143, 184, 0.2);
+    padding: .5rem;
+    font-size: 1em;
+    border: 1px solid #778FB8;
+    backdrop-filter: blur(1rem);
+    color: white;
+}
+
+#roles{
+    font-size: 1.5em;
+    text-decoration: underline;
+    font-weight: 100;
+}
+
+#player_1_input,#player_2_input:focus{
+    outline: none;
 }
 
 .game_theme button{
@@ -80,4 +99,32 @@
 
 .selected_paddle{
     border: 2px solid #1358ce!important;
+}
+
+.game_start{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.game_page a{
+    text-decoration: none;
+    color: black;
+    background-color: #04BF8A;
+    width: 15rem;
+    height: 5rem;
+    font-size: 2em;
+    text-align: center;
+    padding: 1rem;
+    border-radius: .5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.start_game{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
