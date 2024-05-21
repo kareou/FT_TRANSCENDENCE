@@ -1,7 +1,9 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+import random
 
 class GameConsumer(AsyncWebsocketConsumer):
+
     # Static variable to keep track of the number of connections
     default_start_state = {
         "player1": {
@@ -94,3 +96,68 @@ class GameConsumer(AsyncWebsocketConsumer):
                 else:
                     state1[key] = state2[key]
         return state1
+
+
+class LobbyConsumer(AsyncWebsocketConsumer):
+
+    game_data = {}
+    lobby_count = {}
+    def merge_dict(self,dict1, dict2):
+        res = {**dict1, **dict2}
+        return res
+    async def connect(self):
+        self.user = self.scope["user"]
+        self.lobby_id = self.scope["url_route"]["kwargs"]["lobby_id"]
+        if self.lobby_id in LobbyConsumer.lobby_count and LobbyConsumer.lobby_count[self.lobby_id] >= 2:
+            return
+
+        if self.lobby_id in LobbyConsumer.lobby_count:
+            LobbyConsumer.lobby_count[self.lobby_id] += 1
+        else:
+            LobbyConsumer.lobby_count[self.lobby_id] = 1
+
+        role = "player1" if LobbyConsumer.lobby_count[self.lobby_id] == 1 else "player2"
+        await self.channel_layer.group_add(
+            self.lobby_id,
+            self.channel_name
+        )
+        await self.accept()
+        await self.send(text_data=json.dumps({"role": role}))
+
+    async def disconnect(self, close_code):
+        if self.lobby_id in LobbyConsumer.lobby_count:
+            LobbyConsumer.lobby_count[self.lobby_id] -= 1
+
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        if "game_data" in text_data_json:
+            game_data = text_data_json["game_data"]
+            if self.lobby_id in LobbyConsumer.game_data:
+                LobbyConsumer.game_data[self.lobby_id] = self.merge_dict(LobbyConsumer.game_data[self.lobby_id], game_data)
+            else:
+                LobbyConsumer.game_data[self.lobby_id] = game_data
+            print(LobbyConsumer.game_data[self.lobby_id])
+            if len(LobbyConsumer.game_data[self.lobby_id]) == 2:
+                await self.channel_layer.group_send(
+                    self.lobby_id,
+                    {
+                        "type": "lobby_message",
+                        "game_data": game_data
+                    }
+                )
+        elif "start_game" in text_data_json:
+            await self.channel_layer.group_send(
+                self.lobby_id,
+                {
+                    "type": "start_game",
+                    "game_data": text_data_json
+                }
+            )
+
+    async def lobby_message(self, event):
+        game_data = event["game_data"]
+        await self.send(text_data=json.dumps({"game_data": game_data}))
+
+    async def start_game(self, event):
+        game_session = random.randint(1000, 9999)
+        await self.send(text_data=json.dumps({"start_game": game_session}))

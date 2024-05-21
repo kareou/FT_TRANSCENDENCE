@@ -11,7 +11,21 @@ export default class Link extends HTMLAnchorElement {
         if (url !== window.location.pathname)
             window.history.pushState({}, '', url);
         // window.dispatchEvent(new PopStateEvent('popstate'));
-        const route = routes.find(r => r.path === url);
+        // var newurl = url.split('?')[0];
+        let route =null;
+        for (let i = 0; i < routes.length; i++) {
+            const pos = url.indexOf('/?');
+            if (pos === -1) {
+                pos = url.length;
+            }
+            const path = url.slice(0, pos);
+            console.log(path);
+            if (routes[i].path === url) {
+                route = routes[i];
+                break;
+            }
+        }
+        console.log(route);
         if (!route)
             route = routes[0];
         const root = document.getElementById('app');

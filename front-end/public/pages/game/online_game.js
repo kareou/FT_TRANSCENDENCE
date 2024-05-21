@@ -30,7 +30,10 @@ export default class OnlineGame extends HTMLElement {
   }
 
   connectedCallback() {
-    this.websocket = new WebSocket("ws://10.11.3.3:8000/ws/gamematch/game/");
+    console.log("connected");
+    const urlParams = new URLSearchParams(window.location.search);
+    const gameid = urlParams.get("game_id");
+    this.websocket = new WebSocket(`ws://10.11.2.2:8000/ws/gamematch/${gameid}`);
     this.render();
     const canvas = this.querySelector(".board");
     canvas.width = canvas.clientWidth;
