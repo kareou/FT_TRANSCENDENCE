@@ -9,7 +9,7 @@ export default class OnlineGamePage extends HTMLElement {
 	}
 
 	connectedCallback() {
-		this.websocket = new WebSocket("ws://10.11.2.2:8080/ws/lobby/lobby/");
+		this.websocket = new WebSocket("ws://172.20.206.113:8000/ws/lobby/lobby/");
 		this.websocket.onmessage = function (e) {
 			const message = JSON.parse(e.data);
 			console.log(message);

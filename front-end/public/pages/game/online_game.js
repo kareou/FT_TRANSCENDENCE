@@ -1,4 +1,4 @@
-import { PlayerClassic, PlayerTest } from "./game_objects/player.js";
+import { ClassicPaddle } from "./game_objects/player.js";
 import { Ball } from "./game_objects/ball.js";
 
 export default class OnlineGame extends HTMLElement {
@@ -26,22 +26,24 @@ export default class OnlineGame extends HTMLElement {
         dx: 0,
         dy: 0,
       },
-    }
+    };
   }
 
   connectedCallback() {
     console.log("connected");
     const urlParams = new URLSearchParams(window.location.search);
     const gameid = urlParams.get("game_id");
-    this.websocket = new WebSocket(`ws://10.11.2.2:8000/ws/gamematch/${gameid}`);
+    this.websocket = new WebSocket(
+      `ws://172.20.206.113:8000/ws/gamematch/${gameid}/`
+    );
     this.render();
     const canvas = this.querySelector(".board");
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
     const ctx = canvas.getContext("2d");
-    this.player1 = new PlayerClassic(0, ctx);
-    this.player2 = new PlayerTest(1, ctx);
-    this.ball = new Ball(ctx, "beach");
+    this.player1 = new ClassicPaddle(0, ctx, "mod");
+    this.player2 = new ClassicPaddle(1, ctx, "mod");
+    this.ball = new Ball(ctx, "sky");
     this.websocket.onmessage = (e) => {
       const data = JSON.parse(e.data);
       if (data.role) {
@@ -50,10 +52,8 @@ export default class OnlineGame extends HTMLElement {
       }
       if (data.state) {
         this.game_state = data.state;
-        if (this.role !== "player1")
-          this.player1.y = this.game_state.player1.y;
-        if (this.role !== "player2")
-          this.player2.y = this.game_state.player2.y;
+        if (this.role !== "player1") this.player1.y = this.game_state.player1.y;
+        if (this.role !== "player2") this.player2.y = this.game_state.player2.y;
         this.ball.x = this.game_state.ball.x;
         this.ball.y = this.game_state.ball.y;
         this.ball.dx = this.game_state.ball.dx;
@@ -156,7 +156,9 @@ export default class OnlineGame extends HTMLElement {
     this.game_state.ball.y = this.ball.y;
     this.game_state.ball.dx = this.ball.dx;
     this.game_state.ball.dy = this.ball.dy;
-    this.websocket.send(JSON.stringify({ state: this.game_state, game_id: this.game_id }));
+    this.websocket.send(
+      JSON.stringify({ state: this.game_state, game_id: this.game_id })
+    );
   }
 
   #marked(ctx) {

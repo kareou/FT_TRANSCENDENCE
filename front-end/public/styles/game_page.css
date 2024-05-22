@@ -56,7 +56,6 @@
 
 .game_theme button{
     border: none;
-    color: white;
     width: 20rem;
     height: 12rem;
     border-radius: .5rem;
@@ -94,11 +93,14 @@
 
 .themes{
     display: flex;
+    align-items: center;
     gap: 2rem;
 }
 
-.selected_paddle{
-    border: 2px solid #1358ce!important;
+.selected_theme{
+    /* width: 23rem!important;
+    height: 15rem!important; */
+    border: 1px solid #017ba4!important;
 }
 
 .game_start{
@@ -106,8 +108,7 @@
     justify-content: center;
     align-items: center;
 }
-
-.game_page a{
+#start_ev{
     text-decoration: none;
     color: black;
     background-color: #04BF8A;
@@ -120,6 +121,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 1px solid #778FB8;
+    font-family: "Actor";
+    font-weight: 100;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+#start_ev:disabled{
+    font-family: "Actor";
+    font-weight: 100;
+    background-color: #037655;
+    border: none;
+    color: white;
+    cursor: not-allowed;
+}
+
+#start_ev:enabled:hover{
+    box-shadow: 0 5px 20px rgba(255, 255, 255, 0.5);
+    background-color: #04BF8A;
+    color: white;
 }
 
 .start_game{
@@ -128,3 +149,49 @@
     align-items: center;
     width: 100%;
 }
+
+.ready_button{
+    width: 8rem;
+    height: 2.5rem;
+    font-size: 1.5em;
+    border-radius: .5rem;
+    font-family: "Actor";
+    border: none;
+    cursor: pointer;
+    
+}
+
+#p1_ready{
+    background-color: #00BFFF;
+    box-shadow: 5px 5px 0px #017ba4;
+    color: white;
+    transition: all 0.3s ease-in-out;
+}
+
+#p2_ready{
+    background-color: #FFA500;
+    box-shadow: 5px 5px 0px #976201;
+    color: white;
+    transition: all 0.3s ease-in-out;
+}
+
+#p1_ready:hover{
+    background-color: #017ba4;
+    box-shadow: none;
+}
+
+#p2_ready:hover{
+    background-color: #976201;
+    box-shadow: none;
+}
+
+.active#p1_ready{
+    background-color: #017ba4;
+    box-shadow: none;
+}
+
+.active#p2_ready{
+    background-color: #976201;
+    box-shadow: none;
+}
+

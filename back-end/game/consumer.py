@@ -146,11 +146,12 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                     }
                 )
         elif "start_game" in text_data_json:
+            game_session = random.randint(1000, 9999)
             await self.channel_layer.group_send(
                 self.lobby_id,
                 {
                     "type": "start_game",
-                    "game_data": text_data_json
+                    "game_data": game_session
                 }
             )
 
@@ -159,5 +160,5 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"game_data": game_data}))
 
     async def start_game(self, event):
-        game_session = random.randint(1000, 9999)
+        game_session = event["game_data"]
         await self.send(text_data=json.dumps({"start_game": game_session}))
