@@ -158,7 +158,7 @@
     font-family: "Actor";
     border: none;
     cursor: pointer;
-    
+
 }
 
 #p1_ready{
@@ -195,3 +195,27 @@
     box-shadow: none;
 }
 
+.shake#player_1_input{
+    animation: shake 0.5s ease-in-out;
+}
+.shake#player_2_input{
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake{
+    0%{
+        transform: translateX(0);
+    }
+    25%{
+        transform: translateX(1rem);
+    }
+    50%{
+        transform: translateX(-1rem);
+    }
+    75%{
+        transform: translateX(1rem);
+    }
+    100%{
+        transform: translateX(0);
+    }
+}

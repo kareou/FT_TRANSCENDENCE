@@ -34,7 +34,7 @@ export default class OnlineGame extends HTMLElement {
     const urlParams = new URLSearchParams(window.location.search);
     const gameid = urlParams.get("game_id");
     this.websocket = new WebSocket(
-      `ws://172.20.206.113:8000/ws/gamematch/${gameid}/`
+      `ws://10.11.2.2:8000/ws/gamematch/${gameid}/`
     );
     this.render();
     const canvas = this.querySelector(".board");
@@ -88,30 +88,29 @@ export default class OnlineGame extends HTMLElement {
 
   render() {
     this.innerHTML = /*html*/ `
-    <div class="game_container">
-            <div class="game">
-                <div class="players">
-
-                <div class="p_info">
-                    <img id="player_img" src="/public/assets/bg_img.png" alt="">
-                    <h1>player_1</h1>
-                    <h1 id="p1_score">0</h1>
-                </div>
-                <div class="slash">
-                    <h1 class ="timer">
-                    <label id="minutes">00</label>:<label id="seconds">00</label>
-                    </h1>
-                </div>
-                    <div class="p_info">
-                        <h1 id="p2_score">0</h1>
-                        <h1>player_2</h1>
-                        <img id="player_img" src="/public/assets/bg_img.png" alt="">
-                    </div>
-                </div>
-                <canvas class="board"></canvas>
-            </div>
-        </div>
-    `;
+<div class="game_container">
+  <div class="game">
+    <div class="players">
+      <div class="p_info">
+        <img id="player_img" src="/public/assets/bg_img.png" alt="">
+        <h1>player_1</h1>
+        <h1 id="p1_score">0</h1>
+      </div>
+      <div class="slash">
+        <h1 class="timer">
+          <label id="minutes">00</label>:<label id="seconds">00</label>
+        </h1>
+      </div>
+      <div class="p_info">
+        <h1 id="p2_score">0</h1>
+        <h1>player_2</h1>
+        <img id="player_img" src="/public/assets/bg_img.png" alt="">
+      </div>
+    </div>
+    <canvas class="board"></canvas>
+  </div>
+</div>
+`;
   }
 
   #update(ctx) {
@@ -164,9 +163,9 @@ export default class OnlineGame extends HTMLElement {
   #marked(ctx) {
     if (this.ball.x - this.ball.size < 0) {
       this.player2.score++;
-      document.getElementById("p2_score").innerText = this.player2.score;
-      return true;
-    } else if (this.ball.x + this.ball.size > ctx.canvas.width) {
+      document.getElementById("p2_score").innerText = this.player2.score; return true;
+    } else if (this.ball.x +
+      this.ball.size > ctx.canvas.width) {
       this.player1.score++;
       document.getElementById("p1_score").innerText = this.player1.score;
       return true;
@@ -185,10 +184,8 @@ export default class OnlineGame extends HTMLElement {
         minutes++;
         seconds = 0;
       }
-      min.innerText = minutes < 10 ? "0" + minutes : minutes;
-      sec.innerText = seconds < 10 ? "0" + seconds : seconds;
-    }, 1000);
+      min.innerText = minutes < 10 ? "0" + minutes : minutes; sec.innerText = seconds < 10 ? "0" + seconds : seconds;
+    },
+      1000);
   }
-}
-
-customElements.define("online-game", OnlineGame);
+} customElements.define("online-game", OnlineGame);

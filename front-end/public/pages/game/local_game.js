@@ -47,7 +47,7 @@ export default class Game extends HTMLElement {
         this.player2.stopPlayer();
     });
 
-    // this.#update(ctx);
+    this.#update(ctx);
   }
 
   disconnectedCallback() {

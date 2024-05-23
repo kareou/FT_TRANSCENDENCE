@@ -13,7 +13,6 @@ export default class Link extends HTMLAnchorElement {
     // var newurl = url.split('?')[0];
     let route = null;
     for (let i = 0; i < routes.length; i++) {
-      console.log("looping");
       let pos = url.indexOf("/?");
       if (pos === -1) {
         pos = url.length;
@@ -25,7 +24,6 @@ export default class Link extends HTMLAnchorElement {
         break;
       }
     }
-    console.log("here the routes ", route);
     if (!route) route = routes[0];
     const root = document.getElementById("app");
     try {

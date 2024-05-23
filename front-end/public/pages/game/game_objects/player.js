@@ -6,7 +6,7 @@ export class ClassicPaddle{
 		this.y = ctx.canvas.height / 2 - 50;
 		this.height = 100;
 		this.color = "white";
-		this.power = 5;
+		this.power = 2;
 		this.speed = 10;
 		this.velocityY = 0;
 		this.ctx = ctx;
