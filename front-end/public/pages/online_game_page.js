@@ -45,7 +45,7 @@ export default class OnlineGamePage extends HTMLElement {
 					state[0].player2.paddle_theme = message.game_data.player2.paddle_theme;
 				}
 				localStorage.setItem("state", JSON.stringify(state));
-				this.render();
+				// this.render();
 			}
 			if (message.start_game) {
 				let count_down = 3;
@@ -53,12 +53,13 @@ export default class OnlineGamePage extends HTMLElement {
 				document.querySelector("#p1_ready").setAttribute("disabled", true);
 				document.querySelector("#p2_ready").setAttribute("disabled", true);
 				start_ev.setAttribute("disabled", true);
+				start_ev.innerText = `Starting in ${count_down}`;
 				setInterval(() => {
 					count_down -= 1;
-					start_ev.innerText = `Starting in ${count_down}`;
-					if (count === -1) {
+					if (count_down === -1) {
 						Link.navigateTo("/gameplay/?game_id=" + message.start_game);
 					}
+					start_ev.innerText = `Starting in ${count_down}`;
 				}, 1000);
 			}
 		}.bind(this);
@@ -90,8 +91,8 @@ export default class OnlineGamePage extends HTMLElement {
 				</div>
 			</div>
 			<div class="start_game">
-				<a as="co-link" href="/gameplay" id="start_ev" >Start Game</a>
-			</div>
+      			<button id="start_ev" ${this.role === "player2" ? "disabled" : ""}>Start Game</button>
+    		</div>
 		</div>
   `;
 	}

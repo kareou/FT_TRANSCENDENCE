@@ -1,14 +1,14 @@
-import { ClassicPaddle, BlossomPaddle, LightSaber} from "./game_objects/player.js";
+import { ClassicPaddle, BlossomPaddle, LightSaber } from "./game_objects/player.js";
 import { Ball } from "./game_objects/ball.js";
 import { Board } from "./game_objects/board.js";
 
-const getPlayerObject = (paddle_name, player_num,ctx, theme ) => {
+const getPlayerObject = (paddle_name, player_num, ctx, theme) => {
   if (paddle_name === "classic")
-    return new ClassicPaddle(player_num,ctx,theme);
+    return new ClassicPaddle(player_num, ctx, theme);
   else if (paddle_name === "blossom")
-    return new BlossomPaddle(player_num,ctx,theme);
+    return new BlossomPaddle(player_num, ctx, theme);
   else if (paddle_name === "lightsaber")
-    return new LightSaber(player_num,ctx,theme);
+    return new LightSaber(player_num, ctx, theme);
 }
 
 export default class Game extends HTMLElement {
@@ -20,6 +20,7 @@ export default class Game extends HTMLElement {
     this.board;
     this.theme;
     this.data;
+    this.game_started = true;
   }
   connectedCallback() {
     let data = localStorage.getItem("state");
@@ -37,16 +38,20 @@ export default class Game extends HTMLElement {
     this.player2 = getPlayerObject(this.data.player2.paddle_theme, 1, ctx, this.theme);
     this.ball = new Ball(ctx, this.theme);
     this.board = new Board(ctx, this.theme);
-    this.board.draw();
-    this.#drawPaddles(ctx);
-    this.ball.draw();
+    // this.board.draw();
+    // this.#drawPaddles(ctx);
+    // this.ball.draw();
     document.addEventListener("keydown", this.#movePaddels.bind(this));
     document.addEventListener("keyup", (e) => {
       if (e.code == "KeyW" || e.code == "KeyS") this.player1.stopPlayer();
       else if (e.code == "ArrowUp" || e.code == "ArrowDown")
         this.player2.stopPlayer();
     });
+    this.startgame(ctx);
+  }
 
+  async startgame(ctx) {
+    await this.roundStartCountDown(ctx);
     this.#update(ctx);
   }
 
@@ -82,17 +87,60 @@ export default class Game extends HTMLElement {
         `;
   }
 
-  #update(ctx) {
-    requestAnimationFrame(() => this.#update(ctx));
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    this.board.draw();
-    this.#drawPaddles(ctx);
-    this.ball.move(this.player1, this.player2);
-    this.ball.draw();
-    if (this.#marked(ctx)) {
-      this.ball.resetPosition();
-      this.player1.resetPosition();
-      this.player2.resetPosition();
+  roundStartCountDown(ctx) {
+    return new Promise((resolve) => {
+      let count_down = 3;
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      this.board.draw();
+      this.#drawPaddles(ctx);
+      this.ball.draw();
+      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.font = "100px Arial";
+      ctx.fillStyle = "white";
+      ctx.textAlign = "center";
+      ctx.fillText(count_down, ctx.canvas.width / 2, ctx.canvas.height / 2);
+      count_down -= 1;
+      const intervalId = setInterval(() => {
+        if (count_down === -1) {
+          clearInterval(intervalId);
+          resolve();
+          return;
+        }
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        this.board.draw();
+        this.#drawPaddles(ctx);
+        this.ball.draw();
+        ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.font = "100px Arial";
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.fillText(count_down, ctx.canvas.width / 2, ctx.canvas.height / 2);
+        count_down -= 1;
+      }, 1000);
+    });
+  }
+
+  async #update(ctx) {
+    if (this.game_started) {
+      requestAnimationFrame(() => this.#update(ctx));
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      this.board.draw();
+      this.#drawPaddles(ctx);
+      this.ball.move(this.player1, this.player2);
+      this.ball.draw();
+      if (this.#marked(ctx)) {
+        this.ball.resetPosition();
+        this.player1.resetPosition();
+        this.player2.resetPosition();
+        this.game_started = false;
+      }
+    }
+    else {
+      await this.roundStartCountDown(ctx);
+      this.game_started = true;
+      this.#update(ctx);
     }
   }
 
@@ -124,6 +172,8 @@ export default class Game extends HTMLElement {
     }
     return false;
   }
+
+
 
   #timeCountUp() {
     const min = document.getElementById("minutes");
