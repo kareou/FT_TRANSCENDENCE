@@ -1,1 +1,35 @@
-.venv
+# Python #
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# Django #
+*.log
+*.pot
+local_settings.py
+db.sqlite3
+media
+
+# Development #
+###############
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+*.bak
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Virtual Environment #
+######################
+.venv/
+Thumbs.db
