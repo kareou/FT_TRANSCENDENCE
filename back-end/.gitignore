@@ -1,1 +1,37 @@
+# Python
+*.pyc
+__pycache__/
+
+# Django
+*.log
+*.pot
+*.pyc
+*.so
+*.sqlite3
+db.sqlite3
+
+# Environment
+.env
 .venv
+venv/
+env/
+ENV/
+
+# Static and media files
+staticfiles/
+media/
+
+# Django specific files
+*.mo
+*.pot
+*.log
+*.pot~
+*.py[cod]
+__pycache__/
+*.swp
+*.swo
+*.DS_Store
+
+# Visual Studio Code
+.vscode/
+
