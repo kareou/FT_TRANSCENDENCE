@@ -1,35 +1,37 @@
-# Python #
+# Python
 *.pyc
 __pycache__/
-*.pyo
-*.pyd
 
-# Django #
+# Django
 *.log
 *.pot
-local_settings.py
+*.pyc
+*.so
+*.sqlite3
 db.sqlite3
 media
 
-# Development #
-###############
-.idea/
-.vscode/
+# Environment
+.env
+.venv
+venv/
+env/
+ENV/
+
+# Static and media files
+staticfiles/
+media/
+
+# Django specific files
+*.mo
+*.pot
+*.log
+*.pot~
+*.py[cod]
+__pycache__/
 *.swp
 *.swo
-*.swn
-*.bak
+*.DS_Store
 
-# OS generated files #
-######################
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-
-# Virtual Environment #
-######################
-.venv/
-Thumbs.db
+# Visual Studio Code
+.vscode/

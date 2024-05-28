@@ -8,7 +8,7 @@ export default class TopBar extends HTMLElement {
   }
 
   render() {
-    if (window.location.pathname === "/signin" || window.location.pathname === "/signup" || window.location.pathname === "/" || window.location.pathname === "/gameplaye")
+    if (window.location.pathname === "/signin" || window.location.pathname === "/signup" || window.location.pathname === "/" || window.location.pathname === "/gameplay")
       return;
     this.innerHTML = /*HTML*/ `
         <div class="chat_notification_bar_wrapper">

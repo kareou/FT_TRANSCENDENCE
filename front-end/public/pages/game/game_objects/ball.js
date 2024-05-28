@@ -1,25 +1,28 @@
 export class Ball {
-  theme = {
-    "8ball": "black",
-    beach: "white",
-  };
+
   constructor(ctx, theme) {
     this.x = ctx.canvas.width / 2;
     this.y = ctx.canvas.height / 2;
-    this.size = 10;
+    this.size = theme === 'classic' ? 7 : 10;
     this.speed = 4;
     this.dx = 4;
     this.dy = -4;
     this.ctx = ctx;
-    this.color = this.theme[theme] || "black";
+    this.theme = theme;
+    this.color = this.theme === "sky" ? "#FDFD96" : "white";
   }
 
   draw() {
     this.ctx.fillStyle = this.color;
-    this.ctx.beginPath();
-    this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    this.ctx.closePath();
-    this.ctx.fill();
+    if (this.theme === "classic") {
+      this.ctx.fillRect(this.x - this.size, this.y - this.size, this.size * 2, this.size * 2);
+    } else {
+
+      this.ctx.beginPath();
+      this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      this.ctx.closePath();
+      this.ctx.fill();
+    }
   }
 
   move(player1, player2) {
@@ -27,7 +30,6 @@ export class Ball {
     this.#detectPlayerCollision(player1, player2);
     this.x += this.dx;
     this.y += this.dy;
-    this.draw();
   }
   #hitWall() {
     if (this.y + this.size > this.ctx.canvas.height || this.y - this.size < 0) {
@@ -49,6 +51,7 @@ export class Ball {
         this.y > player.y &&
         this.y < player.y + player.height
       ) {
+        // this.x = player.x - this.size;
         this.#hiteplayer(player);
       }
     } else {
@@ -58,14 +61,15 @@ export class Ball {
         this.y > player.y &&
         this.y < player.y + player.height
       ) {
+        // this.x = player.x + player.width + this.size;
         this.#hiteplayer(player);
       }
     }
   }
   resetPosition() {
-	this.x = this.ctx.canvas.width / 2;
-	this.y = this.ctx.canvas.height / 2;
-	this.dx = 4;
-	this.dy = -4;
+    this.x = this.ctx.canvas.width / 2;
+    this.y = this.ctx.canvas.height / 2;
+    this.dx = 4;
+    this.dy = -4;
   }
 }
