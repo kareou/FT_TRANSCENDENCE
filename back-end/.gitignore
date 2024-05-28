@@ -9,6 +9,7 @@ __pycache__/
 *.so
 *.sqlite3
 db.sqlite3
+media
 
 # Environment
 .env
@@ -34,4 +35,3 @@ __pycache__/
 
 # Visual Studio Code
 .vscode/
-
