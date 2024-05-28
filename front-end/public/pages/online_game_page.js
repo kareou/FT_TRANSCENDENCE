@@ -11,7 +11,7 @@ export default class OnlineGamePage extends HTMLElement {
 	}
 
 	connectedCallback() {
-		this.websocket = new WebSocket("ws://10.11.2.2:8000/ws/lobby/lobby/");
+		this.websocket = new WebSocket("ws://localhost:8000/ws/lobby/lobby/");
 		this.websocket.onmessage = function (e) {
 			const message = JSON.parse(e.data);
 			console.log(message);

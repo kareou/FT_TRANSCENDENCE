@@ -34,7 +34,7 @@ export default class OnlineGame extends HTMLElement {
     const urlParams = new URLSearchParams(window.location.search);
     const gameid = urlParams.get("game_id");
     this.websocket = new WebSocket(
-      `ws://10.11.2.2:8000/ws/gamematch/${gameid}/`
+      `ws://localhost:8000/ws/gamematch/${gameid}/`
     );
     this.render();
     const canvas = this.querySelector(".board");
@@ -163,9 +163,9 @@ export default class OnlineGame extends HTMLElement {
   #marked(ctx) {
     if (this.ball.x - this.ball.size < 0) {
       this.player2.score++;
-      document.getElementById("p2_score").innerText = this.player2.score; return true;
-    } else if (this.ball.x +
-      this.ball.size > ctx.canvas.width) {
+      document.getElementById("p2_score").innerText = this.player2.score;
+      return true;
+    } else if (this.ball.x + this.ball.size > ctx.canvas.width) {
       this.player1.score++;
       document.getElementById("p1_score").innerText = this.player1.score;
       return true;
@@ -184,8 +184,9 @@ export default class OnlineGame extends HTMLElement {
         minutes++;
         seconds = 0;
       }
-      min.innerText = minutes < 10 ? "0" + minutes : minutes; sec.innerText = seconds < 10 ? "0" + seconds : seconds;
-    },
-      1000);
+      min.innerText = minutes < 10 ? "0" + minutes : minutes;
+      sec.innerText = seconds < 10 ? "0" + seconds : seconds;
+    }, 1000);
   }
-} customElements.define("online-game", OnlineGame);
+}
+customElements.define("online-game", OnlineGame);
