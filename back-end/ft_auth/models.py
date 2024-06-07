@@ -1,14 +1,31 @@
 from django.db import models
+from django.contrib.auth.models import BaseUserManager , AbstractBaseUser
 
-# Create your models here.
-class User(models.Model):
-    username = models.CharField(max_length=50)
-    email = models.EmailField()
-    password = models.CharField(max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
+class UserManagment(BaseUserManager):
+    def create_user(self, email, username=None, full_name='', password=None):
+        if not email:
+            raise ValueError('Email is required')
+        if not username:
+            raise ValueError('Username is required')
+
+        user = self.model(
+            email=self.normalize_email(email),
+            username=username,
+            full_name=full_name
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+        
+class User(AbstractBaseUser):
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=255)
+    username = models.CharField(max_length=255, unique=True)
+    full_name = models.CharField(max_length=255, default='')
+
+    objects = UserManagment()
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
 
     def __str__(self):
-        return self.username
+        return self.username    

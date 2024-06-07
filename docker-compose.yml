@@ -18,6 +18,7 @@ services:
     build: "./back-end"
     volumes:
       - ./back-end:/back-end
+    restart: on-failure
     ports:
       - "8000:8000"
     depends_on:

@@ -1,6 +1,9 @@
 from django.urls import path
-from .views import UserViewSet
+from . import views
 
 urlpatterns = [
-    path('signin/', UserViewSet.as_view({'post': 'create', 'get': 'list'})),
+    path('register/', views.register),
+    path('login/', views.login),
+    path('logout/', views.logout),
+    path('protected/', views.protected),
 ]
