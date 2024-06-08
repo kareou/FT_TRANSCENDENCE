@@ -23,12 +23,23 @@ body {
     margin: 0 20px;
 }
 
-.playerProfileImage {
+.playerProfileImage1 {
     width: 150px;
     height: 150px;
     border-radius: 50%;
     background-color: blue;
-    background-image: url('assets/Group 37.png');
+    background-image: url('assets/player1.png');
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 10px;
+}
+
+.playerProfileImage2 {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: blue;
+    background-image: url('assets/player2.png');
     background-size: cover;
     background-position: center;
     margin-bottom: 10px;
