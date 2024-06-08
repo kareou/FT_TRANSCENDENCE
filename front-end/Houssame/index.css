@@ -28,7 +28,7 @@ body {
     height: 150px;
     border-radius: 50%;
     background-color: blue;
-    background-image: url('assets/player1.png');
+    background-image: url('assets/Ellipse1.png'), url('assets/player1.png');
     background-size: cover;
     background-position: center;
     margin-bottom: 10px;
@@ -39,17 +39,27 @@ body {
     height: 150px;
     border-radius: 50%;
     background-color: blue;
-    background-image: url('assets/player2.png');
+    background-image: url('assets/Ellipse2.png'), url('assets/player2.png');
     background-size: cover;
     background-position: center;
     margin-bottom: 10px;
 }
 
-.playerRank {
+.playerRank1 {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background-image: url('assets/image 17.png');
+    background-image: url('assets/rankBadge1.png');
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 10px;
+}
+
+.playerRank2 {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-image: url('assets/rankBadge2.png');
     background-size: cover;
     background-position: center;
     margin-bottom: 10px;
