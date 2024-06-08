@@ -81,10 +81,11 @@ body {
 }
 
 .statItem {
-    display: flex;
-    justify-content: space-between;
-    width: 200px;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.statItem span {
+    display: block;
 }
 
 .vsPng {
