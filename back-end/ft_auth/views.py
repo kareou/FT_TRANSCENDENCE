@@ -33,7 +33,7 @@ def login(request):
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)  # Convert token to string
         serializer = UserSerializer(user)
-        response = Response(status=status.HTTP_200_OK, data={'token': {'refresh': str(refresh), 'access': access_token}, 'user': serializer.data})
+        response = Response(status=status.HTTP_200_OK, data={'token': access_token, 'user': serializer.data, 'refresh_token': str(refresh)})
         return response
 
     except Exception as e:
@@ -56,3 +56,11 @@ def logout(request):
         return Response(status=status.HTTP_205_RESET_CONTENT)
     except Exception as e:
         return Response(status=status.HTTP_400_BAD_REQUEST, data={'message': str(e)})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user(request):
+    user = User.objects.get(id=request.user.id)
+    serializer = UserSerializer(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)

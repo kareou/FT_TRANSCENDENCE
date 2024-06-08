@@ -1,5 +1,5 @@
 import Link from "../components/link.js";
-
+import Http from "../http/http.js";
 export default class SignIn extends HTMLElement {
   constructor() {
     super();
@@ -12,19 +12,15 @@ export default class SignIn extends HTMLElement {
       e.preventDefault();
       const email = this.querySelector("#email").value;
       const pwd = this.querySelector("#pwd").value;
-      const data = { "email": email, "password": pwd};
-      fetch("http://localhost:8000/ft_auth/login/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          // console.log(res.token);
-          document.cookie = `token=${JSON.stringify(res.token)}`;
-        });
+      const data = {
+        email: email,
+        password: pwd,
+      };
+      Http.login(data, "ft_auth/login/").then((res) => {
+        if (res.token) {
+          Link.navigateTo("/");
+        }
+      });
     });
   }
 
@@ -37,7 +33,7 @@ export default class SignIn extends HTMLElement {
             <input type="email" name="email" id="email" placeholder="Enter your email" required>
             <label for="password">Password</label>
             <input type="password" name="pwd" id="pwd" placeholder="Enter your password" required>
-            <input type="submit" value="login" />
+            <button type="submit" class="signInButton" >login</button>
             <button class="signInButton"><img src="images/42_logo.svg" alt="42 logo" class="intra_logo"> Sign In with Intra</button>
             <p> Don't have an account yet ? <a is="co-link" href="/signup" class="signUpLink" >Sign Up</a></p>
         </form>
