@@ -1,0 +1,61 @@
+body {
+    background-image: url('assets/signIn&signUp\ template.png');
+    background-repeat: no-repeat;
+    background-size: 100vw 100vh;
+}
+
+.playerProfileImage {
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    margin-left: 200px;
+    margin-top: 200px;
+    display: block;
+    background-color: blue;
+    background-image: url('assets/Group\ 37.png');
+    background-size: 100% 100%;
+}
+
+.playerRank {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-left: 350px;
+    margin-top: 0px;
+    background-image: url('assets/image\ 17.png');
+    background-size: 100% 100%;
+}
+
+.playerName {
+    width: 300px;
+    height: 50px;
+    margin-left: 250px;
+    margin-top: 0px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+    color: rgb(91, 219, 91);
+    /* background-color: blue; */
+}
+
+.playerStats {
+    width: 300px;
+    height: 500px;
+    margin-left: 250px;
+    margin-top: 0px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 15px;
+    color: white;
+    /* background-color: blueviolet; */
+}
+
+.vsPng {
+    width: 100px;
+    height: 100px;
+    margin-left: 350px;
+    margin-top: 0px;
+    background-image: url('assets/VS.png');
+    background-size: 100% 100%;
+    /* background-color: yellow; */
+}
