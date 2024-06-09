@@ -12,8 +12,8 @@ render() {
 this.innerHTML = /*HTML*/ `
   <div class="dashboard_wrapper">
     <div class="profile" >
-      <div class="profile_img" style="background-image: url('/public/assets/test.jpg');">
-        <!-- <img src="/public/assets/test.jpg" class="profile_img" alt="profile"> -->
+      <div class="profile_img">
+        <img src="/public/assets/test.jpg" class="profile_img" alt="profile">
       </div>
       <div class="profile_info">
         <div class="name_n_login">

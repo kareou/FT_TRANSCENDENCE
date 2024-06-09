@@ -11,7 +11,7 @@ export default class Link extends HTMLAnchorElement {
     const token = localStorage.getItem("token");
     const refreshToken = localStorage.getItem("refreshToken");
 
-    if (!token) {
+    if (token === undefined) {
       return false;
     }
 

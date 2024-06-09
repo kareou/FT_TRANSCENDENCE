@@ -14,18 +14,8 @@ class Http {
 			},
 			body: JSON.stringify(data),
 		});
-		if (response.status === 200) {
-			const res = await response.json();
-			localStorage.setItem('token', res.token);
-			localStorage.setItem('refreshToken', res.refresh_token);
-			this.user = res.user;
-			return res;
-		}
-		else {
-			console.log(response);
-			res = await response.json();
-			return res;
-		}
+		res = await response.json();
+		return res;
 	}
 
 	async login(data, url) {

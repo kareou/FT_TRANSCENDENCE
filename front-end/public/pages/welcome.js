@@ -7,9 +7,6 @@ export default class Welcome extends HTMLElement {
 
   connectedCallback() {
     this.render();
-    Http.getData("GET","ft_auth/").then((res) => {
-      console.log(res);
-    });
   }
 
   render() {
