@@ -104,12 +104,13 @@ body {
 .sign_in_up  input{
     width: 559px;
     height: 60px;
-    border: solid 2px #04BF8A;
-
+    border: solid 2px #04bf8a48;
     border-radius: 15px;
     font-size: 20px;
+    color:  white;
     text-indent: 20px;
-    filter: opacity(0.1);
+    /* filter: opacity(0.1); */
+    background: transparent;
 
 }
 

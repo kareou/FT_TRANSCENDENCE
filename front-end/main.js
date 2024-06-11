@@ -8,7 +8,6 @@ app.use("/public", express.static(path.resolve("./", "public")));
 app.get("/*", (req, res) => {
   try {
     // Send the index.html file
-    console.log(req.url);
     res.sendFile(path.resolve("./", "index.html"));
   } catch (error) {
     console.error("Error serving index.html:", error);

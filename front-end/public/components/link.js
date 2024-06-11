@@ -10,13 +10,12 @@ export default class Link extends HTMLAnchorElement {
   static verifyAuth() {
     const token = localStorage.getItem("token");
     const refreshToken = localStorage.getItem("refreshToken");
-
-    if (token === undefined) {
+    if (token === undefined || token === null) {
       return false;
     }
-
+    console.log(token);
     fetch(`${Http.baseUrl}/api/token/verify/`, {
-      method: "POST", // Usually, token verification is done with a POST request
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
@@ -29,11 +28,8 @@ export default class Link extends HTMLAnchorElement {
           return true;
         } else if (res.status === 401) {
             Http.refreshToken().then((res) => {
-              if (res.token) {
-                return true;
-              } else {
-                return false;
-              }
+              console.log(res);
+              return true;
             })
         } else {
           return false;
@@ -65,7 +61,6 @@ export default class Link extends HTMLAnchorElement {
         pos = url.length;
       }
       const path = url.slice(0, pos);
-      console.log(path);
       if (routes[i].path === path) {
         route = routes[i];
         break;
@@ -86,7 +81,6 @@ export default class Link extends HTMLAnchorElement {
   connectedCallback() {
     this.addEventListener("click", (e) => {
       e.preventDefault();
-      console.log("clicked");
       const href = this.getAttribute("href");
       // const text = this.getAttribute('text') || this.innerHTML;
       // this.innerHTML = text;

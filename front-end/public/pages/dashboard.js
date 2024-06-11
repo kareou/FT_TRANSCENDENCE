@@ -1,19 +1,23 @@
+import Http from "../http/http.js";
+
 export default class Dashboard extends HTMLElement {
-constructor() {
-super();
-document.title = "dashboard";
-}
+  constructor() {
+    super();
+    document.title = "dashboard";
+    this.pic = "";
+  }
 
-connectedCallback() {
-this.render();
-}
+  connectedCallback() {
+    // console.log(Http.user);
+    this.render();
+  }
 
-render() {
-this.innerHTML = /*HTML*/ `
+  render() {
+    this.innerHTML = /*HTML*/ `
   <div class="dashboard_wrapper">
     <div class="profile" >
       <div class="profile_img">
-        <img src="/public/assets/test.jpg" class="profile_img" alt="profile">
+        <img src='http://localhost:8000${Http.user.profile_pic}' class="profile_img" alt="profile">
       </div>
       <div class="profile_info">
         <div class="name_n_login">
@@ -60,7 +64,7 @@ this.innerHTML = /*HTML*/ `
     </div>
   </div>
 `;
-}
+  }
 }
 
 customElements.define("dashboard-page", Dashboard);

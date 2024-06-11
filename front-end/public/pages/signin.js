@@ -18,7 +18,7 @@ export default class SignIn extends HTMLElement {
       };
       Http.login(data, "ft_auth/login/").then((res) => {
         if (res.token) {
-          Link.navigateTo("/");
+          Link.navigateTo("/dashboard");
         }
       });
     });

@@ -14,7 +14,11 @@ class Http {
 			},
 			body: JSON.stringify(data),
 		});
-		res = await response.json();
+		if (response.status !== 201) {
+			const res = await response.json();
+			return res;
+		}
+		const res = await response.json();
 		return res;
 	}
 

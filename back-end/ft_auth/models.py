@@ -1,5 +1,8 @@
+from typing import Iterable
 from django.db import models
 from django.contrib.auth.models import BaseUserManager , AbstractBaseUser
+from io import BytesIO
+import requests
 
 class UserManagment(BaseUserManager):
     def create_user(self, email, username=None, full_name='', password=None):
@@ -22,7 +25,7 @@ class User(AbstractBaseUser):
     password = models.CharField(max_length=255)
     username = models.CharField(max_length=255, unique=True)
     full_name = models.CharField(max_length=255, default='')
-    profile_pic = models.ImageField(upload_to='media/users/pfp', default='https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${username}')
+    profile_pic = models.ImageField(upload_to='users_pfp/', default=None)
     level = models.IntegerField(default=1)
     exp = models.IntegerField(default=0)
 
@@ -32,3 +35,15 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.username
+
+    def save(self, *args, **kwargs):
+        if not self.profile_pic:
+            url = f'https://api.dicebear.com/8.x/bottts-neutral/svg?seed={self.username}'
+            response = requests.get(url)
+            if response.status_code == 200:
+                self.profile_pic.save(f'{self.username}.svg', BytesIO(response.content), save=False)
+                self.profile_pic.name = f'users_pfp/{self.username}.svg'
+        else:
+            self.profile_pic.save(self.profile_pic.name, self.profile_pic, save=False)
+
+        super().save(*args, **kwargs)
