@@ -12,7 +12,7 @@ from ft_auth.models import User
 class GameViewSet(viewsets.ModelViewSet):
     queryset = Match.objects.all()
     serializer_class = MatchSerializer
-
+    
     def create(self, request, *args, **kwargs):
         try:
             player1 = request.data.get('player1')

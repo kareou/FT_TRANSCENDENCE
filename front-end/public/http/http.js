@@ -71,19 +71,49 @@ class Http {
 	async refreshToken() {
 		const token = localStorage.getItem('token');
 		const refreshToken = localStorage.getItem('refreshToken');
-		fetch(`${this.baseUrl}/api/token/refresh/`, {
+		const response = await fetch(`${this.baseUrl}/api/token/refresh/`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ refresh: refreshToken}),
+			body: JSON.stringify({ refresh: refreshToken }),
 		})
-			.then((res) => res.json())
-			.then((res) => {
-				console.log(res);
-				localStorage.setItem('token', res.token);
-				return res;
-			});
+		if (response.status === 200) {
+			const res = await response.json();
+			localStorage.setItem('token', res.access);
+			return res;
+		}
+		else {
+			const res = await response.json();
+			return res;
+		}
+	}
+
+	async verifyToken(trials = 0) {
+		console.log("verifying token", trials);
+		const token = localStorage.getItem('token');
+		const refreshToken = localStorage.getItem('refreshToken');
+		const response = await fetch(`${this.baseUrl}/api/token/verify/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ token: token }),
+		})
+		if (response.status === 200) {
+			const res = await response.json();
+			this.user = res.user;
+			return true;
+		}
+		else if (response.status === 401 && trials < 3) {
+			const res = await response.json();
+			await this.refreshToken();
+			return this.verifyToken(trials + 1);
+		}
+		else {
+			const res = await response.json();
+			return false;
+		}
 	}
 }
 

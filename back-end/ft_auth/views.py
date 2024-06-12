@@ -1,13 +1,16 @@
+from typing import Any, Dict
 from django.shortcuts import render
 from django.http import HttpResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from .models import User
-from .serializer import UserSerializer
+from .serializer import UserSerializer, CustomTokenVerifySerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_simplejwt.serializers import TokenVerifySerializer
+from rest_framework_simplejwt.views import TokenVerifyView
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -75,3 +78,6 @@ def update_user(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class TokenVerify(TokenVerifyView):
+    serializer_class = CustomTokenVerifySerializer
