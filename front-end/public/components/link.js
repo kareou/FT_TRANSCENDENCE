@@ -1,4 +1,5 @@
 import { routes } from "../router/routes.js";
+import Http from "../http/http.js";
 
 export default class Link extends HTMLAnchorElement {
   constructor() {
@@ -6,11 +7,19 @@ export default class Link extends HTMLAnchorElement {
     // Set up your custom behavior here
   }
 
+
+
+
   static async navigateTo(url) {
-    console.log("navigating to ", url);
+    const isAuth = await Http.verifyToken();
+    if ( isAuth === false && url !== "/signin" && url !== "/signup" && url !== "/") {
+      console.log("not auth");
+      url = "/signin";
+    }
+    if (isAuth === true && (url === "/signin" || url === "/signup")) {
+      url = "/";
+    }
     if (url !== window.location.pathname) window.history.pushState({}, "", url);
-    // window.dispatchEvent(new PopStateEvent('popstate'));
-    // var newurl = url.split('?')[0];
     let route = null;
     for (let i = 0; i < routes.length; i++) {
       let pos = url.indexOf("/?");
@@ -18,7 +27,6 @@ export default class Link extends HTMLAnchorElement {
         pos = url.length;
       }
       const path = url.slice(0, pos);
-      console.log(path);
       if (routes[i].path === path) {
         route = routes[i];
         break;
@@ -39,13 +47,9 @@ export default class Link extends HTMLAnchorElement {
   connectedCallback() {
     this.addEventListener("click", (e) => {
       e.preventDefault();
-      console.log("clicked");
       const href = this.getAttribute("href");
-      // const text = this.getAttribute('text') || this.innerHTML;
-      // this.innerHTML = text;
       window.history.pushState({}, "", href);
       Link.navigateTo(href);
-      // window.dispatchEvent(new PopStateEvent('popstate'));
     });
   }
 }

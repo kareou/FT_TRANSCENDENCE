@@ -35,7 +35,6 @@ export default class PaddleOption extends HTMLElement {
 
   changePaddle(direction) {
     this.current_paddle += direction;
-	console.log(this.current_paddle, this.player);
     if (this.current_paddle < 0) this.current_paddle = this.paddles.length - 1; // Loop back to the last paddle
     else if (this.current_paddle >= this.paddles.length) this.current_paddle = 0; // Loop back to the first paddle
 	this.changeGameState();
@@ -45,7 +44,6 @@ export default class PaddleOption extends HTMLElement {
   changeGameState() {
 	const state = localStorage.getItem("state");
 	var data = JSON.parse(state);
-	console.log(data[0][this.player]);
 	data[0][this.player].paddle_theme = this.paddles[this.current_paddle];
 	localStorage.setItem("state", JSON.stringify(data));
   }

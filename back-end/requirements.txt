@@ -3,3 +3,7 @@ channels
 daphne
 psycopg2-binary>=2.9
 django-cors-headers
+djangorestframework
+djangorestframework-simplejwt
+pillow
+requests

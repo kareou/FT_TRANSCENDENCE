@@ -92,7 +92,7 @@ body {
     height: 100%;
 }
 
-.sign_in_up>label {
+.sign_in_up label {
     font-size: 30px;
     color: white;
     font-family: jolly lodger;
@@ -101,15 +101,16 @@ body {
     width: 559px;
 }
 
-.sign_in_up > input{
+.sign_in_up  input{
     width: 559px;
     height: 60px;
-    border: solid 2px #04BF8A;
-
+    border: solid 2px #04bf8a48;
     border-radius: 15px;
     font-size: 20px;
+    color:  white;
     text-indent: 20px;
-    filter: opacity(0.1);
+    /* filter: opacity(0.1); */
+    background: transparent;
 
 }
 
@@ -142,6 +143,7 @@ body {
 .signInButton {
     background-color: #04BF8A;
     background-attachment: fixed;
+    opacity: 1;
     color: black;
     border: none;
     border-radius: 20px;
@@ -165,7 +167,7 @@ body {
     cursor: pointer;
 }
 
-.sign_in_up > p {
+.sign_in_up  p {
     color: white;
     font-family: jolly lodger;
     font-size: 20px;
@@ -213,7 +215,7 @@ body {
         padding: 10px;
     }
 
-    .sign_in_up>label, .sign_in_up > input {
+    .sign_in_up label, .sign_in_up  input {
         width: 90%;
     }
 
@@ -230,11 +232,11 @@ body {
         font-size: 2em;
     }
 
-    .sign_in_up>label {
+    .sign_in_up label {
         font-size: 20px;
     }
 
-    .sign_in_up > input {
+    .sign_in_up  input {
         height: 40px;
         font-size: 16px;
     }

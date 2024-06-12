@@ -30,7 +30,6 @@ export default class OnlineGame extends HTMLElement {
   }
 
   connectedCallback() {
-    console.log("connected");
     const urlParams = new URLSearchParams(window.location.search);
     const gameid = urlParams.get("game_id");
     this.websocket = new WebSocket(

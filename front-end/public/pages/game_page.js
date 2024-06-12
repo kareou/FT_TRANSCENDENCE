@@ -151,7 +151,6 @@ export default class GamePage extends HTMLElement {
 
   updateReadyButton(buttonId, isReady) {
     const button = document.querySelector(`#${buttonId}`);
-    console.log(isReady, button);
     button.textContent = isReady ? "Ready" : "Ready";
     if (isReady)
       button.classList.add("active");

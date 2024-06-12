@@ -25,7 +25,6 @@ export default class Game extends HTMLElement {
   connectedCallback() {
     let data = localStorage.getItem("state");
     data = JSON.parse(data);
-    console.log(data);
     this.data = data[0]
     this.theme = this.data['table_theme'];
     this.render();

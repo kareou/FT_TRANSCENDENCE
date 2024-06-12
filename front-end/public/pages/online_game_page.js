@@ -14,7 +14,6 @@ export default class OnlineGamePage extends HTMLElement {
 		this.websocket = new WebSocket("ws://localhost:8000/ws/lobby/lobby/");
 		this.websocket.onmessage = function (e) {
 			const message = JSON.parse(e.data);
-			console.log(message);
 			if (message.role) {
 				this.role = message.role;
 				const data = [

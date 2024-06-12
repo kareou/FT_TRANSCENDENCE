@@ -1,24 +1,27 @@
+import Http from "../http/http.js";
+
 export default class Dashboard extends HTMLElement {
-constructor() {
-super();
-document.title = "dashboard";
-}
+  constructor() {
+    super();
+    document.title = "dashboard";
+    this.user = Http.user;
+  }
 
-connectedCallback() {
-this.render();
-}
+  connectedCallback() {
+    this.render();
+  }
 
-render() {
-this.innerHTML = /*HTML*/ `
+  render() {
+    this.innerHTML = /*HTML*/ `
   <div class="dashboard_wrapper">
     <div class="profile" >
-      <div class="profile_img" style="background-image: url('/public/assets/test.jpg');">
-        <!-- <img src="/public/assets/test.jpg" class="profile_img" alt="profile"> -->
+      <div class="profile_img">
+        <img src='http://localhost:8000${this.user.profile_pic}' class="profile_img" alt="profile">
       </div>
       <div class="profile_info">
         <div class="name_n_login">
-          <h1 id="user_name">Mohamed Khairoun</h1>
-          <h6 id="login">mkhairou</h6>
+          <h1 id="user_name">${this.user.full_name}</h1>
+          <h6 id="login">${this.user.username}</h6>
         </div>
         <h2>
           <span>
@@ -31,7 +34,7 @@ this.innerHTML = /*HTML*/ `
           <h1>Achievements</h1>
           <img src="/public/assets/ranks.svg" alt="medal">
           <h4 class="level">
-            <span>Level 5</span>
+            <span>${this.user.level}</span>
             <span>50%</span>
           </h4>
           <div class="level-bar">
@@ -60,7 +63,7 @@ this.innerHTML = /*HTML*/ `
     </div>
   </div>
 `;
-}
+  }
 }
 
 customElements.define("dashboard-page", Dashboard);
