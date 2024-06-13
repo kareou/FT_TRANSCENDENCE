@@ -1,6 +1,6 @@
 
 import SideBar from '../components/sidebar.js';
-import TopBar from '../components/notification.js';
+import TopBar from '../components/topBar.js';
 import Link from '../components/link.js';
 import Http from '../http/http.js';
 

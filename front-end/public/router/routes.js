@@ -1,9 +1,10 @@
 import SideBar from "../components/sidebar.js";
-import TopBar from "../components/notification.js";
+import TopBar from "../components/topBar.js";
 import Link from "../components/link.js";
 import Game_Option from "../components/game_option.js";
 import Game_Starter from "../components/game_starter.js";
 import Paddle_Option from "../components/paddle_option.js";
+import Toast from "../components/toast.js";
 
 export const routes = [
   {

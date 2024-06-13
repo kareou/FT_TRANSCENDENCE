@@ -8,12 +8,15 @@ export default class Link extends HTMLAnchorElement {
   }
 
 
+  static startWith(string, prefix) {
+    return string.slice(0, prefix.length) === prefix;
+  }
 
 
   static async navigateTo(url) {
     const isAuth = await Http.verifyToken();
+    console.log(isAuth);
     if ( isAuth === false && url !== "/signin" && url !== "/signup" && url !== "/") {
-      console.log("not auth");
       url = "/signin";
     }
     if (isAuth === true && (url === "/signin" || url === "/signup")) {

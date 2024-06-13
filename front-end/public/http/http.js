@@ -58,9 +58,7 @@ class Http {
 			return res;
 		}
 		else if (response.status === 401 && retries < 1) {
-			console.log(localStorage.getItem('token'));
 			await this.refreshToken();
-			console.log(localStorage.getItem('token'));
 			return this.getData(method, url, data, retries + 1);
 		}
 		else
@@ -102,6 +100,7 @@ class Http {
 		})
 		if (response.status === 200) {
 			const res = await response.json();
+			console.log(res);
 			this.user = res.user;
 			return true;
 		}

@@ -1,18 +1,18 @@
 @import url("./dashboard.css");
 
-.game_option{
+.game_option {
     display: flex;
 
     margin-top: 20px;
     color: white;
 }
 
-.game_option_content{
+.game_option_content {
     display: flex;
     justify-content: space-around;
 }
 
-.game_option_content button{
+.game_option_content button {
     border: none;
     width: 1.5rem;
     height: 1.5rem;
@@ -25,14 +25,14 @@
     font-size: 1.5em;
 }
 
-.paddle_picker{
+.paddle_picker {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 1rem;
 }
 
-.paddle_picker button{
+.paddle_picker button {
     border: none;
     width: 1rem;
     height: 3rem;
@@ -49,7 +49,7 @@
     color: white;
 }
 
-.paddle_info{
+.paddle_info {
     border: 1px solid #778FB8;
     border-radius: 1rem;
     backdrop-filter: blur(1rem);
@@ -62,7 +62,7 @@
     padding: 1rem;
 }
 
-.paddle{
+.paddle {
     width: 1rem;
     height: 100%;
     border-radius: .3rem;
@@ -92,7 +92,58 @@
     0% {
         transform: translateX(-200%);
     }
+
     100% {
         transform: translateX(0);
+    }
+}
+
+.toast {
+    position: fixed;
+    display: block;
+    top: 10%;
+    right: 1%;
+    background-color: #778FB8;
+    color: white;
+    font-family: "Coolvetica";
+    width: 25rem;
+    height: 5rem;
+    font-size: 1.2rem;
+    animation: slideInFromRight .5s ease-in-out;
+}
+
+.toast-body{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    height: 100%;
+}
+
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(200%);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.timer-bar{
+    width: 100%;
+    height: .3rem;
+    align-self: flex-end;
+    justify-self: end;
+    place-self: end;
+}
+
+@keyframes timer {
+    0% {
+        width: 100%;
+    }
+
+    100% {
+        width: 0;
     }
 }
