@@ -60,6 +60,7 @@ body{
 .icon_side_bar{
     width: 37px;
     margin: 20px;
+    color: white;
     text-align: center;
 }
 
@@ -70,13 +71,13 @@ body{
     gap: 1rem;
 }
 
-.dash_logos_wrapper a i{
-    color: white;
+.dash_logos_wrapper a.active{
+    border-left: 2px solid #1BA7A0;
 }
 
-.dash_logos_wrapper a.active i{
+.dash_logos_wrapper a.active .icon_side_bar{
     color: #1BA7A0;
-    border-bottom: 2px solid #1BA7A0;
+    filter: drop-shadow(0px 0px 5px #1BA7A0);
 }
 
 .body_wrapper{
