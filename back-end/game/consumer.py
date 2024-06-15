@@ -98,67 +98,48 @@ class GameConsumer(AsyncWebsocketConsumer):
         return state1
 
 
-class LobbyConsumer(AsyncWebsocketConsumer):
+class MatchMakingConsumer(AsyncWebsocketConsumer):
+    player_conections = {}
 
-    game_data = {}
-    lobby_count = {}
-    def merge_dict(self,dict1, dict2):
-        res = {**dict1, **dict2}
-        return res
     async def connect(self):
-        self.user = self.scope["user"]
-        self.lobby_id = self.scope["url_route"]["kwargs"]["lobby_id"]
-        if self.lobby_id in LobbyConsumer.lobby_count and LobbyConsumer.lobby_count[self.lobby_id] >= 2:
-            return
-
-        if self.lobby_id in LobbyConsumer.lobby_count:
-            LobbyConsumer.lobby_count[self.lobby_id] += 1
-        else:
-            LobbyConsumer.lobby_count[self.lobby_id] = 1
-
-        role = "player1" if LobbyConsumer.lobby_count[self.lobby_id] == 1 else "player2"
-        await self.channel_layer.group_add(
-            self.lobby_id,
-            self.channel_name
-        )
+        # self.user = self.scope["request"].user
+        print(self.scope,flush=True)
         await self.accept()
-        await self.send(text_data=json.dumps({"role": role}))
+        # MatchMakingConsumer.player_conections[self.user.username] = self.channel_name
+        # if len(MatchMakingConsumer.player_conections) >= 2:
+        #     player1, player2 = random.sample(MatchMakingConsumer.player_conections.keys(), 2)
+        #     player1_channel = MatchMakingConsumer.player_conections.pop(player1)
+        #     player2_channel = MatchMakingConsumer.player_conections.pop(player2)
+        #     await self.channel_layer.send(
+        #         player1_channel,
+        #         {
+        #             "type": "match_request",
+        #             "player2": player2,
+        #         }
+        #     )
+        #     await self.channel_layer.send(
+        #         player2_channel,
+        #         {
+        #             "type": "match_request",
+        #             "player2": player1,
+        #         }
+        #     )
 
     async def disconnect(self, close_code):
-        if self.lobby_id in LobbyConsumer.lobby_count:
-            LobbyConsumer.lobby_count[self.lobby_id] -= 1
+        pass
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        if "game_data" in text_data_json:
-            game_data = text_data_json["game_data"]
-            if self.lobby_id in LobbyConsumer.game_data:
-                LobbyConsumer.game_data[self.lobby_id] = self.merge_dict(LobbyConsumer.game_data[self.lobby_id], game_data)
-            else:
-                LobbyConsumer.game_data[self.lobby_id] = game_data
-            print(LobbyConsumer.game_data[self.lobby_id])
-            if len(LobbyConsumer.game_data[self.lobby_id]) == 2:
-                await self.channel_layer.group_send(
-                    self.lobby_id,
-                    {
-                        "type": "lobby_message",
-                        "game_data": game_data
-                    }
-                )
-        elif "start_game" in text_data_json:
-            game_session = random.randint(1000, 9999)
-            await self.channel_layer.group_send(
-                self.lobby_id,
-                {
-                    "type": "start_game",
-                    "game_data": game_session
-                }
-            )
+        player2 = text_data_json["player2"]
+        player2_channel = MatchMakingConsumer.player_conections[player2]
+        await self.channel_layer.send(
+            player2_channel,
+            {
+                "type": "match_request",
+                "player1": self.user.username,
+            }
+        )
 
-    async def lobby_message(self, event):
-        game_data = event["game_data"]
-        await self.send(text_data=json.dumps({"game_data": game_data}))
-
-    async def start_game(self, event):
-        game_session = event["game_data"]
-        await self.send(text_data=json.dumps({"start_game": game_session}))
+    async def match_request(self, event):
+        player1 = event["player1"]
+        await self.send(text_data=json.dumps({"player1": player1}))

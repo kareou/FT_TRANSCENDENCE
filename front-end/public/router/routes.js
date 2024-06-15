@@ -5,6 +5,8 @@ import Game_Option from "../components/game_option.js";
 import Game_Starter from "../components/game_starter.js";
 import Paddle_Option from "../components/paddle_option.js";
 import Toast from "../components/toast.js";
+import MatchmakingStats from "../components/matchmaking_stats.js";
+import MatchMakingAvatar from "../components/matchmaking_avatar.js";
 
 export const routes = [
   {
@@ -38,6 +40,14 @@ export const routes = [
   {
     path: "/gameplay",
     component: () => import("../pages/game/local_game.js"),
+  },
+  {
+    path: '/settings',
+    component: () => import('../pages/settings.js')
+  },
+  {
+    path: '/matchmaking',
+    component: () => import('../pages/matchmaking.js')
   },
   {
     path: "/brackets",

@@ -29,11 +29,11 @@ class Http {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify(data),
+			credentials: 'include',
 		});
+		console.log(response);
 		if (response.status === 200) {
 			const res = await response.json();
-			localStorage.setItem('token', res.token);
-			localStorage.setItem('refreshToken', res.refresh_token);
 			this.user = res.user;
 			return res;
 		}
@@ -49,7 +49,7 @@ class Http {
 			method: method,
 			headers: {
 				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${localStorage.getItem('token')}`,
+				'credentials': 'include'
 			},
 			body: method === 'POST' ? JSON.stringify(data) : null,
 		});
@@ -67,18 +67,15 @@ class Http {
 
 
 	async refreshToken() {
-		const token = localStorage.getItem('token');
-		const refreshToken = localStorage.getItem('refreshToken');
 		const response = await fetch(`${this.baseUrl}/api/token/refresh/`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ refresh: refreshToken }),
+			credentials: 'include',
 		})
 		if (response.status === 200) {
 			const res = await response.json();
-			localStorage.setItem('token', res.access);
 			return res;
 		}
 		else {
@@ -89,14 +86,12 @@ class Http {
 
 	async verifyToken(trials = 0) {
 		console.log("verifying token", trials);
-		const token = localStorage.getItem('token');
-		const refreshToken = localStorage.getItem('refreshToken');
 		const response = await fetch(`${this.baseUrl}/api/token/verify/`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ token: token }),
+			credentials: 'include',
 		})
 		if (response.status === 200) {
 			const res = await response.json();
@@ -111,6 +106,7 @@ class Http {
 		}
 		else {
 			const res = await response.json();
+			console.log(res);
 			return false;
 		}
 	}
