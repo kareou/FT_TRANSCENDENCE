@@ -18,32 +18,29 @@ class UserSerializer(serializers.ModelSerializer):
 class CustomTokenVerifySerializer(TokenVerifySerializer):
     def validate(self, attrs):
         request = self.context.get('request')
-        token = request.COOKIES.get('access_token')
+        token = request.data.get('token')
         if not token:
-            raise serializers.ValidationError('No access token provided.')
-        attrs["token"] = token
-        _valid_data = super().validate(attrs)
+            raise serializers.ValidationError('No token provided.')
+        data = {}
         try:
             validated_token = UntypedToken(token)
-            userId = validated_token['user_id']
-            user = User.objects.filter(id=userId).first()
+            user = User.objects.get(id=validated_token['user_id'])
             user_serializer = UserSerializer(user)
-            _valid_data['user'] = user_serializer.data
-        except User.DoesNotExist:
-            _valid_data['user'] = None
+            data['user'] = user_serializer.data
+        except TokenError as e:
+            raise InvalidToken(e)
+        return data
 
-        return _valid_data
-
-
-class CustomTokenRefreshSerializer(TokenRefreshSerializer):
+class CustomeTokenRefreshSerializer(TokenRefreshSerializer):
     def validate(self, attrs):
         request = self.context.get('request')
-        token = request.COOKIES.get('refresh_token')
-        if not token:
+        refresh_token = request.data.get('refresh')
+        if not refresh_token:
             raise serializers.ValidationError('No refresh token provided.')
-        attrs['refresh'] = token
+        data = {}
         try:
-            super().validate(attrs)
+            access_token = refresh_token.access_token
         except TokenError as e:
-            raise serializers.ValidationError(e.args[0])
-        return attrs
+            raise InvalidToken(e)
+
+        return data

@@ -11,10 +11,15 @@ export default class Observer {
 	this.observers = this.observers.filter((obs) => obs !== observer);
   }
 
-  notify(data) {
-	this.observers.forEach((observer) => {
-	  observer.update(data);
-	});
+
+
+  notify(event, data = null) {
+      this.observers.forEach((observer) => {
+        if (observer.event === event) {
+          observer.update(data);
+        }
+      }
+    );
   }
 }
 

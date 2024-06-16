@@ -1,6 +1,12 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 import random
+from rest_framework_simplejwt.tokens import UntypedToken
+from ft_auth.models import User
+from ft_auth.serializer import UserSerializer
+from django.shortcuts import get_object_or_404
+from channels.db import database_sync_to_async
+
 
 class GameConsumer(AsyncWebsocketConsumer):
 
@@ -97,33 +103,46 @@ class GameConsumer(AsyncWebsocketConsumer):
                     state1[key] = state2[key]
         return state1
 
+@database_sync_to_async
+def GetUser(scope):
+    token = scope["cookies"].get("access_token")
+    try:
+        validated_token = UntypedToken(token)
+        user_id = validated_token["user_id"]
+        user = get_object_or_404(User, id=user_id)
+        return (user, user_id)
+    except Exception as e:
+        return None
+
 
 class MatchMakingConsumer(AsyncWebsocketConsumer):
     player_conections = {}
 
     async def connect(self):
-        # self.user = self.scope["request"].user
-        print(self.scope,flush=True)
+        self.user, self.user_id = await GetUser(self.scope)
         await self.accept()
-        # MatchMakingConsumer.player_conections[self.user.username] = self.channel_name
-        # if len(MatchMakingConsumer.player_conections) >= 2:
-        #     player1, player2 = random.sample(MatchMakingConsumer.player_conections.keys(), 2)
-        #     player1_channel = MatchMakingConsumer.player_conections.pop(player1)
-        #     player2_channel = MatchMakingConsumer.player_conections.pop(player2)
-        #     await self.channel_layer.send(
-        #         player1_channel,
-        #         {
-        #             "type": "match_request",
-        #             "player2": player2,
-        #         }
-        #     )
-        #     await self.channel_layer.send(
-        #         player2_channel,
-        #         {
-        #             "type": "match_request",
-        #             "player2": player1,
-        #         }
-        #     )
+        MatchMakingConsumer.player_conections[self.user_id] = (self.channel_name, self.user)
+        if len(MatchMakingConsumer.player_conections) >= 2:
+            player1 = random.choice(list(MatchMakingConsumer.player_conections.keys()))
+            player2 = random.choice(list(MatchMakingConsumer.player_conections.keys()))
+            while player1 == player2:
+                player2 = random.choice(list(MatchMakingConsumer.player_conections.keys()))
+            player1_data = MatchMakingConsumer.player_conections.pop(player1)
+            player2_data = MatchMakingConsumer.player_conections.pop(player2)
+            await self.channel_layer.send(
+                player1_data[0],
+                {
+                    "type": "match_request",
+                    "player2": player2_data[1],
+                }
+            )
+            await self.channel_layer.send(
+                player2_data[0],
+                {
+                    "type": "match_request",
+                    "player2": player1_data[1],
+                }
+            )
 
     async def disconnect(self, close_code):
         pass
@@ -141,5 +160,6 @@ class MatchMakingConsumer(AsyncWebsocketConsumer):
         )
 
     async def match_request(self, event):
-        player1 = event["player1"]
-        await self.send(text_data=json.dumps({"player1": player1}))
+        player2 = event["player2"]
+        await self.send(text_data=json.dumps({"player2": UserSerializer(player2).data}))
+

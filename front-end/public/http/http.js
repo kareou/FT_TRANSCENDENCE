@@ -1,9 +1,11 @@
+import Observer from "../state/observer.js";
 
 
 class Http {
 	constructor() {
 		this.baseUrl = 'http://localhost:8000';
 		this.user = null;
+		this.website_stats = new Observer();
 	}
 
 	async register(data, url) {
@@ -49,8 +51,8 @@ class Http {
 			method: method,
 			headers: {
 				'Content-Type': 'application/json',
-				'credentials': 'include'
 			},
+			credentials: 'include',
 			body: method === 'POST' ? JSON.stringify(data) : null,
 		});
 		if (response.status === 200) {
@@ -80,6 +82,7 @@ class Http {
 		}
 		else {
 			const res = await response.json();
+			console.log(res);
 			return res;
 		}
 	}
@@ -95,7 +98,6 @@ class Http {
 		})
 		if (response.status === 200) {
 			const res = await response.json();
-			console.log(res);
 			this.user = res.user;
 			return true;
 		}
@@ -106,7 +108,6 @@ class Http {
 		}
 		else {
 			const res = await response.json();
-			console.log(res);
 			return false;
 		}
 	}

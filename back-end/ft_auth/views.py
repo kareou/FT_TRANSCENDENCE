@@ -5,11 +5,10 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from .models import User
-from .serializer import UserSerializer, CustomTokenVerifySerializer, CustomTokenRefreshSerializer
+from .serializer import UserSerializer, CustomTokenVerifySerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_simplejwt.serializers import TokenVerifySerializer
 from rest_framework_simplejwt.views import TokenVerifyView, TokenRefreshView
 
 @api_view(['POST'])
@@ -84,20 +83,26 @@ def update_user(request):
 
 class TokenVerify(TokenVerifyView):
     serializer_class = CustomTokenVerifySerializer
-
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, context={'request': request})
-        try:
-            serializer.validate(request.data)
-            serializer.is_valid(raise_exception=True)
-        except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        token = request.COOKIES.get('access_token')
+        if not token:
+            return Response({'message': 'No access token provided'}, status=status.HTTP_400_BAD_REQUEST)
+        request.data['token'] = token
+        return super().post(request, *args, **kwargs)
 
 class TokenRefresh(TokenRefreshView):
-    serializer_class = CustomTokenRefreshSerializer
-
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, context={'request': request})
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.validated_data)
+        token = request.COOKIES.get('refresh_token')
+        if not token:
+            return Response({'message': 'No refresh token provided'}, status=status.HTTP_400_BAD_REQUEST)
+        request.data['refresh'] = token
+        response = super().post(request, *args, **kwargs)
+        response.set_cookie(
+            'access_token',
+            response.data['access'],
+            expires=RefreshToken(token).access_token.lifetime,
+            httponly=True,
+            secure=True,
+            samesite='lax'
+        )
+        return response
