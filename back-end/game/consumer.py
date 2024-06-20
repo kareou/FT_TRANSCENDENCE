@@ -1,6 +1,12 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 import random
+from rest_framework_simplejwt.tokens import UntypedToken
+from ft_auth.models import User
+from ft_auth.serializer import UserSerializer
+from django.shortcuts import get_object_or_404
+from channels.db import database_sync_to_async
+
 
 class GameConsumer(AsyncWebsocketConsumer):
 
@@ -97,68 +103,64 @@ class GameConsumer(AsyncWebsocketConsumer):
                     state1[key] = state2[key]
         return state1
 
+@database_sync_to_async
+def GetUser(scope):
+    token = scope["cookies"].get("access_token")
+    try:
+        validated_token = UntypedToken(token)
+        user_id = validated_token["user_id"]
+        user = get_object_or_404(User, id=user_id)
+        return (user, user_id)
+    except Exception as e:
+        return None
 
-class LobbyConsumer(AsyncWebsocketConsumer):
 
-    game_data = {}
-    lobby_count = {}
-    def merge_dict(self,dict1, dict2):
-        res = {**dict1, **dict2}
-        return res
+class MatchMakingConsumer(AsyncWebsocketConsumer):
+    player_conections = {}
+
     async def connect(self):
-        self.user = self.scope["user"]
-        self.lobby_id = self.scope["url_route"]["kwargs"]["lobby_id"]
-        if self.lobby_id in LobbyConsumer.lobby_count and LobbyConsumer.lobby_count[self.lobby_id] >= 2:
-            return
-
-        if self.lobby_id in LobbyConsumer.lobby_count:
-            LobbyConsumer.lobby_count[self.lobby_id] += 1
-        else:
-            LobbyConsumer.lobby_count[self.lobby_id] = 1
-
-        role = "player1" if LobbyConsumer.lobby_count[self.lobby_id] == 1 else "player2"
-        await self.channel_layer.group_add(
-            self.lobby_id,
-            self.channel_name
-        )
+        self.user, self.user_id = await GetUser(self.scope)
         await self.accept()
-        await self.send(text_data=json.dumps({"role": role}))
-
-    async def disconnect(self, close_code):
-        if self.lobby_id in LobbyConsumer.lobby_count:
-            LobbyConsumer.lobby_count[self.lobby_id] -= 1
-
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        if "game_data" in text_data_json:
-            game_data = text_data_json["game_data"]
-            if self.lobby_id in LobbyConsumer.game_data:
-                LobbyConsumer.game_data[self.lobby_id] = self.merge_dict(LobbyConsumer.game_data[self.lobby_id], game_data)
-            else:
-                LobbyConsumer.game_data[self.lobby_id] = game_data
-            print(LobbyConsumer.game_data[self.lobby_id])
-            if len(LobbyConsumer.game_data[self.lobby_id]) == 2:
-                await self.channel_layer.group_send(
-                    self.lobby_id,
-                    {
-                        "type": "lobby_message",
-                        "game_data": game_data
-                    }
-                )
-        elif "start_game" in text_data_json:
-            game_session = random.randint(1000, 9999)
-            await self.channel_layer.group_send(
-                self.lobby_id,
+        MatchMakingConsumer.player_conections[self.user_id] = (self.channel_name, self.user)
+        if len(MatchMakingConsumer.player_conections) >= 2:
+            player1 = random.choice(list(MatchMakingConsumer.player_conections.keys()))
+            player2 = random.choice(list(MatchMakingConsumer.player_conections.keys()))
+            while player1 == player2:
+                player2 = random.choice(list(MatchMakingConsumer.player_conections.keys()))
+            player1_data = MatchMakingConsumer.player_conections.pop(player1)
+            player2_data = MatchMakingConsumer.player_conections.pop(player2)
+            await self.channel_layer.send(
+                player1_data[0],
                 {
-                    "type": "start_game",
-                    "game_data": game_session
+                    "type": "match_request",
+                    "player2": player2_data[1],
+                }
+            )
+            await self.channel_layer.send(
+                player2_data[0],
+                {
+                    "type": "match_request",
+                    "player2": player1_data[1],
                 }
             )
 
-    async def lobby_message(self, event):
-        game_data = event["game_data"]
-        await self.send(text_data=json.dumps({"game_data": game_data}))
+    async def disconnect(self, close_code):
+        MatchMakingConsumer.player_conections.pop(self.user_id)
+        self.close()
 
-    async def start_game(self, event):
-        game_session = event["game_data"]
-        await self.send(text_data=json.dumps({"start_game": game_session}))
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        player2 = text_data_json["player2"]
+        player2_channel = MatchMakingConsumer.player_conections[player2]
+        await self.channel_layer.send(
+            player2_channel,
+            {
+                "type": "match_request",
+                "player1": self.user.username,
+            }
+        )
+
+    async def match_request(self, event):
+        player2 = event["player2"]
+        await self.send(text_data=json.dumps({"player2": UserSerializer(player2).data}))
+

@@ -9,8 +9,7 @@ from .serializer import UserSerializer, CustomTokenVerifySerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_simplejwt.serializers import TokenVerifySerializer
-from rest_framework_simplejwt.views import TokenVerifyView
+from rest_framework_simplejwt.views import TokenVerifyView, TokenRefreshView
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -34,9 +33,12 @@ def login(request):
         if not user.check_password(password):
             return Response(status=status.HTTP_404_BAD_REQUEST, data={'message': 'Incorrect password'})
         refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)  # Convert token to string
+        access_token = str(refresh.access_token)
         serializer = UserSerializer(user)
-        response = Response(status=status.HTTP_200_OK, data={'token': access_token, 'user': serializer.data, 'refresh_token': str(refresh)})
+        response = Response(serializer.data, status=status.HTTP_200_OK)
+        print(refresh.access_token.lifetime,flush=True)
+        response.set_cookie(key='access_token', value=access_token, expires=refresh.access_token.lifetime, httponly=True, secure=True, samesite='lax')
+        response.set_cookie(key='refresh_token', value=str(refresh), expires=refresh.lifetime, httponly=True, secure=True, samesite='lax')
         return response
 
     except Exception as e:
@@ -81,3 +83,26 @@ def update_user(request):
 
 class TokenVerify(TokenVerifyView):
     serializer_class = CustomTokenVerifySerializer
+    def post(self, request, *args, **kwargs):
+        token = request.COOKIES.get('access_token')
+        if not token:
+            return Response({'message': 'No access token provided'}, status=status.HTTP_400_BAD_REQUEST)
+        request.data['token'] = token
+        return super().post(request, *args, **kwargs)
+
+class TokenRefresh(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        token = request.COOKIES.get('refresh_token')
+        if not token:
+            return Response({'message': 'No refresh token provided'}, status=status.HTTP_400_BAD_REQUEST)
+        request.data['refresh'] = token
+        response = super().post(request, *args, **kwargs)
+        response.set_cookie(
+            'access_token',
+            response.data['access'],
+            expires=RefreshToken(token).access_token.lifetime,
+            httponly=True,
+            secure=True,
+            samesite='lax'
+        )
+        return response

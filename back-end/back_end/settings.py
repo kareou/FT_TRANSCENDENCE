@@ -91,6 +91,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'ft_auth',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -152,7 +153,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'ft_auth.authentications.CustomAuthentication',
     ),
 }
 
@@ -217,6 +218,8 @@ CORS_ALLOW_HEADERS = (
     "user-agent",
     "x-csrftoken",
     "x-requested-with",
+    "cookie",
+    "set-cookie",
 )
 
 CORS_ALLOW_CREDENTIALS = True

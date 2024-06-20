@@ -2,6 +2,7 @@ from typing import Iterable
 from django.db import models
 from django.contrib.auth.models import BaseUserManager , AbstractBaseUser
 from io import BytesIO
+from user.models import Stats
 import requests
 
 class UserManagment(BaseUserManager):
@@ -47,3 +48,6 @@ class User(AbstractBaseUser):
             self.profile_pic.save(self.profile_pic.name, self.profile_pic, save=False)
 
         super().save(*args, **kwargs)
+        if not Stats.objects.filter(user=self).exists():
+            Stats.objects.create(user=self)
+
