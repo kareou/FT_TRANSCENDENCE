@@ -9,20 +9,27 @@
     border: 1px solid #778FB8;
     width: fit-content;
     border-radius: 15px;
+    color: #fff;
+    backdrop-filter: blur(10px);
+    background-color: rgba(27, 167, 160, 0.05);
+    height: 90vh !important;
     /* flex: 4; */
 }
 
-.right_sidebar_wrapper {
-    backdrop-filter: blur(10px);
-    height: 90vh !important;
-    color: #fff;
+/* .right_sidebar_wrapper {
     border: 1px solid #778FB8;
     border-radius: 15px;
+} */
+
+.content_wrapper{
+    background-color: rgba(27, 167, 160, 0.05);
+    
 }
 
 .account_settings_wrapper {
     display: flex;
     flex-direction: column;
+    /* background-color: rgba(27, 167, 160, 0.05); */
     justify-content: space-between;
     height: 60%;
     padding: 10%;
@@ -146,7 +153,7 @@
 }
 
 .button_edit {
-    background-color: green;
+    background-color: #04BF8A;
     position: relative;
     font-size: 23px;
     width: 130px;
@@ -207,7 +214,7 @@
 
 .button_save {
     flex: 1;
-    background-color: green;
+    background-color: #04BF8A;
     font-size: 30px;
     align-content: center;
     position: absolute;

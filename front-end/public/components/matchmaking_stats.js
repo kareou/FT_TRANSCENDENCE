@@ -35,8 +35,8 @@ export default class MatchmakingStats extends HTMLElement {
 
 	getUser(){
 		this.user = this.matched_users[this.id - 1];
-		if (!this.user)
-			this.user = this.matched_users[0];
+		// if (!this.user)
+		// 	this.user = this.matched_users[0];
 	}
 
 	update(data) {
@@ -47,28 +47,29 @@ export default class MatchmakingStats extends HTMLElement {
 
 	render() {
 		this.innerHTML = /*html*/`
+		<h1 id="opponents_name">${this.user ? this.user.username : "Looking for opponent"}</h1>
 		<div class="playerStats">
-			<div class="statItem">
+			<h1 class="statItem">
 				<span>Matches</span>
 				<span>
 				${this.userStats.matches}
 				</span>
-			</div>
-			<div class="statItem">
+			</h1>
+			<h1 class="statItem">
 				<span>Win</span><span>
 				${this.userStats.win}
 				</span>
-			</div>
-			<div class="statItem">
+			</h1>
+			<h1 class="statItem">
 				<span>Lose</span><span>
 				${this.userStats.lose}
 				</span>
-			</div>
-			<div class="statItem">
+			</h1>
+			<h1 class="statItem">
 				<span>Draw</span><span>
 				${this.userStats.draw}
 				</span>
-				</div>
+				</h1>
         </div>
 	  `;
 	}

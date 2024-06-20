@@ -145,7 +145,8 @@ class MatchMakingConsumer(AsyncWebsocketConsumer):
             )
 
     async def disconnect(self, close_code):
-        pass
+        MatchMakingConsumer.player_conections.pop(self.user_id)
+        self.close()
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)

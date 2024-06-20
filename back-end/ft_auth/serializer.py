@@ -27,6 +27,8 @@ class CustomTokenVerifySerializer(TokenVerifySerializer):
             user = User.objects.get(id=validated_token['user_id'])
             user_serializer = UserSerializer(user)
             data['user'] = user_serializer.data
+        except User.DoesNotExist:
+            raise serializers.ValidationError('No user found for the provided token.')
         except TokenError as e:
             raise InvalidToken(e)
         return data

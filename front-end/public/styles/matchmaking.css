@@ -1,28 +1,63 @@
+@import url("./dashboard.css");
+
 .matchmaking{
 	display: flex;
-    flex-direction: row;
     align-items: center;
+    justify-content: space-around;
+    font-family: "Coolvetica";
+    width: 100%;
+}
+
+.matchmaking-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 90vh;
+    backdrop-filter: blur(10px);
+    border: 1px solid #778FB8;
+    background-color: rgba(27, 167, 160, 0.05);
+    border-radius: 1rem;
 }
 
 .avatar img{
-	width: 150px;
-    height: 150px;
+	width: 20rem;
+    height: 20rem;
     border-radius: 50%;
 	margin-bottom: 10px;
     position: relative;
 }
 
-.vsPng {
-    width: 100px;
-    height: 100px;
-    background-image: url('/public/assets/VS.png');
-    background-size: cover;
-    background-position: center;
-}
 
 .playerStats {
     text-align: center;
-    font-weight: bold;
     font-size: 15px;
-    color: white;
+}
+
+#opponents_name{
+    text-align: center;
+    font-size: 2em;
+    color: #04D98B;
+    font-family: "Coolvetica";
+    
+}
+
+#vspng{
+    height: 40rem;
+}
+
+.statItem span {
+    font-family: "Coolvetica";
+    display: block;
+    font-size: 1.5em;
+
+}
+
+#cancel{
+    font-size: 1.5em;
+    background-color: #04BF8A;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+    align-items: end;
 }
