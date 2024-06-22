@@ -1,0 +1,64 @@
+.game_container{
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+}
+
+.game{
+  display: flex;
+  flex-direction: column;
+  width: 100rem;
+  height: 65rem;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.board{
+  display: grid;
+  height: 100%;
+  width: 100%;
+
+}
+
+.players{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 10px 10px 0 0;
+  padding: 1rem;
+  margin-left: 10rem;
+  margin-right: 10rem;
+  width: 80%;
+  background: linear-gradient(130deg, rgba(244, 63, 232, 0.2), rgba(4, 217, 139, 0.2));
+  backdrop-filter: blur(1rem);
+}
+
+#player_img{
+width: 4rem;
+height: 4rem;
+border-radius: 5px;
+}
+
+.player_2{
+border-radius: 0 0 10px 10px;
+}
+
+.p_info{
+display: flex;
+align-items: center;
+font-size: 1.5em;
+gap: 1rem;
+}
+
+
+.timer{
+font-size: 2em;
+color: white;
+}
