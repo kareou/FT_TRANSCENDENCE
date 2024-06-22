@@ -55,6 +55,8 @@ export default class MatchMakingAvatar extends HTMLElement {
       </div>
       `;
     }
+
+    
   }
   // <h1 id="opponents_name">${this.user ? this.user.username : "Looking for opponent ..."}</h1>
 

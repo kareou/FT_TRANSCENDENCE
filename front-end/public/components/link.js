@@ -4,7 +4,6 @@ import Http from "../http/http.js";
 export default class Link extends HTMLAnchorElement {
   constructor() {
     super();
-    // Set up your custom behavior here
   }
 
   static startWith(string, prefix) {
@@ -20,7 +19,6 @@ export default class Link extends HTMLAnchorElement {
 
 
   static async findRoute(routers, path, parent_path = "") {
-    console.log(routers);
     let route = null;
     const isAuth = await Http.verifyToken();
     for (let i = 0; i < routers.length; i++) {

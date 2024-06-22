@@ -10,7 +10,7 @@ export class ClassicPaddle{
 		this.speed = 10;
 		this.velocityY = 0;
 		this.ctx = ctx;
-		this.score = 0;
+		this.score =  0;
 		this.game_theme = game_theme;
 	}
 
