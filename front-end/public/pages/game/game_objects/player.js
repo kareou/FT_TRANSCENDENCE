@@ -22,8 +22,6 @@ export class ClassicPaddle{
 		}
 		let radius = (this.game_theme === "classic" ? 0 : 5);
 		this.ctx.beginPath();
-		// this.ctx.shadowBlur = 20;
-		// this.ctx.shadowColor = "white";
         this.ctx.roundRect(this.x, this.y, this.width, this.height, radius);
         this.ctx.fill();
         this.ctx.closePath();

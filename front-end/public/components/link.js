@@ -7,40 +7,65 @@ export default class Link extends HTMLAnchorElement {
     // Set up your custom behavior here
   }
 
-
   static startWith(string, prefix) {
-    return string.slice(0, prefix.length) === prefix;
+    return string.startsWith(prefix);
+  }
+
+  static matchUrl(url, path) {
+    if (path === '/') return url === path;
+    if (url.endsWith('/'))
+      url = url.slice(0, -1);
+    return url === path;
   }
 
 
-  static async navigateTo(url) {
-    const isAuth = await Http.verifyToken();
-    console.log(isAuth);
-    if ( isAuth === false && url !== "/signin" && url !== "/signup" && url !== "/") {
-      url = "/signin";
-    }
-    if (isAuth === true && (url === "/signin" || url === "/signup")) {
-      url = "/";
-    }
-    if (url !== window.location.pathname) window.history.pushState({}, "", url);
+  static async findRoute(routers, path, parent_path = "") {
+    console.log(routers);
     let route = null;
-    for (let i = 0; i < routes.length; i++) {
-      let pos = url.indexOf("/?");
-      if (pos === -1) {
-        pos = url.length;
-      }
-      const path = url.slice(0, pos);
-      if (routes[i].path === path) {
-        route = routes[i];
-        break;
+    const isAuth = await Http.verifyToken();
+    for (let i = 0; i < routers.length; i++) {
+      if (routers[i].requireAuth === true) {
+        if (isAuth === false) {
+          return Link.findRoute(routers[i].children, "/auth/signin", "");
+        }
+        if (routers[i].children) {
+          route = await Link.findRoute(routers[i].children, path, parent_path + routers[i].path);
+          if (route) return route;
+        }
+        if (Link.matchUrl(path, parent_path+routers[i].path)) {
+          return routers[i];
+        }
+      }else{
+        if (routers[i].children) {
+          route = await Link.findRoute(routers[i].children, path, parent_path + routers[i].path);
+          if (route) return route;
+        }
+        if (Link.matchUrl(path, parent_path+routers[i].path)) {
+          console.log(routers[i].path);
+          return routers[i];
+        }
       }
     }
+    return route;
+  }
+
+  static async navigateTo(url) {
+    if (url !== window.location.pathname) window.history.pushState({}, "", url);
+    let pos = url.indexOf("/?");
+    if (pos === -1) {
+      pos = url.length;
+    }
+    const path = url.slice(0, pos);
+    var route = await Link.findRoute(routes, path);
     if (!route) route = routes[0];
+    console.log(route);
     const root = document.getElementById("app");
     try {
       const component = await route.component();
       const componentToRender = new component.default();
-      root.innerHTML = "";
+      if (root.firstChild) {
+        root.removeChild(root.firstChild);
+      }
       root.appendChild(componentToRender);
     } catch (e) {
       console.error(e);

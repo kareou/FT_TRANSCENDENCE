@@ -107,7 +107,9 @@ class Http {
 			return this.verifyToken(trials + 1);
 		}
 		else {
-			const res = await response.json();
+			await this.refreshToken();
+			if (trials < 1)
+				return this.verifyToken(trials + 1);
 			return false;
 		}
 	}

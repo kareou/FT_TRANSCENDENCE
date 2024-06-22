@@ -65,6 +65,18 @@ body{
     text-align: center;
 }
 
+.logout_logo_wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.logout_logo_wrapper .icon_side_bar:hover{
+    cursor: pointer;
+    color: #1BA7A0;
+}
+
 .dash_logos_wrapper{
     display: grid;
     align-items: center;

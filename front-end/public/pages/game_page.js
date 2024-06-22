@@ -61,7 +61,7 @@ export default class GamePage extends HTMLElement {
       setInterval(() => {
         count_down -= 1;
         if (count_down === -1) {
-          Link.navigateTo("/gameplay");
+          Link.navigateTo("/game/local");
         }
         start_ev.innerText = `Starting in ${count_down}`;
       }, 1000);

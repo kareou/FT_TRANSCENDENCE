@@ -76,18 +76,18 @@ export default class SideBar extends HTMLElement {
       <a is="co-link" href="/dashboard" class="active">
         <i class="fa-thin fa-objects-column fa-2xl icon_side_bar"></i>
       </a>
-      <a is="co-link" href="/gameplay">
+      <a is="co-link" href="/dashboard/game">
         <i class="fa-light fa-gamepad-modern fa-2xl icon_side_bar"></i>
       </a>
-      <a is="co-link" href="/chat">
+      <a is="co-link" href="/dashboard/chat">
         <i class="fa-light fa-message-dots fa-2xl icon_side_bar"></i>
       </a>
-      <a is="co-link" href="/settings">
+      <a is="co-link" href="/dashboard/settings">
         <i class="fa-light fa-gear fa-2xl icon_side_bar"></i>
       </a>
     </div>
     <div class="logout_logo_wrapper">
-      <img src="/public/assets/Logout.png" alt="Logout logo" class="icon_side_bar">
+      <i class="fa-light fa-left-from-bracket fa-2xl icon_side_bar"></i>
     </div>
 </div>
 `;

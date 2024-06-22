@@ -9,24 +9,7 @@ export default class OnlineGame extends HTMLElement {
     this.ball;
     this.websocket = null;
     this.role = null;
-    this.game_id = null;
     this.game_started = false;
-    this.game_state = {
-      player1: {
-        y: 0,
-        score: 0,
-      },
-      player2: {
-        y: 0,
-        score: 0,
-      },
-      ball: {
-        x: 0,
-        y: 0,
-        dx: 0,
-        dy: 0,
-      },
-    };
   }
 
   connectedCallback() {
@@ -47,16 +30,24 @@ export default class OnlineGame extends HTMLElement {
       const data = JSON.parse(e.data);
       if (data.role) {
         this.role = data.role;
-        this.game_id = data.game_id;
+        console.log(this.role);
       }
-      if (data.state) {
-        this.game_state = data.state;
-        if (this.role !== "player1") this.player1.y = this.game_state.player1.y;
-        if (this.role !== "player2") this.player2.y = this.game_state.player2.y;
-        this.ball.x = this.game_state.ball.x;
-        this.ball.y = this.game_state.ball.y;
-        this.ball.dx = this.game_state.ball.dx;
-        this.ball.dy = this.game_state.ball.dy;
+      if (data.data) {
+        if (data.data.sender !== this.role) {
+          if (data.data.sender === "player1") {
+            this.player1.y = data.data.py;
+          } else {
+            this.player2.y = data.data.py;
+          }
+        }
+      }
+      if (data.ball) {
+        if (this.role === "player2"){
+          this.ball.x = data.ball.x;
+          this.ball.y = data.ball.y;
+          this.ball.dx = data.ball.dx;
+          this.ball.dy = data.ball.dy;
+        }
       }
       if (data.message) {
         if (data.message === "Game is starting") {
@@ -66,22 +57,31 @@ export default class OnlineGame extends HTMLElement {
         }
       }
     };
-    this.game_state.player1.y = this.player1.y;
-    this.game_state.player2.y = this.player2.y;
     this.#drawBoard(ctx);
     this.#drawPaddles(ctx);
     this.ball.draw();
     document.addEventListener("keydown", this.#movePaddels.bind(this));
     document.addEventListener("keyup", (e) => {
       if (e.code == "KeyW" || e.code == "KeyS") {
-        if (this.role === "player1") this.player1.stopPlayer();
-        else this.player2.stopPlayer();
+        if (this.role === "player1"){
+          this.player1.stopPlayer();
+          this.websocket.send(JSON.stringify({data: {py: this.player1.y, sender: this.role}}));
+        }else{
+          this.player2.stopPlayer();
+          this.websocket.send(JSON.stringify({data: {py: this.player2.y, sender: this.role}}));
+        }
       }
     });
   }
 
   disconnectedCallback() {
     document.removeEventListener("keydown", this.#movePaddels);
+    document.removeEventListener("keyup", (e) => {
+      if (e.code == "KeyW" || e.code == "KeyS") {
+        if (this.role === "player1") this.player1.stopPlayer();
+        else this.player2.stopPlayer();
+      }
+    });
     this.websocket.close();
   }
 
@@ -117,14 +117,25 @@ export default class OnlineGame extends HTMLElement {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     this.#drawBoard(ctx);
     this.#drawPaddles(ctx);
-    this.ball.move(this.player1, this.player2);
+    // this.ball.move(this.player1, this.player2);
     if (this.#marked(ctx)) {
       this.ball.resetPosition();
       this.player1.resetPosition();
       this.player2.resetPosition();
     }
-    this.#update_game_state();
+    if (this.role === "player1")
+      this.sendBallState()
     this.ball.draw();
+  }
+
+  sendBallState() {
+    const ball = {
+      x: this.ball.x,
+      y: this.ball.y,
+      dx: this.ball.dx,
+      dy: this.ball.dy
+    }
+    this.websocket.send(JSON.stringify({ball: ball}));
   }
 
   #drawPaddles(ctx) {
@@ -139,24 +150,24 @@ export default class OnlineGame extends HTMLElement {
 
   #movePaddels(e) {
     if (e.code == "KeyW") {
-      if (this.role === "player1") this.player1.movePlayer("up");
-      else this.player2.movePlayer("up");
+      if (this.role === "player1"){
+        this.player1.movePlayer("up");
+        this.websocket.send(JSON.stringify({data: {py: this.player1.y, sender: this.role}}));
+      }
+      else{ 
+        this.player2.movePlayer("up")
+        this.websocket.send(JSON.stringify({data: {py: this.player2.y, sender: this.role}}));
+      }
     } else if (e.code == "KeyS") {
-      if (this.role === "player1") this.player1.movePlayer("down");
-      else this.player2.movePlayer("down");
+      if (this.role === "player1"){
+        this.player1.movePlayer("down");
+        this.websocket.send(JSON.stringify({data: {py: this.player1.y, sender: this.role}}));
+      }
+      else{
+        this.player2.movePlayer("down")
+        this.websocket.send(JSON.stringify({data: {py: this.player2.y, sender: this.role}}));
+      }
     }
-  }
-
-  #update_game_state() {
-    this.game_state.player1.y = this.player1.y;
-    this.game_state.player2.y = this.player2.y;
-    this.game_state.ball.x = this.ball.x;
-    this.game_state.ball.y = this.ball.y;
-    this.game_state.ball.dx = this.ball.dx;
-    this.game_state.ball.dy = this.ball.dy;
-    this.websocket.send(
-      JSON.stringify({ state: this.game_state, game_id: this.game_id })
-    );
   }
 
   #marked(ctx) {
