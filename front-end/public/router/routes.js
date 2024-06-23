@@ -17,14 +17,20 @@ export const routes = [
     component: () => import("../pages/welcome.js"),
   },
   {
-    path: "/signin", // Changed from "/signin" to "signin"
+    path: "/auth",
     requireAuth: false,
-    component: () => import("../pages/signin.js"),
-  },
-  {
-    path: "/signup", // Changed from "/signup" to "signup"
-    requireAuth: false,
-    component: () => import("../pages/signup.js"),
+    children: [
+      {
+        path: "/signin", // Changed from "/signin" to "signin"
+        requireAuth: false,
+        component: () => import("../pages/signin.js"),
+      },
+      {
+        path: "/signup", // Changed from "/signup" to "signup"
+        requireAuth: false,
+        component: () => import("../pages/signup.js"),
+      },
+    ],
   },
   {
     path: "/dashboard",

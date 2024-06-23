@@ -1,15 +1,30 @@
+import Link from "./link.js";
+
 export default class TopBar extends HTMLElement {
   constructor() {
     super();
   }
 
   connectedCallback() {
+    this.initURLChangeDetection();
+    this.checkAndRender();
+  }
+
+  checkAndRender() {
+    const path = window.location.pathname;
+    if (path === "/" || Link.startWith(path, "/game") || Link.startWith(path, "/auth")) {
+      return;
+    }
     this.render();
   }
 
+  initURLChangeDetection() {
+    this.selected = window.location.pathname;
+    // Listen for popstate, hashchange, and custom locationchange events
+    window.addEventListener("locationchange", this.checkAndRender.bind(this));
+  }
+
   render() {
-    if (window.location.pathname === "/signin" || window.location.pathname === "/signup" || window.location.pathname === "/" || window.location.pathname === "/gameplay")
-      return;
     this.innerHTML = /*HTML*/ `
         <div class="chat_notification_bar_wrapper">
                 <div class="search_input_wrapper">

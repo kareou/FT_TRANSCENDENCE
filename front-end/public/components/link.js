@@ -39,7 +39,6 @@ export default class Link extends HTMLAnchorElement {
           if (route) return route;
         }
         if (Link.matchUrl(path, parent_path+routers[i].path)) {
-          console.log(routers[i].path);
           return routers[i];
         }
       }
@@ -56,7 +55,6 @@ export default class Link extends HTMLAnchorElement {
     const path = url.slice(0, pos);
     var route = await Link.findRoute(routes, path);
     if (!route) route = routes[0];
-    console.log(route);
     const root = document.getElementById("app");
     try {
       const component = await route.component();
@@ -65,8 +63,10 @@ export default class Link extends HTMLAnchorElement {
         root.removeChild(root.firstChild);
       }
       root.appendChild(componentToRender);
+      const event = new CustomEvent("locationchange", {detail: path});
+      window.dispatchEvent(event);
+
     } catch (e) {
-      console.error(e);
     }
   }
 

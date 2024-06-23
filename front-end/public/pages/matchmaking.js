@@ -58,6 +58,7 @@ export default class MatchMaking extends HTMLElement {
               clearInterval(this.intervalId);
               this.intervalId = null;
               this.websocket.close(3000);
+              this.websocket = null;
               Link.navigateTo(`/game/online/?game_id=${game_id}`);
             }
           }, 1000);
@@ -78,9 +79,10 @@ export default class MatchMaking extends HTMLElement {
     const state = this.querySelector("#lobby_state");
     state.innerHTML = "Waiting for a player to join...";
   }
-  
+
   disconnectedCallback() {
-    this.websocket.close(3001);
+    if (this.websocket)
+      this.websocket.close(3001);
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
@@ -88,7 +90,7 @@ export default class MatchMaking extends HTMLElement {
   }
 
   render() {
-    
+
     this.innerHTML = /*html*/ `
 		<div class="matchmaking-wrapper">
       <div class="matchmaking">

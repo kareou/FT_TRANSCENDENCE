@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from channels.db import database_sync_to_async
 from user.models import Stats
 from user.serializer import StatsSerializer
+from django.db import transaction
 from .models import Match
 
 @database_sync_to_async
@@ -22,27 +23,40 @@ def GetUser(scope):
         return None
 
 @database_sync_to_async
-def updateGameScore(game_id, player1_score, player2_score, winner):
+def updateGameScore(game_id, player1_score = None, player2_score = None, player1 = None, player2 = None):
     try:
-        game = get_object_or_404(Match, id=game_id)
-        game.player1_score = player1_score
-        game.player2_score = player2_score
-        game.winner = winner
-        game.save()
+        with transaction.atomic():
+            game = get_object_or_404(Match, id=game_id)
+            if player1_score is not None:
+                game.player1_score += player1_score
+            if player2_score is not None:
+                game.player2_score += player2_score
+            winner = None
+            if game.player1_score == 3:
+                winner = player1
+            elif game.player2_score == 3:
+                winner = player2
+            if winner is not None:
+                game.winner = winner
+            game.save()
+            return winner
     except Exception as e:
-        pass
+        return None
 
 @database_sync_to_async
 def updateUserStats(user, winner, goals_scored, goals_conceded):
     try:
-        stats = get_object_or_404(Stats, user_id=user)
-        stats.goals_scored += goals_scored
-        stats.goals_conceded += goals_conceded
-        if user == winner:
-            stats.matche_won += 1
-        else:
-            stats.matche_lost += 1
-        stats.save()
+        with transaction.atomic():
+            stats = get_object_or_404(Stats, user_id=user)
+            stats.goals_scored += goals_scored
+            stats.goals_conceded += goals_conceded
+            if winner is not None:
+                stats.matche_played += 1
+                if user == winner:
+                    stats.matche_won += 1
+                else:
+                    stats.matche_lost += 1
+            stats.save()
     except Exception as e:
         pass
 
@@ -89,6 +103,16 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.game_id,
             self.channel_name
         )
+        if close_code != 3000:
+            opponent = GameConsumer.game_users_data[self.game_id][0]["player1"] if self.user == GameConsumer.game_users_data[self.game_id][1]["player2"] else GameConsumer.game_users_data[self.game_id][1]["player2"]
+            await updateGameScore(game_id=self.game_id, winner=opponent)
+            await self.channel_layer.group_send(
+                self.game_id,
+                {
+                    "type": "game_end",
+                    "winner": opponent,
+                }
+            )
         await self.close()
 
 
@@ -148,13 +172,15 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.checkGameEnd(event)
         except:
             pass
-        
+
     async def checkGameEnd(self, event):
+        p1 = GameConsumer.game_users_data[self.game_id][0]["player1"]
+        p2 = GameConsumer.game_users_data[self.game_id][1]["player2"]
         winner = None
-        if event["score"]["p1"] == 5:
-            winner = GameConsumer.game_users_data[self.game_id][0]["player1"]
-        elif event["score"]["p2"] == 5:
-            winner = GameConsumer.game_users_data[self.game_id][1]["player2"]
+        if self.user == GameConsumer.game_users_data[self.game_id][0]["player1"]:
+            winner = await updateGameScore(self.game_id, event["score"]["p1"], event["score"]["p2"], p1, p2)
+            await updateUserStats(p2, winner, event["score"]["p2"], event["score"]["p1"])
+            await updateUserStats(p1, winner, event["score"]["p1"], event["score"]["p2"])
         if winner is not None:
             await self.channel_layer.group_send(
                 self.game_id,
@@ -163,9 +189,6 @@ class GameConsumer(AsyncWebsocketConsumer):
                     "winner": winner,
                 }
             )
-            await updateGameScore(self.game_id, event["score"]["p1"], event["score"]["p2"], winner)
-            await updateUserStats(GameConsumer.game_users_data[self.game_id][1]["player2"], winner, event["score"]["p2"], event["score"]["p1"])
-            await updateUserStats(GameConsumer.game_users_data[self.game_id][0]["player1"], winner, event["score"]["p1"], event["score"]["p2"])
 
     async def game_end(self, event):
         winner = event["winner"]
@@ -232,7 +255,6 @@ class MatchMakingConsumer(AsyncWebsocketConsumer):
 
 
     async def disconnect(self, close_code):
-        print(close_code, flush=True)
         if close_code != 3000:
             if self.user_id in MatchMakingConsumer.player_peered:
                 opponent = MatchMakingConsumer.player_peered[self.user_id][0]

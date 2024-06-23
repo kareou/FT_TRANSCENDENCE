@@ -34,7 +34,6 @@ export default class OnlineGame extends HTMLElement {
       const data = JSON.parse(e.data);
       if (data.role) {
         this.role = data.role;
-        console.log(this.role);
         Http.website_stats.notify("gameusers", { [this.role]: Http.user });
       }
       if (data.state) {
@@ -61,8 +60,8 @@ export default class OnlineGame extends HTMLElement {
       }
       if (data.score) {
         if (this.role === "player2") {
-          this.player1.score = data.score.p1;
-          this.player2.score = data.score.p2;
+          this.player1.score += data.score.p1;
+          this.player2.score += data.score.p2;
           document.getElementById("p1_score").innerText =
             this.player1.score.toString();
           document.getElementById("p2_score").innerText =
@@ -88,7 +87,7 @@ export default class OnlineGame extends HTMLElement {
   disconnectedCallback() {
     document.removeEventListener("keydown", (e) => this.#handleKeyDown(e));
     document.removeEventListener("keyup", (e) => this.#handleKeyUp(e));
-    this.websocket.close();
+    this.websocket.close(3001);
   }
 
   render() {
@@ -106,6 +105,7 @@ export default class OnlineGame extends HTMLElement {
     const modal = document.createElement("winner-modal");
     modal.setAttribute("winner", this.winner);
     this.appendChild(modal);
+    this.websocket.close();
   }
 
   #update(ctx) {
@@ -200,19 +200,11 @@ export default class OnlineGame extends HTMLElement {
       this.player2.score++;
       document.getElementById("p2_score").innerText =
         this.player2.score.toString();
-      this.websocket.send(
-        JSON.stringify({
-          score: { p2: this.player2.score, p1: this.player1.score },
-        })
-      );
+      this.websocket.send(JSON.stringify({ score: { p2: 1, p1: 0 } }));
       return true;
     } else if (this.ball.x + this.ball.size > ctx.canvas.width) {
       this.player1.score++;
-      this.websocket.send(
-        JSON.stringify({
-          score: { p2: this.player2.score, p1: this.player1.score },
-        })
-      );
+      this.websocket.send(JSON.stringify({ score: { p2: 0, p1: 1 } }));
       document.getElementById("p1_score").innerText =
         this.player1.score.toString();
       return true;

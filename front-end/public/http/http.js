@@ -33,14 +33,13 @@ class Http {
 			body: JSON.stringify(data),
 			credentials: 'include',
 		});
-		console.log(response);
 		if (response.status === 200) {
 			const res = await response.json();
 			this.user = res.user;
 			return res;
 		}
 		else {
-			console.log(response);
+
 			res = await response.json();
 			return res;
 		}
@@ -82,13 +81,11 @@ class Http {
 		}
 		else {
 			const res = await response.json();
-			console.log(res);
 			return res;
 		}
 	}
 
 	async verifyToken(trials = 0) {
-		console.log("verifying token", trials);
 		const response = await fetch(`${this.baseUrl}/api/token/verify/`, {
 			method: 'POST',
 			headers: {
