@@ -9,6 +9,7 @@ import MatchmakingStats from "../components/matchmaking_stats.js";
 import MatchMakingAvatar from "../components/matchmaking_avatar.js";
 import GameScore from "../components/game_score.js";
 import WinnerModal from "../components/winner_modal.js";
+import MatchData from "../components/match_data.js";
 
 export const routes = [
   {

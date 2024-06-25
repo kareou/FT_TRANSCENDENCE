@@ -170,3 +170,40 @@
     border-radius: 1rem;
     font-family: "Coolvetica";
 }
+
+.matchdata{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 2rem;
+    backdrop-filter: blur(1rem);
+    width: 30rem;
+    height: 5rem;
+    border-radius: 1rem;
+}
+
+.matchdata.win{
+    background-color: rgba(27, 167, 64, 0.25);
+}
+
+.matchdata.lose{
+    background-color: rgba(167, 27, 27, 0.25);
+}
+
+.matchdata h1{
+    font-size: 2em;
+    color: white;
+    font-family: "Coolvetica";
+}
+
+.matchdata .player{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.matchdata .player img{
+    border-radius: 50%;
+    width: 4rem;
+    height: 4rem;
+}
