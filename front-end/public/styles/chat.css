@@ -1,6 +1,6 @@
 .conv_data_container_chat__
 {
-    max-height: 500px; /* Example max-height */
+    height: 100%;
     overflow: hidden;
 }
 .slots_messages_container__ {
@@ -220,12 +220,12 @@ body{
 .first_profile_wrapper_chat{
     width: fit-content;
     width: 100%;
-
+    border-bottom: 1px solid #778FB8;;
 }
 
-.chat_bulle_wrapper {
+/* .chat_bulle_wrapper {
     display: flex;
-}
+} */
 
 .first_section_wrapper_chat{
     width: 20%;
@@ -237,33 +237,69 @@ body{
     padding: 20px 25px;
 }
 
-.chat_bulle_wrapper{
+/* .chat_bulle_wrapper{
     display: flex;
     align-items: center;
-}
+} */
 
 .pdp_logo_chat{
     width: 60px;
 }
 
-.data_chat_bulle_wrapper{
+/* .data_chat_bulle_wrapper{
     color: white;
     font-size: 18px;
-}
+} */
 
 .content_bulle_chat{
     color: gray;
     font-size: 14px;
 }
 
-.data_chat_bulle_wrapper{
+/* .data_chat_bulle_wrapper{
     padding: 0 0 0 15px;
+} */
+.chat_bulle_wrapper {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin: 5px 0;
+    /* background-color: #f0f0f0; Light background for contrast */
+    border-radius: 5px; /* Rounded corners for a modern look */
+    border-bottom: 1px solid #4b5e8d; /* Bottom border for separation */
+    transition: background-color 0.3s ease; /* Smooth transition on hover */
 }
 
-.chat_bulles_wrapper_{
-    /* background-color: #1BA7A0; */
-    border-top: 1px solid #4b5e8d;
+.chat_bulle_wrapper:hover {
+    background-color: #6dd88d; /* Slightly darker on hover */
+}   
+
+.chat_pdp_wrapper img {
+    border-radius: 50%; /* Circular profile picture */
+    width: 40px; /* Fixed size for profile picture */
+    height: 40px; /* Fixed size for profile picture */
+    margin-right: 10px; /* Space between image and text */
 }
+
+.data_chat_bulle_wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.name_bulle_chat {
+    font-weight: bold; /* Bold username */
+    color: #d7da60; /* Dark text for readability */
+    margin-bottom: 5px; /* Space between name and status */
+}
+
+.status_bulle_chat {
+    font-size: 0.9em; /* Slightly smaller font for status */
+    color: #666; /* Lighter text for status */
+}
+
+/* .chat_bulle_wrapper{
+    border-bottom: 1px solid #4b5e8d;
+} */
 
 .last_chat{
     border-bottom: 1px solid #778FB8;
