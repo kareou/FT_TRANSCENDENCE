@@ -5,3 +5,4 @@ class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Match
         fields = "__all__"
+        db_table = "match"

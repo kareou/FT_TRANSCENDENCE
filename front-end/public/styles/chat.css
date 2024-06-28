@@ -1,3 +1,54 @@
+.conv_data_container_chat__
+{
+    height: 100%;
+    overflow: hidden;
+}
+.slots_messages_container__ {
+    height: 100%; /* Full height of the parent container */
+    max-height: inherit; /* Inherit max-height from the base container */
+    overflow-y: auto; /* Add vertical scrollbar when necessary */
+
+    /* Other styles for your message container */
+}
+.slots_messages_container__::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+}
+
+.slots_messages_container__::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Track color */
+}
+
+.slots_messages_container__::-webkit-scrollbar-thumb {
+    background-color: #888; /* Thumb color */
+    border-radius: 4px; /* Rounded corners for the thumb */
+}
+
+/* Hide scrollbar when not interacting */
+.slots_messages_container__ {
+    scrollbar-width: none; /* Firefox */
+}
+
+.slots_messages_container__::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+}
+
+.send-button {
+    background-color: #4CAF50; /* Green background */
+    border: none; /* Remove border */
+    color: white; /* White text */
+    padding: 10px 20px; /* Padding inside button */
+    text-align: center; /* Center text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Display as inline-block */
+    font-size: 16px; /* Font size */
+    border-radius: 25px; /* Rounded corners */
+    transition-duration: 0.4s; /* Smooth transition on hover */
+}
+
+.send-button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
 *{
     box-sizing: border-box;
     margin: 0;
@@ -192,12 +243,12 @@ body{
 .first_profile_wrapper_chat{
     width: fit-content;
     width: 100%;
-
+    border-bottom: 1px solid #778FB8;;
 }
 
-.chat_bulle_wrapper {
+/* .chat_bulle_wrapper {
     display: flex;
-}
+} */
 
 .first_section_wrapper_chat{
     width: 20%;
@@ -209,33 +260,69 @@ body{
     padding: 20px 25px;
 }
 
-.chat_bulle_wrapper{
+/* .chat_bulle_wrapper{
     display: flex;
     align-items: center;
-}
+} */
 
 .pdp_logo_chat{
     width: 60px;
 }
 
-.data_chat_bulle_wrapper{
+/* .data_chat_bulle_wrapper{
     color: white;
     font-size: 18px;
-}
+} */
 
 .content_bulle_chat{
     color: gray;
     font-size: 14px;
 }
 
-.data_chat_bulle_wrapper{
+/* .data_chat_bulle_wrapper{
     padding: 0 0 0 15px;
+} */
+.chat_bulle_wrapper {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin: 5px 0;
+    /* background-color: #f0f0f0; Light background for contrast */
+    border-radius: 5px; /* Rounded corners for a modern look */
+    border-bottom: 1px solid #4b5e8d; /* Bottom border for separation */
+    transition: background-color 0.3s ease; /* Smooth transition on hover */
 }
 
-.chat_bulles_wrapper_{
-    /* background-color: #1BA7A0; */
-    border-top: 1px solid #4b5e8d;
+.chat_bulle_wrapper:hover {
+    background-color: #6dd88d; /* Slightly darker on hover */
+}   
+
+.chat_pdp_wrapper img {
+    border-radius: 50%; /* Circular profile picture */
+    width: 40px; /* Fixed size for profile picture */
+    height: 40px; /* Fixed size for profile picture */
+    margin-right: 10px; /* Space between image and text */
 }
+
+.data_chat_bulle_wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.name_bulle_chat {
+    font-weight: bold; /* Bold username */
+    color: #d7da60; /* Dark text for readability */
+    margin-bottom: 5px; /* Space between name and status */
+}
+
+.status_bulle_chat {
+    font-size: 0.9em; /* Slightly smaller font for status */
+    color: #666; /* Lighter text for status */
+}
+
+/* .chat_bulle_wrapper{
+    border-bottom: 1px solid #4b5e8d;
+} */
 
 .last_chat{
     border-bottom: 1px solid #778FB8;
@@ -394,7 +481,7 @@ body{
 }
 
 .second_section_wrapper_chat{
-    height: 100%;
+    height: 80%;
 }
 
 .con_infos_wrapper_{
