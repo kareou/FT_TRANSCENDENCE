@@ -12,7 +12,6 @@ export default class Observer {
   }
 
 
-
   notify(event, data = null) {
       this.observers.forEach((observer) => {
         if (observer.event === event) {

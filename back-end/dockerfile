@@ -10,4 +10,8 @@ WORKDIR /back-end
 
 EXPOSE 8000
 
+COPY ./script.sh script.sh
+
+# ENTRYPOINT ["sh", "script.sh"]
+
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

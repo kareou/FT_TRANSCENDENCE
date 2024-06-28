@@ -10,6 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
         extra_kwargs = {'password': {'write_only': True}}
+        db_table = 'user'
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user

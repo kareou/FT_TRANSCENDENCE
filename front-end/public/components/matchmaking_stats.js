@@ -26,28 +26,43 @@ export default class MatchmakingStats extends HTMLElement {
 	connectedCallback() {
 		this.getUser();
 		this.render();
-		Http.getData("GET",`api/stats/${this.user.id}`)
+		if (this.user) {
+			Http.getData("GET",`api/stats/${this.user.id}`)
 			.then((data) => {
 				this.updateStats(data);
 				this.render();
 			});
+		}
 	}
 
 	getUser(){
 		this.user = this.matched_users[this.id - 1];
-		// if (!this.user)
-		// 	this.user = this.matched_users[0];
 	}
 
 	update(data) {
 		this.matched_users = data.players;
 		this.getUser();
+		if (this.user){
+
+			Http.getData("GET",`api/stats/${this.user.id}`)
+			.then((data) => {
+				this.updateStats(data);
+				this.render();
+			});
+		}
+		else{
+			this.userStats = {
+				matches: "-",
+				win: "-",
+				lose: "-",
+				draw: "-"
+			}
+		}
 		this.render();
 	}
 
 	render() {
 		this.innerHTML = /*html*/`
-		<h1 id="opponents_name">${this.user ? this.user.username : "Looking for opponent"}</h1>
 		<div class="playerStats">
 			<h1 class="statItem">
 				<span>Matches</span>

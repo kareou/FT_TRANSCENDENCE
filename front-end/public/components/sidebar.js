@@ -16,7 +16,10 @@ export default class SideBar extends HTMLElement {
     const links = this.querySelectorAll("a");
     for (let i = 0; i < links.length; i++) {
       const link = links[i];
-      if (Link.startWith(window.location.pathname, link.getAttribute("href"))) {
+      if (window.location.pathname === link.getAttribute("href")){
+        link.classList.add("active");
+      }
+      else if ( Link.startWith(window.location.pathname, link.getAttribute("href")) && link.getAttribute("href") !== "/dashboard") {
         link.classList.add("active");
       } else {
         link.classList.remove("active");
@@ -27,7 +30,7 @@ export default class SideBar extends HTMLElement {
   // Check the current URL and render if it matches certain criteria
   checkAndRender() {
     const path = window.location.pathname;
-    if (path === "/signin" || path === "/signup" || path === "/" || path === "/gameplay") {
+    if (path === "/" || Link.startWith(path, "/game") || Link.startWith(path, "/auth")) {
       return;
     }
     this.render();
@@ -36,26 +39,8 @@ export default class SideBar extends HTMLElement {
 
   // Initialize URL change detection
   initURLChangeDetection() {
-    // Override pushState and replaceState to detect changes
-    const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
-
-    history.pushState = function (...args) {
-      originalPushState.apply(this, args);
-      window.dispatchEvent(new Event('pushstate'));
-      window.dispatchEvent(new Event('locationchange'));
-    };
-
-    history.replaceState = function (...args) {
-      originalReplaceState.apply(this, args);
-      window.dispatchEvent(new Event('replacestate'));
-      window.dispatchEvent(new Event('locationchange'));
-    };
-
     this.selected = window.location.pathname;
     // Listen for popstate, hashchange, and custom locationchange events
-    window.addEventListener('popstate', this.checkAndRender.bind(this));
-    window.addEventListener('hashchange', this.checkAndRender.bind(this));
     window.addEventListener('locationchange', this.checkAndRender.bind(this));
   }
 
@@ -76,18 +61,18 @@ export default class SideBar extends HTMLElement {
       <a is="co-link" href="/dashboard" class="active">
         <i class="fa-thin fa-objects-column fa-2xl icon_side_bar"></i>
       </a>
-      <a is="co-link" href="/gameplay">
+      <a is="co-link" href="/dashboard/game">
         <i class="fa-light fa-gamepad-modern fa-2xl icon_side_bar"></i>
       </a>
-      <a is="co-link" href="/chat">
+      <a is="co-link" href="/dashboard/chat">
         <i class="fa-light fa-message-dots fa-2xl icon_side_bar"></i>
       </a>
-      <a is="co-link" href="/settings">
+      <a is="co-link" href="/dashboard/settings">
         <i class="fa-light fa-gear fa-2xl icon_side_bar"></i>
       </a>
     </div>
     <div class="logout_logo_wrapper">
-      <img src="/public/assets/Logout.png" alt="Logout logo" class="icon_side_bar">
+      <i class="fa-light fa-left-from-bracket fa-2xl icon_side_bar"></i>
     </div>
 </div>
 `;

@@ -56,7 +56,8 @@ export default class Dashboard extends HTMLElement {
       </div>
     </div>
     <div class="game_wrapper">
-      <button class="game_button">Play Now</button>
+      <a is="co-link" href="/dashboard/game/local/1v1" class="game_button" id="local">Play Local</a>
+      <a is="co-link" href="/dashboard/game/online/1v1" class="game_button" id="online">Play Online</a>
     </div>
     <div class="online_friend">
       <h1>Friends</h1>

@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'ft_auth',
     'user',
+    'chat',
 ]
 
 MIDDLEWARE = [

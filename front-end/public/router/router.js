@@ -10,7 +10,7 @@ window.addEventListener('popstate', () => {
 }
 );
 
-window.onload = (e) => {
+window.onload = async (e) => {
     e.preventDefault();
     Link.navigateTo(window.location.pathname);
 };

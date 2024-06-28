@@ -6,20 +6,22 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import User
 from .serializer import UserSerializer, CustomTokenVerifySerializer
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenVerifyView, TokenRefreshView
+from datetime import datetime
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
     serializer = UserSerializer(data=request.data)
-    if serializer.is_valid():
+    try:
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_201_CREATED)
-    else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={'message': str(e)})
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -37,8 +39,8 @@ def login(request):
         serializer = UserSerializer(user)
         response = Response(serializer.data, status=status.HTTP_200_OK)
         print(refresh.access_token.lifetime,flush=True)
-        response.set_cookie(key='access_token', value=access_token, expires=refresh.access_token.lifetime, httponly=True, secure=True, samesite='lax')
-        response.set_cookie(key='refresh_token', value=str(refresh), expires=refresh.lifetime, httponly=True, secure=True, samesite='lax')
+        response.set_cookie(key='access_token', value=access_token, expires=(datetime.now() + refresh.access_token.lifetime).strftime('%a, %d-%b-%Y %H:%M:%S GMT'),httponly=True, secure=True, samesite='lax')
+        response.set_cookie(key='refresh_token', value=str(refresh), expires=(datetime.now() + refresh.lifetime).strftime('%a, %d-%b-%Y %H:%M:%S GMT'), httponly=True, secure=True, samesite='lax')
         return response
 
     except Exception as e:
@@ -54,11 +56,13 @@ def protected(request):
 @permission_classes([AllowAny])
 def logout(request):
     try:
-        refresh_token = request.data.get('refresh_token')
-        token = RefreshToken(refresh_token)
-        token.blacklist()
-
-        return Response(status=status.HTTP_205_RESET_CONTENT)
+        refresh_token = request.COOKIES.get('refresh_token')
+        if not refresh_token:
+            return Response({'message': 'No refresh token provided'}, status=status.HTTP_400_BAD_REQUEST)
+        response = Response(status=status.HTTP_200_OK)
+        response.delete_cookie('access_token')
+        response.delete_cookie('refresh_token')
+        return response
     except Exception as e:
         return Response(status=status.HTTP_400_BAD_REQUEST, data={'message': str(e)})
 
@@ -100,7 +104,7 @@ class TokenRefresh(TokenRefreshView):
         response.set_cookie(
             'access_token',
             response.data['access'],
-            expires=RefreshToken(token).access_token.lifetime,
+            expires=(datetime.now() + AccessToken(response.data['access']).lifetime).strftime('%a, %d-%b-%Y %H:%M:%S GMT'),
             httponly=True,
             secure=True,
             samesite='lax'
