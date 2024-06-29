@@ -46,7 +46,9 @@ class User(AbstractBaseUser):
                 self.profile_pic.name = f'users_pfp/{self.username}.svg'
         else:
             self.profile_pic.save(self.profile_pic.name, self.profile_pic, save=False)
-
+        if self.exp >= 100:
+            self.level += 1
+            self.exp = 0
         super().save(*args, **kwargs)
         if not Stats.objects.filter(user=self).exists():
             Stats.objects.create(user=self)

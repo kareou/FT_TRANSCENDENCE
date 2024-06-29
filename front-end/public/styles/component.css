@@ -273,3 +273,59 @@
     padding: 1rem;
     width: 100%;
 }
+
+.steps {
+    display: flex;
+    padding: 0;
+    justify-content: space-between;
+    align-items: end;
+    color: white;
+    width: 40rem;
+    margin-bottom: -2rem;
+}
+
+.step {
+    text-align: start;
+    width: 4rem; /* Added width to center the steps */
+}
+
+.graph {
+    padding: 2rem;
+    display: flex;
+    gap: 0;
+    width: 100%;
+    font-size: 1.5rem;
+}
+
+.graph ol {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    list-style: none;
+    color: white;
+    border-right: 1px solid white;
+    width: max-content;
+    padding: 0; /* Removed padding to align the text */
+    margin: 0; /* Removed margin to align the text */
+}
+
+.graph ol li {
+    position: relative;
+    /* width: 100%; */
+    height: 2rem;
+    display: flex;
+    justify-content: space-between;
+
+}
+
+#stat {
+    margin-left: 0; /* Changed margin to 0 to align text properly */
+    padding-left: 0.5rem; /* Added padding for better spacing */
+}
+
+#progress{
+    position: absolute;
+    left: 101%;
+    height: 100%;
+    background-color: #085E6D;
+}

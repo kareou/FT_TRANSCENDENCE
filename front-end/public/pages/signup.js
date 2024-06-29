@@ -47,7 +47,8 @@ render() {
       </form>
   </div>
 `;
-      }
+}
+
 }
 
 customElements.define("sign-up", SignUp);

@@ -8,13 +8,13 @@ export default class ProfileInfo extends HTMLElement {
   }
   connectedCallback() {
     if (this.id != this.user.id) {
-        Http.getData(`/users/${this.id}`).then((data) => {
+      Http.getData(`/users/${this.id}`).then((data) => {
         this.user = data;
         this.render();
-        });
+      });
     }
     else
-        this.render();
+      this.render();
   }
   render() {
     this.innerHTML = /*HTML*/ `
@@ -39,10 +39,10 @@ export default class ProfileInfo extends HTMLElement {
           <img src="/public/assets/ranks.svg" alt="medal">
           <h4 class="level">
             <span>${this.user.level}</span>
-            <span>50%</span>
+            <span>${this.user.exp}%</span>
           </h4>
           <div class="level-bar">
-            <span></span>
+            <span style="width: ${this.user.exp}%;"></span>
           </div>
         </div>
       </div>
