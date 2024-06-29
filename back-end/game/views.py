@@ -34,7 +34,7 @@ class GameViewSet(viewsets.ModelViewSet):
         user = get_object_or_404(User, pk=user_id)
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        matches = Match.objects.filter(Q(player1=user) | Q(player2=user)).order_by('-created_at')
+        matches = Match.objects.filter(Q(player1=user) | Q(player2=user)).order_by('-created_at')[0:7]
         if matches is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
         serialized = MatchSerializer(matches, many=True)

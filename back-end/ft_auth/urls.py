@@ -7,4 +7,5 @@ urlpatterns = [
     path('login/', views.login),
     path('logout/', views.logout),
     path('protected/', views.protected),
+    path('user/<int:user_id>', views.GetUser),
 ]

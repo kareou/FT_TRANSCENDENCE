@@ -213,7 +213,9 @@
     background-color: rgba(27, 167, 160, 0.05);
     backdrop-filter: blur(1rem);
     width: 100%;
+    grid-area: game;
     height: 100%;
+    border-radius: 1rem;
 }
 
 .win_rate{
@@ -328,4 +330,31 @@
     left: 101%;
     height: 100%;
     background-color: #085E6D;
+}
+
+.match_history{
+    padding: 1rem;
+    width: 100%;
+    height: 100%;
+    border-radius: 1rem;
+    background-color: rgba(27, 167, 160, 0.05);
+    backdrop-filter: blur(1rem);
+    grid-area: friends;
+}
+
+.achievement_list{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.achievement_list img{
+    height: 5rem;
+    border-radius: 50%;
+    filter: opacity(0.5);
+}
+.achievement_list img.earned{
+    height: 5rem;
+    border-radius: 50%;
+    filter: opacity(1);
 }

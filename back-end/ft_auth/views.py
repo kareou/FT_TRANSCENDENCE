@@ -11,6 +11,7 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, Ou
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenVerifyView, TokenRefreshView
 from datetime import datetime
+from django.shortcuts import get_object_or_404
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -110,3 +111,11 @@ class TokenRefresh(TokenRefreshView):
             samesite='lax'
         )
         return response
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def GetUser(request, user_id):
+    print(user_id,flush=True)
+    user = get_object_or_404(User, pk=user_id)
+    serializer = UserSerializer(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)

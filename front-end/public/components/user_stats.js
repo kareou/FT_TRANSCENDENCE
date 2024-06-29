@@ -36,7 +36,7 @@ export default class UserStats extends HTMLElement {
 
     render() {
         this.innerHTML = /*html*/ `
-<div class="user_stats" style="grid-area: game;">
+<div class="user_stats">
     <div class="win_rate">
         <div>
             <span class="stat_label">Win Rate</span>

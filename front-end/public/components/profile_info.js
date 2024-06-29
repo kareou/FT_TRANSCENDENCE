@@ -8,14 +8,25 @@ export default class ProfileInfo extends HTMLElement {
   }
   connectedCallback() {
     if (this.id != this.user.id) {
-      Http.getData(`/users/${this.id}`).then((data) => {
+      Http.getData("Get",`ft_auth/user/${this.id}`).then((data) => {
         this.user = data;
         this.render();
+        this.markUnearnedAchievements();
       });
     }
-    else
+    else{
       this.render();
+      this.markUnearnedAchievements();
+    }
   }
+
+  markUnearnedAchievements() {
+    const achievements = document.querySelectorAll(".achievement_list img");
+    for (let i = 0; i < this.user.level; i++) {
+      achievements[i].classList.add("earned");
+    }
+  }
+
   render() {
     this.innerHTML = /*HTML*/ `
         <div class="profile" >
@@ -36,7 +47,15 @@ export default class ProfileInfo extends HTMLElement {
         </h2>
         <div class="achievement">
           <h1>Achievements</h1>
-          <img src="/public/assets/ranks.svg" alt="medal">
+          <div class="achievement_list">
+          <img src="/public/assets/ranks/1.png" alt="medal">
+          <img src="/public/assets/ranks/2.png" alt="medal">
+          <img src="/public/assets/ranks/3.png" alt="medal">
+          <img src="/public/assets/ranks/4.png" alt="medal">
+          <img src="/public/assets/ranks/5.png" alt="medal">
+          <img src="/public/assets/ranks/6.png" alt="medal">
+          <img src="/public/assets/ranks/7.png" alt="medal">
+          </div>
           <h4 class="level">
             <span>${this.user.level}</span>
             <span>${this.user.exp}%</span>

@@ -16,7 +16,7 @@ export default class MatchHistory extends HTMLElement {
   }
   render() {
     this.innerHTML = /*HTML*/ `
-      <div class="match_history" style="grid-area: friends;">
+      <div class="match_history">
         <h1>Last 5 matches</h1>
         <div class="matches">
           ${this.matches.map(

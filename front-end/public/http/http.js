@@ -8,37 +8,45 @@ class Http {
   }
 
   async register(data, url) {
-    const response = await fetch(`${this.baseUrl}/${url}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    if (response.status !== 201) {
+    try {
+      const response = await fetch(`${this.baseUrl}/${url}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (response.status !== 201) {
+        const res = await response.json();
+        return res;
+      }
       const res = await response.json();
       return res;
+    } catch (e) {
+      return { error: e.message };
     }
-    const res = await response.json();
-    return res;
   }
 
   async login(data, url) {
-    const response = await fetch(`${this.baseUrl}/${url}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-      credentials: "include",
-    });
-    if (response.status === 200) {
-      const res = await response.json();
-      this.user = res.user;
-      return res;
-    } else {
-      res = await response.json();
-      return res;
+    try {
+      const response = await fetch(`${this.baseUrl}/${url}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+      if (response.status === 200) {
+        const res = await response.json();
+        this.user = res.user;
+        return res;
+      } else {
+        res = await response.json();
+        return res;
+      }
+    } catch (e) {
+      return { error: e.message };
     }
   }
 
@@ -53,7 +61,6 @@ class Http {
         body: method === "POST" ? JSON.stringify(data) : null,
       });
       if (response.status === 200) {
-        console.log(response);
         const res = await response.json();
         return res;
       } else if (response.status === 401 && retries < 1) {
@@ -66,19 +73,23 @@ class Http {
   }
 
   async refreshToken() {
-    const response = await fetch(`${this.baseUrl}/api/token/refresh/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
-    if (response.status === 200) {
-      const res = await response.json();
-      return res;
-    } else {
-      const res = await response.json();
-      return res;
+    try {
+      const response = await fetch(`${this.baseUrl}/api/token/refresh/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      if (response.status === 200) {
+        const res = await response.json();
+        return res;
+      } else {
+        const res = await response.json();
+        return res;
+      }
+    } catch (e) {
+      return { error: e.message };
     }
   }
 
