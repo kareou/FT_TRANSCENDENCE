@@ -27,10 +27,4 @@ class StatsViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, pk=None):
-        user = get_object_or_404(User, pk=request.user.id)
-        stats = get_object_or_404(Stats, user_id=user)
-        serializer = StatsSerializer(stats, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_403_FORBIDDEN)

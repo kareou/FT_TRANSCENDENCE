@@ -178,7 +178,7 @@
     gap: 1rem;
     padding: 0 2rem;
     backdrop-filter: blur(1rem);
-    width: 30rem;
+    width: 100%;
     height: 5rem;
     border-radius: 1rem;
 }
@@ -206,4 +206,70 @@
     border-radius: 50%;
     width: 4rem;
     height: 4rem;
+}
+
+.user_stats{
+    padding: 1rem 0;
+    background-color: rgba(27, 167, 160, 0.05);
+    backdrop-filter: blur(1rem);
+    width: 100%;
+    height: 100%;
+}
+
+.win_rate{
+    display: flex;
+    justify-content: space-between;
+    background-color: #085E6D;
+    gap: 1rem;
+    padding: 1rem;
+    width: 100%;
+    height: 10rem;
+    color: white;
+    min-height: 5rem;
+}
+
+
+.win_rate>div{
+    display: flex;
+    flex-direction: column;
+}
+.stat_type .stat_label{
+    font-size: 1.25rem;
+}
+.stat_label{
+    font-size: 1.25rem;
+}
+.stat_value{
+    font-size: 2rem;
+    font-weight: 500;
+}
+.stat_subtext{
+    font-size: 1rem;
+
+}
+
+.stat_type .stat_subtext{
+    font-size: 1.5rem;
+
+}
+
+.extra_stats{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 2rem;
+    width: 100%;
+    height: 5rem;
+    border-radius: 1rem;
+    margin-top: -1rem;
+}
+
+.stat_type{
+    color: white;
+    display: grid;
+    font-family: "Coolvetica";
+    background-color: rgba(27, 167, 160);
+    padding: 1rem;
+    width: 100%;
 }

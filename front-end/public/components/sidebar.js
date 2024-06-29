@@ -67,6 +67,9 @@ export default class SideBar extends HTMLElement {
       <a is="co-link" href="/dashboard/chat">
         <i class="fa-light fa-message-dots fa-2xl icon_side_bar"></i>
       </a>
+      <a is="co-link" href="/dashboard/profile">
+        <i class="fa-thin fa-user fa-2xl icon_side_bar"></i>
+      </a>
       <a is="co-link" href="/dashboard/settings">
         <i class="fa-light fa-gear fa-2xl icon_side_bar"></i>
       </a>

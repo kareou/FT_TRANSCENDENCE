@@ -10,6 +10,9 @@ import MatchMakingAvatar from "../components/matchmaking_avatar.js";
 import GameScore from "../components/game_score.js";
 import WinnerModal from "../components/winner_modal.js";
 import MatchData from "../components/match_data.js";
+import ProfileInfor from "../components/profile_info.js";
+import MatchHistory from "../components/matchHistory.js";
+import UserStats from "../components/user_stats.js";
 
 export const routes = [
   {
@@ -51,6 +54,11 @@ export const routes = [
         path: "/settings", // Changed from "/settings" to "settings"
         requireAuth: true,
         component: () => import("../pages/settings.js"),
+      },
+      {
+        path: "/profile", // Changed from "/settings" to "settings"
+        requireAuth: true,
+        component: () => import("../pages/profile.js"),
       },
       {
         path: "/game", // Changed from "/game" to "game"
