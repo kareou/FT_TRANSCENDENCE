@@ -74,7 +74,7 @@ class Http {
 
   async refreshToken() {
     try {
-      const response = await fetch(`${this.baseUrl}/api/token/refresh/`, {
+      const response = await fetch(`${this.baseUrl}/api/token/refresh`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -95,7 +95,7 @@ class Http {
 
   async verifyToken(trials = 0) {
     try {
-      const response = await fetch(`${this.baseUrl}/api/token/verify/`, {
+      const response = await fetch(`${this.baseUrl}/api/token/verify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

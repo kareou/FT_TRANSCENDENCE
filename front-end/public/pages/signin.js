@@ -16,8 +16,8 @@ export default class SignIn extends HTMLElement {
         email: email,
         password: pwd,
       };
-      Http.login(data, "ft_auth/login/").then((res) => {
-        if (res.token) {
+      Http.login(data, "api/user/login/").then((res) => {
+        if (res.user) {
           Link.navigateTo("/dashboard");
         }
       });

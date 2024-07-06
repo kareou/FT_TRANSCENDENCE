@@ -20,7 +20,7 @@ export default class SignUp extends HTMLElement {
         email: email,
         password: pwd,
       };
-      Http.register(data,"ft_auth/register/").then((res) => {
+      Http.register(data,"api/user/register/").then((res) => {
         // if (res.token) {
         //   Link.navigateTo("/");
         // }

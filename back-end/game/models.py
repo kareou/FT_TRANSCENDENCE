@@ -1,5 +1,5 @@
 from django.db import models
-from ft_auth.models import User
+from user.models import User
 
 class Match(models.Model):
     player1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player1")

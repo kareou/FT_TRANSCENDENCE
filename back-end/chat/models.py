@@ -1,6 +1,6 @@
 
 from django.db import models
-from ft_auth.models import User
+from user.models import User
 from django.utils import timezone
 
 

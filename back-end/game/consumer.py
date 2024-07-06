@@ -2,12 +2,12 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 import random
 from rest_framework_simplejwt.tokens import UntypedToken
-from ft_auth.models import User
-from ft_auth.serializer import UserSerializer
+from user.models import User
+from user.serializers import UserSerializer
 from django.shortcuts import get_object_or_404
 from channels.db import database_sync_to_async
 from user.models import Stats
-from user.serializer import StatsSerializer
+from user.serializers import StatsSerializer
 from django.db import transaction
 from .models import Match
 

@@ -18,16 +18,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
-from ft_auth.views import TokenVerify, TokenRefresh
+from user.views import CustomTokenVerifyView, CustomTokenRefreshView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('ft_auth/', include('ft_auth.urls')),
-    path('api/token/refresh/', TokenRefresh.as_view(), name='token_refresh'),
-    path('api/token/verify/', TokenVerify.as_view(), name='token_verify'),
-    path('api/auth/', include('rest_framework.urls')),
+    path('api/', include('user.urls')),
+    path('api/token/verify', CustomTokenVerifyView.as_view(), name='token_verify'),
+    path('api/token/refresh', CustomTokenRefreshView.as_view(), name='token_refresh'),
     path("api/", include("game.urls")),
-    path("api/", include("user.urls")),
     path("chat/", include("chat.urls")),
 ]
 

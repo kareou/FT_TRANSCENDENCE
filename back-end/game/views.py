@@ -6,7 +6,7 @@ from .serializer import MatchSerializer
 from rest_framework import status
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-from ft_auth.models import User
+from user.models import User
 from django.db.models import Q
 from rest_framework.response import Response
 

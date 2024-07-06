@@ -35,6 +35,10 @@ export default class SideBar extends HTMLElement {
     }
     this.render();
     this.findSelected();
+    const logoutBtn = this.querySelector(".logout_logo_wrapper");
+    logoutBtn.addEventListener("click", () => {
+      Link.navigateTo("/");
+    });
   }
 
   // Initialize URL change detection
