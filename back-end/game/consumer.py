@@ -13,14 +13,14 @@ from .models import Match
 
 @database_sync_to_async
 def GetUser(scope):
-    token = scope["cookies"].get("access_token")
+    token = scope["cookies"].get("access")
     try:
         validated_token = UntypedToken(token)
         user_id = validated_token["user_id"]
         user = get_object_or_404(User, id=user_id)
         return (user, user_id)
     except Exception as e:
-        return None
+        return (None, None)
 
 @database_sync_to_async
 def updateGameScore(game_id, player1_score = None, player2_score = None, player1 = None, player2 = None, winner = None):

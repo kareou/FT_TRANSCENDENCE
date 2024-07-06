@@ -45,7 +45,7 @@ class UserAction(ModelViewSet):
         return Response({'detail': 'forbidden.'}, status=status.HTTP_403_FORBIDDEN)
 
     def retrieve(self, request, *args, **kwargs):
-        # this is the case when the retrieve method is called with the pk as 'update' 
+        # this is the case when the retrieve method is called with the pk as 'update'
         if kwargs['pk'] == 'update':
             return Response({'detail': 'Method \"GET\" not allowed.'}, status=status.HTTP_200_OK)
         try:
@@ -105,7 +105,7 @@ class UserAction(ModelViewSet):
             refresh_token = RefreshToken.for_user(user)
             access_token = str(refresh_token.access_token)
             response  = Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
-            response.data = serializer.data
+            response.data = {"user": serializer.data}
             response.set_cookie(key='refresh', value=str(refresh_token), httponly=True)
             response.set_cookie(key='access', value=access_token, httponly=True)
             return response
@@ -146,7 +146,7 @@ class UserAction(ModelViewSet):
             return response
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
+
 class CustomTokenVerifyView(TokenVerifyView):
     serializer_class = CustomVerifyTokenSerializer
 
@@ -159,4 +159,4 @@ class CustomTokenRefreshView(TokenRefreshView):
         response.set_cookie(key='access', value=access, httponly=True)
         response.data = {}
         return response
-    
+

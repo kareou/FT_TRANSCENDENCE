@@ -17,6 +17,7 @@ export default class SignIn extends HTMLElement {
         password: pwd,
       };
       Http.login(data, "api/user/login/").then((res) => {
+        console.log(res);
         if (res.user) {
           Link.navigateTo("/dashboard");
         }
@@ -27,7 +28,7 @@ export default class SignIn extends HTMLElement {
   render() {
     this.innerHTML = /*HTML*/ `
       <div id="signin" class="container sign_in_up">
-        <form class="container_form" action="localhost:8000/ft_auth/login/">
+        <form class="container_form" action="localhost:8000/api/user/login/">
             <h1 class="welcome-text">Welcome back</h1>
             <label for="email">Email</label>
             <input type="email" name="email" id="email" placeholder="Enter your email" required>

@@ -50,6 +50,28 @@ class Http {
     }
   }
 
+  async logout() {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/user/logout/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      if (response.status === 200) {
+        const res = await response.json();
+        this.user = null;
+        return res;
+      } else {
+        const res = await response.json();
+        return res;
+      }
+    } catch (e) {
+      return { error: e.message };
+    }
+  }
+
   async getData(method, url, data = null, retries = 0) {
     try {
       const response = await fetch(`${this.baseUrl}/${url}`, {

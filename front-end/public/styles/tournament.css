@@ -1,0 +1,39 @@
+.generate_tournament{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.bracket{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 50vh;
+}
+
+.round{
+	display: grid;
+	justify-content: space-around;
+	align-items: center;
+	height: 100%;
+}
+
+.match{
+	display: grid;
+	justify-content: start;
+	align-items: center;
+	width: 11rem;
+	background-color: gray;
+}
+
+.player{
+	display: flex;
+	justify-content: start;
+	align-items: center;
+	padding-left: 1rem;
+	border-left: 4px solid rebeccapurple;
+}
+
+.player h1{
+	color: #000;
+}

@@ -8,7 +8,7 @@ export default class ProfileInfo extends HTMLElement {
   }
   connectedCallback() {
     if (this.id != this.user.id) {
-      Http.getData("Get",`ft_auth/user/${this.id}`).then((data) => {
+      Http.getData("Get",`api/user/${this.id}`).then((data) => {
         this.user = data;
         this.render();
         this.markUnearnedAchievements();

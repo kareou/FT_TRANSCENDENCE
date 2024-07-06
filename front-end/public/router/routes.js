@@ -25,12 +25,12 @@ export const routes = [
     requireAuth: false,
     children: [
       {
-        path: "/signin", // Changed from "/signin" to "signin"
+        path: "/login", // Changed from "/signin" to "signin"
         requireAuth: false,
         component: () => import("../pages/signin.js"),
       },
       {
-        path: "/signup", // Changed from "/signup" to "signup"
+        path: "/register", // Changed from "/signup" to "signup"
         requireAuth: false,
         component: () => import("../pages/signup.js"),
       },
@@ -84,6 +84,11 @@ export const routes = [
                 requireAuth: true,
                 component: () => import("../pages/game_page.js"),
               },
+              {
+                path: "/tournament", // Changed from "/tournament" to "tournament"
+                requireAuth: true,
+                component: () => import("../pages/tournament.js"),
+              }
             ],
           },
         ],
