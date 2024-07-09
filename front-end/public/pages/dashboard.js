@@ -14,35 +14,7 @@ export default class Dashboard extends HTMLElement {
   render() {
     this.innerHTML = /*HTML*/ `
   <div class="dashboard_wrapper">
-    <div class="profile" >
-      <div class="profile_img">
-        <img src='http://localhost:8000${this.user.profile_pic}' class="profile_img" alt="profile">
-      </div>
-      <div class="profile_info">
-        <div class="name_n_login">
-          <h1 id="user_name">${this.user.full_name}</h1>
-          <h6 id="login">${this.user.username}</h6>
-        </div>
-        <h2>
-          <span>
-            <i class="fa-sharp fa-light fa-coins" style="color: #04BF8A;"></i>
-          </span>
-          <span id="user_coins">2300$
-          </span>
-        </h2>
-        <div class="achievement">
-          <h1>Achievements</h1>
-          <img src="/public/assets/ranks.svg" alt="medal">
-          <h4 class="level">
-            <span>${this.user.level}</span>
-            <span>50%</span>
-          </h4>
-          <div class="level-bar">
-            <span></span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <profile-info id="${this.user.id}"></profile-info>
     <div class="rank">
       <div class="first">
         <img src="/public/assets/medal.png" alt="medal">

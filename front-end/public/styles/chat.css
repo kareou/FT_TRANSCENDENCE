@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "roboto";
+    src: url("/public/assets/fonts/Roboto-Regular.ttf");
+}
+
 .conv_data_container_chat__
 {
     height: 100%;
@@ -178,11 +183,23 @@ body{
 .chat_notification_bar_wrapper
 {
     display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    align-items: end;
+    justify-content: space-between;
+    padding: 0 1rem;
 }
 
-.chat_notification_bar_wrapper > div > input{
+#welcoming{
+    font-size: 3em;
+    font-family: "roboto";
+    margin-bottom: -1.5rem;
+}
+
+.chat_notification_bar_wrapper >div{
+    display: flex;
+    align-items: center;
+}
+
+.search_input_wrapper > input{
     backdrop-filter: blur(10px);
     background-color: transparent;
     border: 1px solid #778FB8;

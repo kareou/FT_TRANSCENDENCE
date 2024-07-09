@@ -87,7 +87,8 @@ export default class OnlineGame extends HTMLElement {
   disconnectedCallback() {
     document.removeEventListener("keydown", (e) => this.#handleKeyDown(e));
     document.removeEventListener("keyup", (e) => this.#handleKeyUp(e));
-    this.websocket.close(3001);
+    if (this.websocket)
+      this.websocket.close(3001);
   }
 
   render() {
@@ -105,7 +106,8 @@ export default class OnlineGame extends HTMLElement {
     const modal = document.createElement("winner-modal");
     modal.setAttribute("winner", this.winner);
     this.appendChild(modal);
-    this.websocket.close();
+    this.websocket.close(3000);
+    this.websocket = null;
   }
 
   #update(ctx) {

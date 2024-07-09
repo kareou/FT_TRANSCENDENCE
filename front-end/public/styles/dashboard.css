@@ -171,15 +171,10 @@ h1{
     /* width: 100%; */
     text-align: center;
     display: grid;
-    justify-content: center;
+    /* justify-content: center; */
     align-items: center;
 }
 
-.achievement img{
-    height: 80%;
-    width: 80%;
-    border-radius: 1rem;
-}
 
 .level-bar{
     display: flex;
@@ -194,7 +189,6 @@ h1{
 
 .level-bar span{
     background-color: #04D98B;
-    width: 50%;
     height: 1rem;
     border-radius: 1rem;
 }

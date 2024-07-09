@@ -178,7 +178,7 @@
     gap: 1rem;
     padding: 0 2rem;
     backdrop-filter: blur(1rem);
-    width: 30rem;
+    width: 100%;
     height: 5rem;
     border-radius: 1rem;
 }
@@ -206,4 +206,155 @@
     border-radius: 50%;
     width: 4rem;
     height: 4rem;
+}
+
+.user_stats{
+    padding: 1rem 0;
+    background-color: rgba(27, 167, 160, 0.05);
+    backdrop-filter: blur(1rem);
+    width: 100%;
+    grid-area: game;
+    height: 100%;
+    border-radius: 1rem;
+}
+
+.win_rate{
+    display: flex;
+    justify-content: space-between;
+    background-color: #085E6D;
+    gap: 1rem;
+    padding: 1rem;
+    width: 100%;
+    height: 10rem;
+    color: white;
+    min-height: 5rem;
+}
+
+
+.win_rate>div{
+    display: flex;
+    flex-direction: column;
+}
+.stat_type .stat_label{
+    font-size: 1.25rem;
+}
+.stat_label{
+    font-size: 1.25rem;
+}
+.stat_value{
+    font-size: 2rem;
+    font-weight: 500;
+}
+.stat_subtext{
+    font-size: 1rem;
+
+}
+
+.stat_type .stat_subtext{
+    font-size: 1.5rem;
+
+}
+
+.extra_stats{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 2rem;
+    width: 100%;
+    height: 5rem;
+    border-radius: 1rem;
+    margin-top: -1rem;
+}
+
+.stat_type{
+    color: white;
+    display: grid;
+    font-family: "Coolvetica";
+    background-color: rgba(27, 167, 160);
+    padding: 1rem;
+    width: 100%;
+}
+
+.steps {
+    display: flex;
+    padding: 0;
+    justify-content: space-between;
+    align-items: end;
+    color: white;
+    width: 40rem;
+    margin-bottom: -2rem;
+}
+
+.step {
+    text-align: start;
+    width: 4rem; /* Added width to center the steps */
+}
+
+.graph {
+    padding: 2rem;
+    display: flex;
+    gap: 0;
+    width: 100%;
+    font-size: 1.5rem;
+}
+
+.graph ol {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    list-style: none;
+    color: white;
+    border-right: 1px solid white;
+    width: max-content;
+    padding: 0; /* Removed padding to align the text */
+    margin: 0; /* Removed margin to align the text */
+}
+
+.graph ol li {
+    position: relative;
+    /* width: 100%; */
+    height: 2rem;
+    display: flex;
+    justify-content: space-between;
+
+}
+
+#stat {
+    margin-left: 0; /* Changed margin to 0 to align text properly */
+    padding-left: 0.5rem; /* Added padding for better spacing */
+}
+
+#progress{
+    position: absolute;
+    left: 101%;
+    height: 100%;
+    background-color: #085E6D;
+}
+
+.match_history{
+    padding: 1rem;
+    width: 100%;
+    height: 100%;
+    border-radius: 1rem;
+    background-color: rgba(27, 167, 160, 0.05);
+    backdrop-filter: blur(1rem);
+    grid-area: friends;
+}
+
+.achievement_list{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.achievement_list img{
+    height: 5rem;
+    border-radius: 50%;
+    filter: opacity(0.5);
+}
+.achievement_list img.earned{
+    height: 5rem;
+    border-radius: 50%;
+    filter: opacity(1);
 }

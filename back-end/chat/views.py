@@ -5,8 +5,8 @@ from django.db.models import Q
 from .models import ChatMessage
 from .serializers import ChatMessageSerializer
 import logging
-from ft_auth.models import User
-from ft_auth.serializer import UserSerializer
+from user.models import User
+from user.serializers import UserSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -85,8 +85,8 @@ from django.db.models.functions import Coalesce
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from .models import ChatMessage
-from ft_auth.serializer import UserSerializer
-from ft_auth.models import User
+from user.serializers import UserSerializer
+from user.models import User
 
 class UserConversationViewSet(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]

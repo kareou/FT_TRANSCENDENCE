@@ -10,6 +10,9 @@ import MatchMakingAvatar from "../components/matchmaking_avatar.js";
 import GameScore from "../components/game_score.js";
 import WinnerModal from "../components/winner_modal.js";
 import MatchData from "../components/match_data.js";
+import ProfileInfor from "../components/profile_info.js";
+import MatchHistory from "../components/matchHistory.js";
+import UserStats from "../components/user_stats.js";
 
 export const routes = [
   {
@@ -22,12 +25,12 @@ export const routes = [
     requireAuth: false,
     children: [
       {
-        path: "/signin", // Changed from "/signin" to "signin"
+        path: "/login", // Changed from "/signin" to "signin"
         requireAuth: false,
         component: () => import("../pages/signin.js"),
       },
       {
-        path: "/signup", // Changed from "/signup" to "signup"
+        path: "/register", // Changed from "/signup" to "signup"
         requireAuth: false,
         component: () => import("../pages/signup.js"),
       },
@@ -53,6 +56,11 @@ export const routes = [
         component: () => import("../pages/settings.js"),
       },
       {
+        path: "/profile", // Changed from "/settings" to "settings"
+        requireAuth: true,
+        component: () => import("../pages/profile.js"),
+      },
+      {
         path: "/game", // Changed from "/game" to "game"
         requireAuth: true,
         children: [
@@ -76,6 +84,11 @@ export const routes = [
                 requireAuth: true,
                 component: () => import("../pages/game_page.js"),
               },
+              {
+                path: "/tournament", // Changed from "/tournament" to "tournament"
+                requireAuth: true,
+                component: () => import("../pages/tournament.js"),
+              }
             ],
           },
         ],

@@ -2,28 +2,28 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 import random
 from rest_framework_simplejwt.tokens import UntypedToken
-from ft_auth.models import User
-from ft_auth.serializer import UserSerializer
+from user.models import User
+from user.serializers import UserSerializer
 from django.shortcuts import get_object_or_404
 from channels.db import database_sync_to_async
 from user.models import Stats
-from user.serializer import StatsSerializer
+from user.serializers import StatsSerializer
 from django.db import transaction
 from .models import Match
 
 @database_sync_to_async
 def GetUser(scope):
-    token = scope["cookies"].get("access_token")
+    token = scope["cookies"].get("access")
     try:
         validated_token = UntypedToken(token)
         user_id = validated_token["user_id"]
         user = get_object_or_404(User, id=user_id)
         return (user, user_id)
     except Exception as e:
-        return None
+        return (None, None)
 
 @database_sync_to_async
-def updateGameScore(game_id, player1_score = None, player2_score = None, player1 = None, player2 = None):
+def updateGameScore(game_id, player1_score = None, player2_score = None, player1 = None, player2 = None, winner = None):
     try:
         with transaction.atomic():
             game = get_object_or_404(Match, id=game_id)
@@ -31,7 +31,6 @@ def updateGameScore(game_id, player1_score = None, player2_score = None, player1
                 game.player1_score += player1_score
             if player2_score is not None:
                 game.player2_score += player2_score
-            winner = None
             if game.player1_score == 3:
                 winner = player1
             elif game.player2_score == 3:
@@ -39,6 +38,7 @@ def updateGameScore(game_id, player1_score = None, player2_score = None, player1
             if winner is not None:
                 game.winner = winner
             game.save()
+            print(winner, flush=True)
             return winner
     except Exception as e:
         return None
@@ -54,9 +54,13 @@ def updateUserStats(user, winner, goals_scored, goals_conceded):
                 stats.matche_played += 1
                 if user == winner:
                     stats.matche_won += 1
+                    user.exp += 10
                 else:
                     stats.matche_lost += 1
+                    user.exp += 5
+                user.save()
             stats.save()
+
     except Exception as e:
         pass
 
@@ -178,7 +182,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         p2 = GameConsumer.game_users_data[self.game_id][1]["player2"]
         winner = None
         if self.user == GameConsumer.game_users_data[self.game_id][0]["player1"]:
-            winner = await updateGameScore(self.game_id, event["score"]["p1"], event["score"]["p2"], p1, p2)
+            winner = await updateGameScore(self.game_id, event["score"]["p1"], event["score"]["p2"], p1, p2, None)
             await updateUserStats(p2, winner, event["score"]["p2"], event["score"]["p1"])
             await updateUserStats(p1, winner, event["score"]["p1"], event["score"]["p2"])
         if winner is not None:
