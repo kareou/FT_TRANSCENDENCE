@@ -7,3 +7,5 @@ djangorestframework
 djangorestframework-simplejwt
 pillow
 requests
+pyotp
+qrcode

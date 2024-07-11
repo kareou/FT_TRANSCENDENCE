@@ -3,9 +3,11 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.room_name = "chat_room"
+        self.user_id = self.scope['url_route']['kwargs']['user_id']
+        self.receiver_id = self.scope['url_route']['kwargs']['receiver_id']
+        self.room_name = f"private_chat_{min(self.user_id, self.receiver_id)}_{max(self.user_id, self.receiver_id)}"
         self.room_group_name = f"chat_{self.room_name}"
-
+        print(f"chat group name =  {self.room_group_name}")
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -24,14 +26,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         try:
             text_data_json = json.loads(text_data)
-            message = text_data_json['content']
+            message = text_data_json['message']
+            sender = text_data_json['sender']
             print(f"Received message: {message}")
 
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                     'type': 'chat_message',
-                    'content': message
+                    'sender': sender,
+                    'message': message
                 }
             )
         except json.JSONDecodeError:
@@ -41,9 +45,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }))
 
     async def chat_message(self, event):
-        message = event['content']
+        message = event['message']
+        sender = event['sender']
         print(f"Sending message to WebSocket: {message}")
 
         await self.send(text_data=json.dumps({
-            'content': message
+            'message': message,
+            'sender': sender
         }))
+
+
