@@ -5,6 +5,7 @@ export default class ProfileInfo extends HTMLElement {
     super();
     this.user = Http.user;
     this.id = this.getAttribute("id");
+    this.websocket = null;
   }
   connectedCallback() {
     if (this.id != this.user.username) {
@@ -28,35 +29,87 @@ export default class ProfileInfo extends HTMLElement {
       achievements[i].classList.add("earned");
     }
   }
-  async sendMessage() {
-    const messageContent = document.querySelector('.message-input').value;
-    const messageData = {
-        sender: Http.user.id,
-        receiver: this.user.id,
-        message: messageContent,
-        timestamp: new Date().toISOString(),
-    };    
+  async fetchOrCreateConversation(senderId, receiverId) {
     try {
-        const response = await fetch('http://localhost:8000/chat/messages/', {
+        const response = await fetch(`http://localhost:8000/chat/conversations/fetch_or_create/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.token}`
             },
             credentials: 'include',
-            body: JSON.stringify(messageData),
+            body: JSON.stringify({
+                sender: senderId,
+                receiver: receiverId
+            }),
         });
 
         if (response.ok) {
-            const data = await response.json();
-            console.log('Message saved:', data);
-            document.querySelector('.message-input').value = '';
+            const conversation = await response.json();
+            console.log('Fetched or created conversation:', conversation);
+            return conversation;
         } else {
-            console.error('Error saving message:', response.statusText);
+            const errorData = await response.json();
+            console.error('Error fetching or creating conversation:', errorData.detail || response.statusText);
         }
     } catch (error) {
         console.error('Error:', error);
     }
 }
+setupWebSocket() {
+  this.websocket = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${Http.user.id}/${this.user.id}/`);
+
+  this.websocket.addEventListener("open", function (event) {
+      console.log("WebSocket connection opened.");
+  });
+
+  this.websocket.addEventListener("close", function (event) {
+      console.log("WebSocket connection closed.");
+  });
+}
+h
+
+async sendMessage() {
+  try {
+    let conversation = await this.fetchOrCreateConversation(Http.user.id, this.user.id);
+    
+    const messageContent = document.querySelector('.message-input').value;
+    const messageData = {
+      sender: Http.user.id,
+      message: messageContent,
+      timestamp: new Date().toISOString(),
+      conversation: conversation.id
+    };
+    
+    this.setupWebSocket();
+    const response = await fetch('http://localhost:8000/chat/messages/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.token}`
+      },
+      credentials: 'include',
+      body: JSON.stringify(messageData),
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      const dataWs = {
+        message: data.message,
+        sender: data.sender
+      };
+      console.log('Message saved:', data);
+      this.websocket.send(JSON.stringify(dataWs));
+      document.querySelector('.message-input').value = '';
+    } else {
+      const errorData = await response.json();
+      console.error('Error saving message:', errorData.detail || response.statusText);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
   setupEventListeners()
   {
     const buttonNew = document.querySelector('.new-msg');
@@ -85,6 +138,7 @@ export default class ProfileInfo extends HTMLElement {
 
     buttonSend.addEventListener('click', () => {
       this.sendMessage();
+      buttonClose.click();
     });
   }
   render() {
