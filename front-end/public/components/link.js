@@ -19,6 +19,9 @@ export default class Link extends HTMLAnchorElement {
 
 
   static async findRoute(routers, path, parent_path = "") {
+    if (!Array.isArray(routers)) {
+      return null;
+    }
     let route = null;
     const isAuth = await Http.verifyToken();
     for (let i = 0; i < routers.length; i++) {

@@ -27,7 +27,7 @@ export default class TopBar extends HTMLElement {
   render() {
     this.innerHTML = /*HTML*/ `
         <div class="chat_notification_bar_wrapper">
-        <h1 id="welcoming">Welcom back,</h1>
+        <!-- <h1 id="welcoming">Welcom back,</h1> -->
         <div>
                 <div class="search_input_wrapper">
                     <input type="text" name="search" id="search_chat" class="search_chat"
