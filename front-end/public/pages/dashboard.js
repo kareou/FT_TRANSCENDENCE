@@ -14,7 +14,7 @@ export default class Dashboard extends HTMLElement {
   render() {
     this.innerHTML = /*HTML*/ `
   <div class="dashboard_wrapper">
-    <profile-info id="${this.user.id}"></profile-info>
+    <profile-info id="${this.user.username}"></profile-info>
     <div class="rank">
       <div class="first">
         <img src="/public/assets/medal.png" alt="medal">

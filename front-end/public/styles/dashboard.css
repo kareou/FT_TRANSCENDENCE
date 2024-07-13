@@ -201,3 +201,40 @@ h1{
     font-family: "Actor";
     font-weight: 100;
 }
+
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: block;
+}
+
+.msg-prompt {
+    position: absolute;
+    height: 100px;
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    background-color: #778FB8;
+    display: none;
+}
+
+.msg-prompt.visible {
+    display: flex;
+}
+
+.close-btn {
+    position: absolute;
+    left: 0;
+    top: 5%;
+    transform: translateY(-50%);
+}
+
+.msg-prompt_sub1 {
+    display: flex;
+    flex-direction: row;
+    justify-content:space-evenly;
+}
