@@ -69,7 +69,7 @@ export default class Chat extends HTMLElement {
         const userContainer = this.querySelector('.first_section_wrapper_chat');
         userContainer.innerHTML = `<div class="first_profile_wrapper_chat">
                     <div class="pdp_warpper">
-                        <img src="../assets/pdp.png" alt="profile picture" class="pfp_logo">
+                        <img src="http://localhost:8000${this.user.profile_pic}" alt="profile picture" class="pfp_logo">
                         <div class="txt_one">Chats</div>
 
                     </div>
@@ -83,7 +83,7 @@ export default class Chat extends HTMLElement {
                 <div class="chat_bulles_wrapper user" id="${user.id}" name="${user.username}">
                     <div class="chat_bulle_wrapper">
                         <div class="chat_pdp_wrapper">
-                            <img src="/assets/Ellipse 20.png" alt="ellipse 20" class="pdp_logo_chat">
+                            <img src='${user.profile_pic}' alt="ellipse 20" class="pdp_logo_chat">
                         </div>
                         <div class="data_chat_bulle_wrapper">
                             <div class="name_bulle_chat">${user.username}</div>

@@ -1,7 +1,7 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.db.models import Q, Max
+from django.db.models import Q, Max, Case, When
 from .serializers import ConversationSerializer, ChatMessageSerializer
 from .models import Conversation, ChatMessage
 from django.contrib.auth import get_user_model
@@ -59,12 +59,12 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
+        # Get conversations where the logged-in user is either sender or receiver, ordered by last_message_time
         conversations = Conversation.objects.filter(
             Q(sender=user) | Q(receiver=user)
-        ).annotate(
-            last_message_time=Max('chatmessage__timestamp')
         ).order_by('-last_message_time')
 
+        # Maintain an ordered list of active user IDs based on the conversation order
         ordered_user_ids = []
         for conversation in conversations:
             if conversation.sender.id != user.id:
@@ -72,16 +72,44 @@ class UserViewSet(viewsets.ModelViewSet):
             if conversation.receiver.id != user.id:
                 ordered_user_ids.append(conversation.receiver.id)
 
-        seen = set()
-        ordered_user_ids = [x for x in ordered_user_ids if not (x in seen or seen.add(x))]
+        # Use Django's `Case` and `When` to maintain the order
+        preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(ordered_user_ids)])
 
-        active_users = User.objects.filter(id__in=ordered_user_ids).order_by(
-            models.Case(
-                *[models.When(id=pk, then=pos) for pos, pk in enumerate(ordered_user_ids)]
-            )
-        )
+        # Queryset of users who have had conversations with the logged-in user, ordered by last_message_time
+        active_users = User.objects.filter(id__in=ordered_user_ids).order_by(preserved_order)
 
         return active_users
+
+# class UserViewSet(viewsets.ModelViewSet):
+#     serializer_class = UserSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def get_queryset(self):
+#         user = self.request.user
+
+#         conversations = Conversation.objects.filter(
+#             Q(sender=user) | Q(receiver=user)
+#         ).annotate(
+#             last_message_time=Max('chatmessage__timestamp')
+#         ).order_by('-last_message_time')
+
+#         ordered_user_ids = []
+#         for conversation in conversations:
+#             if conversation.sender.id != user.id:
+#                 ordered_user_ids.append(conversation.sender.id)
+#             if conversation.receiver.id != user.id:
+#                 ordered_user_ids.append(conversation.receiver.id)
+
+#         seen = set()
+#         ordered_user_ids = [x for x in ordered_user_ids if not (x in seen or seen.add(x))]
+
+#         active_users = User.objects.filter(id__in=ordered_user_ids).order_by(
+#             models.Case(
+#                 *[models.When(id=pk, then=pos) for pos, pk in enumerate(ordered_user_ids)]
+#             )
+#         )
+
+#         return active_users
 
 # class UserViewSet(viewsets.ModelViewSet):
 #     queryset = User.objects.all()
