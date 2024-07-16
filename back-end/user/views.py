@@ -12,6 +12,11 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action, permission_classes
 
+#send email
+from django.core.mail import send_mail, EmailMessage
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
+
 class StatsViewSet(viewsets.ViewSet):
     queryset = Stats.objects.all()
     serializer_class = StatsSerializer
@@ -86,7 +91,21 @@ class UserAction(ModelViewSet):
         serializer = UserSerializer(data=request.data, context={'partial': False})
         if serializer.is_valid():
             serializer.save()
-            return Response({'message': 'Account created successfully'}, status=status.HTTP_201_CREATED)
+            # send verification email  
+            current_site = get_current_site(request)
+            mail_subject = 'ft_transcendence Email verification'  
+            message = render_to_string('email_confirmation.html', {  
+                'user': user,  
+                'domain': current_site.domain,  
+                'uid':urlsafe_base64_encode(force_bytes(user.pk)),  
+                'token':account_activation_token.make_token(user),  
+            })  
+            to_email = request.data['email']
+            email = EmailMessage(  
+                        mail_subject, message, to=[to_email]  
+            )  
+            email.send()
+            return Response({'message': 'Account created successfully please activate by confirming your email'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])

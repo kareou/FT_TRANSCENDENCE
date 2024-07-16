@@ -27,6 +27,7 @@ class User(AbstractBaseUser):
     profile_pic = models.ImageField(upload_to='users_pfp/', default=None)
     level = models.IntegerField(default=1)
     exp = models.IntegerField(default=0)
+    is_email_verified = models.BooleanField(default=False)
     _2fa_enabled = models.BooleanField(default=False)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
