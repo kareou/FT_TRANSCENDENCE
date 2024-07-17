@@ -12,4 +12,12 @@ RUN chmod +x start.sh
 
 EXPOSE 8000
 
+# Check if .venv directory exists
+RUN if [ -d ".venv" ]; then \
+    bash -c "source .venv/bin/activate"; \
+    else \
+    python -m venv .venv; \
+    bash -c "source .venv/bin/activate"; \
+    fi
+
 CMD ["sh", "start.sh"]
