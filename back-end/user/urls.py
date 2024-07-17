@@ -10,5 +10,6 @@ statRouter.register('stats', views.StatsViewSet, basename='stats')
 
 urlpatterns = [
 	path('', include(statRouter.urls)),
-	path('', include(userRouter.urls))
+	path('', include(userRouter.urls)),
+	path('activate/<uidb64>/<token>/', views.UserAction.as_view({'get': 'account_activate'}), name='account_activate'),
 ]

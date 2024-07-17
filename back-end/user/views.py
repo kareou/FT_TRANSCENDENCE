@@ -13,9 +13,13 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action, permission_classes
 
 #send email
-from django.core.mail import send_mail, EmailMessage
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
 
 class StatsViewSet(viewsets.ViewSet):
     queryset = Stats.objects.all()
@@ -44,6 +48,8 @@ class UserAction(ModelViewSet):
     def get_permissions(self):
         if self.action == 'retrieve' or self.action == 'list' or self.action == 'update':
             self.permission_classes = [IsAuthenticated,]
+        if self.action == 'register' or self.action == 'login' or self.action == 'account_activate':
+            self.permission_classes = [AllowAny,]
         return super(UserAction, self).get_permissions()
 
     def list(self, request):
@@ -90,23 +96,48 @@ class UserAction(ModelViewSet):
     def register(self, request):
         serializer = UserSerializer(data=request.data, context={'partial': False})
         if serializer.is_valid():
-            serializer.save()
+            user = serializer.save()
             # send verification email  
             current_site = get_current_site(request)
+            account_activation_token = PasswordResetTokenGenerator()
             mail_subject = 'ft_transcendence Email verification'  
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = account_activation_token.make_token(user)
+            # Construct the verification URL
+            verification_url = f"http://{current_site.domain}{reverse('account_activate', kwargs={'uidb64': uid, 'token': token})}"
             message = render_to_string('email_confirmation.html', {  
                 'user': user,  
                 'domain': current_site.domain,  
-                'uid':urlsafe_base64_encode(force_bytes(user.pk)),  
-                'token':account_activation_token.make_token(user),  
+                'verification_url': verification_url,  # Pass the verification URL to the template
             })  
             to_email = request.data['email']
-            email = EmailMessage(  
-                        mail_subject, message, to=[to_email]  
-            )  
+            email = EmailMultiAlternatives(
+                subject=mail_subject,
+                body=message,
+                to=[to_email]
+            )
+            email.attach_alternative(message, "text/html")
             email.send()
             return Response({'message': 'Account created successfully please activate by confirming your email'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def account_activate(self, request, uidb64, token):
+        print(f"uidb64: {uidb64}, token: {token}")
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = User.objects.get(pk=uid)
+        except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+        account_activation_token = PasswordResetTokenGenerator()
+        if user and user.is_email_verified:
+            return Response({'message': 'Account is already activated'}, status=status.HTTP_200_OK)
+        if user is not None and account_activation_token.check_token(user, token):
+            user.is_email_verified = True
+            user.save()
+            return Response({'message': 'Account activated successfully'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'message': 'Activation link is invalid!'}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def login(self, request):
@@ -116,6 +147,8 @@ class UserAction(ModelViewSet):
             user = User.objects.filter(email=email).first()
             if not user or not user.check_password(password):
                 return Response({'message': 'incorrect email or password'}, status=status.HTTP_401_UNAUTHORIZED)
+            if not user.is_email_verified:
+                return Response({'message': 'Email not verified'}, status=status.HTTP_401_UNAUTHORIZED)
             if user._2fa_enabled:
                 code = request.data['otp']
                 if not verify_otp(code):
