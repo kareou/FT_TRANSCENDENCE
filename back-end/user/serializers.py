@@ -20,6 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=False)
     password = serializers.CharField(required=False, write_only=True, min_length=8)
     _2fa_enabled = serializers.BooleanField(read_only=True)
+    is_email_verified = serializers.BooleanField(read_only=True)
 
     def validate(self, data):
         if not self.context.get('partial') and not ('full_name' in data and 'username' in data and 'email' in data and 'password' in data):

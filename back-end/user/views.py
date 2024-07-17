@@ -48,7 +48,7 @@ class UserAction(ModelViewSet):
     def get_permissions(self):
         if self.action == 'retrieve' or self.action == 'list' or self.action == 'update':
             self.permission_classes = [IsAuthenticated,]
-        if self.action == 'register' or self.action == 'login' or self.action == 'account_activate':
+        if self.action == 'account_activate' or self.action == 'password_reset_confirm':
             self.permission_classes = [AllowAny,]
         return super(UserAction, self).get_permissions()
 
@@ -100,11 +100,11 @@ class UserAction(ModelViewSet):
             # send verification email  
             current_site = get_current_site(request)
             account_activation_token = PasswordResetTokenGenerator()
-            mail_subject = 'ft_transcendence Email verification'  
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = account_activation_token.make_token(user)
             # Construct the verification URL
             verification_url = f"http://{current_site.domain}{reverse('account_activate', kwargs={'uidb64': uid, 'token': token})}"
+            mail_subject = 'ft_transcendence Email verification'  
             message = render_to_string('email_confirmation.html', {  
                 'user': user,  
                 'domain': current_site.domain,  
@@ -123,7 +123,6 @@ class UserAction(ModelViewSet):
 
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def account_activate(self, request, uidb64, token):
-        print(f"uidb64: {uidb64}, token: {token}")
         try:
             uid = urlsafe_base64_decode(uidb64).decode()
             user = User.objects.get(pk=uid)
@@ -138,6 +137,53 @@ class UserAction(ModelViewSet):
             return Response({'message': 'Account activated successfully'}, status=status.HTTP_200_OK)
         else:
             return Response({'message': 'Activation link is invalid!'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def reset_password(self, request):
+        email = request.data['email']
+        user = User.objects.filter(email=email).first()
+        if not user:
+            return Response({'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        current_site = get_current_site(request)
+        account_activation_token = PasswordResetTokenGenerator()
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = account_activation_token.make_token(user)
+        #Construct the reset password URL
+        reset_password_url = f"http://{current_site.domain}{reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})}"
+        mail_subject = 'ft_transcendence password reset'
+        message = render_to_string('password_reset.html', {  
+                'user': user,  
+                'domain': current_site.domain,  
+                'reset_password_url': reset_password_url,  # Pass the reset password URL to the template
+            })  
+        to_email = request.data['email']
+        email = EmailMultiAlternatives(
+            subject=mail_subject,
+            body=message,
+            to=[to_email]
+        )
+        email.attach_alternative(message, "text/html")
+        email.send()
+        return Response({'message': 'Password reset link sent to your email'}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def password_reset_confirm(self, request, uidb64, token):
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = User.objects.get(pk=uid)
+        except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+        account_activation_token = PasswordResetTokenGenerator()
+        if user is not None and account_activation_token.check_token(user, token):
+            if "password" not in request.data:
+                return Response({'message': 'Password is required'}, status=status.HTTP_400_BAD_REQUEST)
+            if request.data['password'] != request.data['confirm_password']:
+                return Response({'message': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(request.data['password'])
+            user.save()
+            return Response({'message': 'Password reset successful'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'message': 'Password reset link is invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def login(self, request):
