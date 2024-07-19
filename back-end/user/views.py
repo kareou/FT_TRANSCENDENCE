@@ -2,7 +2,7 @@ import os
 from .models import User, Stats
 from .twoFactorAuth import generate_qr, verify_otp
 from .serializers import UserSerializer, CustomVerifyTokenSerializer, CustomRefreshTokenSerializer, StatsSerializer
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from rest_framework import viewsets, generics, status
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -48,8 +48,6 @@ class UserAction(ModelViewSet):
     def get_permissions(self):
         if self.action == 'retrieve' or self.action == 'list' or self.action == 'update':
             self.permission_classes = [IsAuthenticated,]
-        if self.action == 'account_activate' or self.action == 'password_reset_confirm':
-            self.permission_classes = [AllowAny,]
         return super(UserAction, self).get_permissions()
 
     def list(self, request):
@@ -105,7 +103,7 @@ class UserAction(ModelViewSet):
             # Construct the verification URL
             verification_url = f"http://{current_site.domain}{reverse('account_activate', kwargs={'uidb64': uid, 'token': token})}"
             mail_subject = 'ft_transcendence Email verification'  
-            message = render_to_string('email_confirmation.html', {  
+            message = render_to_string('confirmation_email.html', {  
                 'user': user,  
                 'domain': current_site.domain,  
                 'verification_url': verification_url,  # Pass the verification URL to the template
@@ -151,7 +149,7 @@ class UserAction(ModelViewSet):
         #Construct the reset password URL
         reset_password_url = f"http://{current_site.domain}{reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})}"
         mail_subject = 'ft_transcendence password reset'
-        message = render_to_string('password_reset.html', {  
+        message = render_to_string('password_reset_email.html', {  
                 'user': user,  
                 'domain': current_site.domain,  
                 'reset_password_url': reset_password_url,  # Pass the reset password URL to the template
@@ -166,7 +164,7 @@ class UserAction(ModelViewSet):
         email.send()
         return Response({'message': 'Password reset link sent to your email'}, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    @action(detail=False, methods=['post','get'], permission_classes=[AllowAny])
     def password_reset_confirm(self, request, uidb64, token):
         try:
             uid = urlsafe_base64_decode(uidb64).decode()
@@ -174,6 +172,12 @@ class UserAction(ModelViewSet):
         except(TypeError, ValueError, OverflowError, User.DoesNotExist):
             user = None
         account_activation_token = PasswordResetTokenGenerator()
+        if request.method =='GET':
+            if user is not None and account_activation_token.check_token(user, token):
+                reset_password_url = f"http://{request.get_host()}{reverse('password_reset_confirm', kwargs={'uidb64': uidb64, 'token': token})}"
+                return render(request, 'password_reset_confirm.html', {'reset_password_url': reset_password_url})
+            else:
+                return Response({'message': 'Password reset link is invalid'}, status=status.HTTP_400_BAD_REQUEST)
         if user is not None and account_activation_token.check_token(user, token):
             if "password" not in request.data:
                 return Response({'message': 'Password is required'}, status=status.HTTP_400_BAD_REQUEST)
