@@ -18,16 +18,15 @@ export default class Link extends HTMLAnchorElement {
   }
 
 
-  static async findRoute(routers, path, parent_path = "") {
+  static async findRoute(routers, path, parent_path = "", isAuth ) {
     let route = null;
-    const isAuth = await Http.verifyToken();
     for (let i = 0; i < routers.length; i++) {
       if (routers[i].requireAuth === true) {
         if (isAuth === false) {
-          return Link.findRoute(routers[i].children, "/auth/signin", "");
+          throw new Error("Unauthorized");
         }
         if (routers[i].children) {
-          route = await Link.findRoute(routers[i].children, path, parent_path + routers[i].path);
+          route = await Link.findRoute(routers[i].children, path, parent_path + routers[i].path, isAuth);
           if (route) return route;
         }
         if (Link.matchUrl(path, parent_path+routers[i].path)) {
@@ -35,7 +34,7 @@ export default class Link extends HTMLAnchorElement {
         }
       }else{
         if (routers[i].children) {
-          route = await Link.findRoute(routers[i].children, path, parent_path + routers[i].path);
+          route = await Link.findRoute(routers[i].children, path, parent_path + routers[i].path, isAuth);
           if (route) return route;
         }
         if (Link.matchUrl(path, parent_path+routers[i].path)) {
@@ -53,7 +52,18 @@ export default class Link extends HTMLAnchorElement {
       pos = url.length;
     }
     const path = url.slice(0, pos);
-    var route = await Link.findRoute(routes, path);
+    const isAuth = await Http.verifyToken();
+    try{
+      var route = await Link.findRoute(routes, path, "", isAuth);
+      if (!route) throw new Error("Not Found");
+    }
+    catch (e) {
+      if (e.message === "Unauthorized") {
+        window.location.href = "/login";
+        return;
+      }
+      window.location.href = "/404";
+    }
     if (!route) route = routes[0];
     const root = document.getElementById("app");
     try {

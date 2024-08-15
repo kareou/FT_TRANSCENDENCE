@@ -358,3 +358,16 @@
     border-radius: 50%;
     filter: opacity(1);
 }
+
+
+/* 04D98B */
+.notification_wrapper{
+    background-color: rgba(4, 217, 139, 0.25);
+    backdrop-filter: blur(1rem);
+    border-radius: 50%;
+    height: 3rem;
+    width: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

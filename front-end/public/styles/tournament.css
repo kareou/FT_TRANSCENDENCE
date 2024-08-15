@@ -2,6 +2,7 @@
 	display: grid;
 	justify-content: center;
 	align-items: center;
+	grid-area: setup;
 	width: 100%;
 }
 
@@ -16,6 +17,17 @@ input#player {
 
 input[type='radio'] {
 	display: none;
+}
+
+#addPlayer{
+	width: 10rem;
+	padding: 0.5rem;
+	margin: 0.5rem;
+	border: 1px solid #778FB8;
+	outline: none;
+	border-radius: 0.5rem;
+	background-color: #778FB8;
+	align-self: center;
 }
 
 /* input[type='radio']+label:before {
@@ -81,9 +93,10 @@ input[type='radio']:checked+label {
 }
 
 .input-group{
-	display: grid;
+	display: flex;
+	flex-direction: column;
 	justify-content: center;
-	align-items: center;
+	/* align-items: center; */
 }
 
 .paddles{
@@ -104,28 +117,68 @@ input[type='radio']:checked+label {
 
 .tournament_wrapper {
 	display: grid;
-	justify-content: center;
-	align-items: center;
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr 3fr;
 	width: 100%;
 	background-color: rgba(27, 167, 160, 0.05);
 	border: 1px solid #778FB8;
 	height: 85vh;
 	border-radius: 1rem;
 	backdrop-filter: blur(10px);
+	grid-template-areas:
+	"setup"
+	"bracket";
 }
 
 .tournament {
+	grid-area: bracket;
 	display: grid;
-	justify-content: center;
-	align-items: center;
+	grid-template-columns: 1fr 3fr;
+	grid-template-rows: 1fr;
+	grid-template-areas:
+	"players tournament_bracket";
+	gap: 2rem;
+	width: 100%;
+	height: 100%;
+	padding: 2rem;
+}
+
+#start{
+	width: 10rem;
+	padding: 0.5rem;
+	margin: 0.5rem;
+	border: 1px solid #778FB8;
+	outline: none;
+	border-radius: 0.5rem;
+	background-color: #778FB8;
+	align-self: center;
+}
+
+.tournament_player{
+	color: white;
+	font-size: 1.2em;
 	width: 100%;
 }
 
+.tournament_player th{
+	text-align: center;
+	border-bottom: 1px solid #778FB8;
+}
+
+.tournament_player td{
+	height: 3rem;
+}
+
 .bracket {
+	grid-area: tournament_bracket;
 	display: flex;
-	justify-content: center;
+	flex-direction: column;
+	/* justify-content: center; */
 	align-items: center;
-	height: fit-content;
+}
+
+.players_n_generate{
+	grid-area: players;
 }
 
 .round {
@@ -141,12 +194,6 @@ input[type='radio']:checked+label {
 	align-items: center;
 	width: 11rem;
 	background-color: gray;
-}
-
-.tournament_player {
-	display: flex;
-	justify-content: start;
-	align-items: center;
 }
 
 .player {

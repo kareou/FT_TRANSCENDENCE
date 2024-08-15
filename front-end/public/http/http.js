@@ -5,6 +5,7 @@ class Http {
     this.baseUrl = "http://localhost:8000";
     this.user = null;
     this.website_stats = new Observer();
+    this.notification_socket = null;
   }
 
   async register(data, url) {
@@ -27,6 +28,15 @@ class Http {
     }
   }
 
+  openSocket() {
+    this.notification_socket = new WebSocket(
+      `ws://localhost:8000/ws/notification/${this.user.id}/`
+    );
+    this.notification_socket.onmessage = (e) => {
+      console.log(e);
+    }
+  }
+
   async login(data, url) {
     try {
       const response = await fetch(`${this.baseUrl}/${url}`, {
@@ -40,6 +50,7 @@ class Http {
       if (response.status === 200) {
         const res = await response.json();
         this.user = res.user;
+        this.openSocket();
         return res;
       } else {
         res = await response.json();
@@ -127,6 +138,11 @@ class Http {
       if (response.status === 200) {
         const res = await response.json();
         this.user = res.user;
+        if (!this.notification_socket) {
+          this.openSocket();
+        }else if(this.notification_socket.readyState === 3){
+          this.openSocket();
+        }
         return true;
       } else if (response.status === 401 && trials < 3) {
         const res = await response.json();
