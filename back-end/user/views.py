@@ -84,7 +84,7 @@ class UserAction(ModelViewSet):
         serializer = UserSerializer(user, data=request.data, context={'partial': True})
         if serializer.is_valid():
             serializer.save()
-            return Response({'message': 'User updated successfully'}, status=status.HTTP_200_OK)
+            return Response({'message': 'User updated successfullyly'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, **kwargs):
@@ -101,7 +101,7 @@ class UserAction(ModelViewSet):
             return Response({'message': 'Incorrect old password'}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(request.data['password'])
         user.save()
-        return Response({'message': 'Password updated successfully'}, status=status.HTTP_200_OK)
+        return Response({'message': 'Password updated successfullyly'}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def register(self, request):
@@ -129,7 +129,7 @@ class UserAction(ModelViewSet):
             )
             email.attach_alternative(message, "text/html")
             email.send()
-            return Response({'message': 'Account created successfully please activate by confirming your email'}, status=status.HTTP_201_CREATED)
+            return Response({'message': 'Account created successfullyly please activate by confirming your email'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
@@ -145,7 +145,7 @@ class UserAction(ModelViewSet):
         if user is not None and account_activation_token.check_token(user, token):
             user.is_email_verified = True
             user.save()
-            return Response({'message': 'Account activated successfully'}, status=status.HTTP_200_OK)
+            return Response({'message': 'Account activated successfullyly'}, status=status.HTTP_200_OK)
         else:
             return Response({'message': 'Activation link is invalid!'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -198,7 +198,7 @@ class UserAction(ModelViewSet):
                 return Response({'message': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
             user.set_password(request.data['password'])
             user.save()
-            return Response({'message': 'Password reset successful'}, status=status.HTTP_200_OK)
+            return Response({'message': 'Password reset successfully'}, status=status.HTTP_200_OK)
         else:
             return Response({'message': 'Password reset link is invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -219,7 +219,7 @@ class UserAction(ModelViewSet):
             serializer = UserSerializer(user)
             refresh_token = RefreshToken.for_user(user)
             access_token = str(refresh_token.access_token)
-            response  = Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
+            response  = Response({'message': 'Login successfully'}, status=status.HTTP_200_OK)
             response.data = serializer.data
             response.set_cookie(key='refresh', value=str(refresh_token), httponly=True)
             response.set_cookie(key='access', value=access_token, httponly=True)
@@ -255,7 +255,7 @@ class UserAction(ModelViewSet):
         try:
             refresh_token = RefreshToken(request.data.get('refresh'))
             refresh_token.blacklist()
-            response = Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
+            response = Response({'message': 'Logout successfully'}, status=status.HTTP_200_OK)
             response.delete_cookie('refresh')
             response.delete_cookie('access')
             return response
@@ -321,7 +321,13 @@ class UserAction(ModelViewSet):
             user = User.objects.create_user(username=user_data['login'], full_name= user_data['usual_full_name'], email=user_data['email'], password=secrets.token_urlsafe(8), profile_pic_url=user_data['image']['versions']['small'])
             user.is_email_verified = True
             user.save()
-        return Response(user_data)
+        refresh_token = RefreshToken.for_user(user)
+        access_token = str(refresh_token.access_token)
+        response  = Response({'message': 'Login successfully'}, status=status.HTTP_200_OK)
+        response.data = UserSerializer(user).data
+        response.set_cookie(key='refresh', value=str(refresh_token), httponly=True)
+        response.set_cookie(key='access', value=access_token, httponly=True)
+        return response
 
 class CustomTokenVerifyView(TokenVerifyView):
     serializer_class = CustomVerifyTokenSerializer
@@ -335,4 +341,3 @@ class CustomTokenRefreshView(TokenRefreshView):
         response.set_cookie(key='access', value=access, httponly=True)
         response.data = {}
         return response
-    
