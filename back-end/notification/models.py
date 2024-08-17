@@ -12,8 +12,8 @@ class NotificationType(models.TextChoices):
 
 class Notification(models.Model):
     message = models.CharField(max_length=255)
-    type = models.CharField(max_length=2, choices=NotificationType.choices, default=NotificationType.MESSAGE)
-    status = models.booleanField(default=False)
+    type = models.CharField(max_length=3, choices=NotificationType.choices, default=NotificationType.MESSAGE)
+    read = models.BooleanField(default=False)
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver')
     created_at = models.DateTimeField(auto_now_add=True)
 

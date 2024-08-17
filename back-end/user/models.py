@@ -59,7 +59,7 @@ class Stats(models.Model):
     goals_scored = models.IntegerField(default=0)
     goals_conceded = models.IntegerField(default=0)
     goals_difference = models.IntegerField(default=0)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=None)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=None)
 
     def __str__(self):
         return self.matche_played

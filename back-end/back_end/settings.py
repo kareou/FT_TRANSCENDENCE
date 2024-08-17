@@ -92,6 +92,8 @@ INSTALLED_APPS = [
     'user',
     'chat',
     'game',
+    'friends',
+    'notification',
 ]
 
 MIDDLEWARE = [

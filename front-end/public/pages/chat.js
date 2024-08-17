@@ -19,6 +19,9 @@ export default class Chat extends HTMLElement {
 
   setupWebSocket() {
     this.websocket = new WebSocket("ws://127.0.0.1:8000/ws/chat/");
+    this.websocket.onerror = function (event) {
+      console.error("WebSocket error observed:", event);
+    };
 
     this.websocket.addEventListener("open", function (event) {
       console.log("WebSocket connection opened.");
@@ -199,6 +202,7 @@ export default class Chat extends HTMLElement {
   }
 
   async sendMessage() {
+    console.log("sending message to ", this.receiverId);
     if (!this.receiverId) {
       console.error("No receiver selected");
       this.clearChatArea();
@@ -254,8 +258,15 @@ export default class Chat extends HTMLElement {
           sendButton.click();
         }
       });
+    console.log("recer ", this.receiverId);
     sendButton.addEventListener("click", () => {
       this.sendMessage();
+      const data = {
+        type: "message",
+        receiver: this.receiverId,
+        message: document.querySelector(".message-input").value,
+      };
+      Http.notification_socket.send(JSON.stringify(data));
     });
   }
 

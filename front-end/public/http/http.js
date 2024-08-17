@@ -8,6 +8,10 @@ class Http {
     this.notification_socket = null;
   }
 
+  notifyStats(data) {
+    console.log("test socket", data);
+  }
+
   async register(data, url) {
     try {
       const response = await fetch(`${this.baseUrl}/${url}`, {
@@ -33,7 +37,8 @@ class Http {
       `ws://localhost:8000/ws/notification/${this.user.id}/`
     );
     this.notification_socket.onmessage = (e) => {
-      console.log(e);
+      const data = JSON.parse(e.data);
+      this.notifyStats(data);
     }
   }
 

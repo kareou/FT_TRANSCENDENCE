@@ -10,38 +10,31 @@ export default class Notification extends HTMLElement{
         this.render();
     }
 
-    async renderNotification(){
-        // const response = await fetch('http://localhost:3000/api/notification', {
-        //     method: 'GET',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     credentials: 'include',
-        // });
-        // const data = await data.json();
+    async getNotification(){
+        const response = await fetch('http://localhost:8000/api/notification/get_unread/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        });
+        const data = await response.json();
+        console.log(data)
         const notificationContainer = this.querySelector('.notification_container');
-        const dropdown =document.querySelector('.notification_dropdown');
-        if (dropdown.classList.contains('show')){
-            dropdown.classList.remove('show');
-            document.querySelector('.notification_container').innerHTML = '';
-            return;
-        }
-        // if (data.length > 0){
-        //     data.forEach(notification => {
-        //         const notificationDiv = document.createElement('div');
-        //         notificationDiv.classList.add('notification');
-        //         notificationDiv.innerHTML = `
-        //             <div class="notification_image">
-        //                 <img src="${notification.img}" alt="avatar" class="avatar_icon">
-        //             </div>
-        //             <div class="notification_content">
-        //                 <h2>${notification.title}</h2>
-        //                 <p>${notification.content}</p>
-        //             </div>
-        //         `;
-        //         notificationContainer.appendChild(notificationDiv);
-        //     });
-        // }else{
+        const dropdown = document.querySelector('.notification_dropdown');
+        if (data.length > 0){
+            data.forEach(notification => {
+                const notificationDiv = document.createElement('div');
+                notificationDiv.classList.add('notification');
+                notificationDiv.innerHTML = `
+                    <div class="notification_content">
+                        <h2>${notification.type}</h2>
+                        <p>${notification.message}</p>
+                    </div>
+                `;
+                notificationContainer.appendChild(notificationDiv);
+            });
+        }else{
             const notificationDiv = document.createElement('div');
             notificationDiv.classList.add('notification');
             notificationDiv.innerHTML = `
@@ -50,8 +43,20 @@ export default class Notification extends HTMLElement{
                 </div>
             `;
             notificationContainer.appendChild(notificationDiv);
-        // }
-        document.querySelector('.notification_dropdown').classList.toggle('show');
+        }
+    }
+
+    async markAllRead(){
+        const response = await fetch('http://localhost:8000/api/notification/mark_all_read/', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        });
+        if (response.ok){
+            this.render();
+        }
     }
 
     render(){
@@ -68,8 +73,13 @@ export default class Notification extends HTMLElement{
             </div>
             </div>
             `;
+        this.getNotification();
         const notification = this.querySelector('.notification_wrapper');
-        notification.addEventListener('click', this.renderNotification.bind(this));
+        notification.addEventListener('click', () => {
+            document.querySelector('.notification_dropdown').classList.toggle('show');
+        });
+        const notificationButton = this.querySelector('.notification_button');
+        notificationButton.addEventListener('click', this.markAllRead.bind(this));
     }
 }
 

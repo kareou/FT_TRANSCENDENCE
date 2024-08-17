@@ -10,5 +10,6 @@ statRouter.register('stats', views.StatsViewSet, basename='stats')
 
 urlpatterns = [
 	path('', include(statRouter.urls)),
-	path('', include(userRouter.urls))
+	path('', include(userRouter.urls)),
+    
 ]
