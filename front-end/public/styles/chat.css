@@ -3,6 +3,11 @@
     src: url("/public/assets/fonts/Roboto-Regular.ttf");
 }
 
+@font-face {
+    font-family: "Almarai";
+    src: url('/public/assets/fonts/Almarai-Regular.ttf');
+}
+
 .conv_data_container_chat__
 {
     height: 100%;
@@ -38,20 +43,20 @@
 }
 
 .send-button {
-    background-color: #4CAF50; /* Green background */
+    background-color: #2563EB; /* Green background */
     border: none; /* Remove border */
     color: white; /* White text */
     padding: 10px 20px; /* Padding inside button */
     text-align: center; /* Center text */
     text-decoration: none; /* Remove underline */
-    display: inline-block; /* Display as inline-block */
+    /* display: inline-block; Display as inline-block */
     font-size: 16px; /* Font size */
     border-radius: 25px; /* Rounded corners */
     transition-duration: 0.4s; /* Smooth transition on hover */
 }
 
 .send-button:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: #5289ff; /* Darker green on hover */
 }
 
 *{
@@ -230,8 +235,7 @@ body{
 .first_profile_wrapper_chat{
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    padding: 25px;
+    padding: 30px 25px;
 }
 
 .pdp_warpper{
@@ -241,13 +245,16 @@ body{
 
 .txt_one{
     color: white;
-    font-size: 22px;
+    font-size: 36px;
     padding: 0 25px;
+    font-family: 'Actor';
 }
 
 .pfp_logo{
-    width: 80px;
+    width: 93px;
+    border-radius: 50%;
     object-fit: contain;
+    border: solid 4px #587187;
 }
 
 .chat_wrapper_{
@@ -259,7 +266,7 @@ body{
 .first_profile_wrapper_chat{
     width: fit-content;
     width: 100%;
-    border-bottom: 0.6px solid #778FB8;;
+    border-bottom: 0.6px solid #778FB8;
 }
 
 /* .chat_bulle_wrapper {
@@ -301,8 +308,8 @@ body{
 .chat_bulle_wrapper {
     display: flex;
     align-items: center;
-    padding: 10px;
-    margin: 5px 0;
+    padding: 10px 25px;
+    /* margin: 5px 0; */
     /* background-color: #f0f0f0; Light background for contrast */
     border-radius: 5px; /* Rounded corners for a modern look */
     border-bottom: 0.6px solid #4b5e8d; /* Bottom border for separation */
@@ -310,13 +317,13 @@ body{
 }
 
 .chat_bulle_wrapper:hover {
-    background-color: #6dd88d; /* Slightly darker on hover */
+    background-color: #3C4A60; /* Slightly darker on hover */
 }
 
 .chat_pdp_wrapper img {
     border-radius: 50%; /* Circular profile picture */
-    width: 40px; /* Fixed size for profile picture */
-    height: 40px; /* Fixed size for profile picture */
+    width: 70px; /* Fixed size for profile picture */
+    height: 70px; /* Fixed size for profile picture */
     margin-right: 10px; /* Space between image and text */
 }
 
@@ -326,9 +333,10 @@ body{
 }
 
 .name_bulle_chat {
-    font-weight: bold; /* Bold username */
-    color: #d7da60; /* Dark text for readability */
+    font-size: 20px;
+    color: white; /* Dark text for readability */
     margin-bottom: 5px; /* Space between name and status */
+    font-family: "Almarai";
 }
 
 .status_bulle_chat {
@@ -355,10 +363,10 @@ body{
     position: relative;
     backdrop-filter: blur(10px);
     border-radius: 18px 0px 0 18px;
-
+    background-color: rgba(27, 167, 160, 0.05);
 }
 
-.first_section_wrapper_chat::after {
+/* .first_section_wrapper_chat::after {
     content: "";
     border-radius: 18px 0px 0 18px ;
     position: absolute;
@@ -369,7 +377,7 @@ body{
     background-color: rgba(27, 167, 160, 0.05);
     opacity: 0.10;
     z-index: -1;
-}
+} */
 
 .chat_wrapper_,
 .first_wrapper_info_user_chat_wrapper,
@@ -383,6 +391,7 @@ body{
 
 .first_wrapper_info_user_chat_wrapper{
     justify-content: space-between;
+    background-color: rgba(27, 167, 160, 0.05);
 }
 
 .second_section_wrapper_chat{
@@ -427,17 +436,19 @@ body{
     position: relative;
     backdrop-filter: blur(10px);
     border-radius: 0px 15px 15px 0px;
+    background-color: rgba(27, 167, 160, 0.05);
+    display: none;
 }
 
 .chat_container_conv__{
-    border-bottom: 0.6px solid #778FB8;
     position: relative;
     backdrop-filter: blur(10px);
+    height: 100%;
+    background: rgb(0, 10, 10, 0.1);
 }
 
-.first_wrapper_info_user_chat_wrapper::after,
-.third_section_wrapper_chat::after,
-.chat_container_conv__::after {
+/* .first_wrapper_info_user_chat_wrapper::after,
+.third_section_wrapper_chat::after::after {
     content: "";
     position: absolute;
     top: 0;
@@ -447,33 +458,46 @@ body{
     background-color: rgba(27, 167, 160, 0.05);
     opacity: 0.10;
     z-index: -1;
-}
+} */
 
 
-.chat_container_conv__::after{
+/* .chat_container_conv__::after{
     background-color: #000000!important;
-}
+} */
 .logo_chat_user{
     width: 70px;
+    border-radius: 50%;
     object-fit: cover;
 }
 
-.send_msg_input{
-    background-color: #0000;
-    border-radius: 18px;
+.send_msg_input {
+    width: 100%;
+    max-height: 13rem;
+    background-color: transparent;
+    color: white;
+    overflow-y: hidden;
+    padding: .5rem .75rem;
+    resize: none;
+    font-size: 19px;
     border: none;
-    width: 70%;
-    height: 50px;
-    box-shadow: 1px 1px 5px #778FB8;
+}
+
+.send_msg_input:focus{
+    outline: none;
+    color: white;
 }
 
 .message_user_content__{
-    background-color: #808080;
+    background-color: rgba(255, 255, 255, 0.13);
     width: fit-content;
     padding: 10px 15px;
     color: white;
+    font-size: 20px;
+    font-family: "roboto";
     border-radius: 12px;
+    position: relative;
 }
+
 
 .message_container__{
     margin: 8px;
@@ -505,17 +529,20 @@ body{
 }
 
 .input_conv_container__chat{
-    text-align: center;
+    background-color: #323a48;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    padding: .5rem;
+    gap: .5rem;
+    border-radius: 1rem;
+    justify-self: center;
+    width: 80%;
 }
 
-.send_msg_input{
-    padding: 0 25px;
-    font-size: 19px;
-    color: gray;
-}
 
 .second_msg_user > .message_user_container__ > .message_user_content__{
-    background-color: #04D98B!important;
+    background-color: rgba(4, 217, 139, 0.17)!important;
 }
 
 .second_msg_user{
@@ -596,6 +623,62 @@ body{
 }
 
 
+.play_invite{
+    width: 6rem;
+    height: 3rem;
+    border-radius: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    background-color: #009F83;
+    box-shadow: 5px 5px 0px #006b57;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.play_invite:hover{
+    background-color: #006b57;
+    box-shadow: none;
+}
+
+.find_conv{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+}
+
+.find_conv h1{
+    font-size: 2em;
+    font-family: "Actor";
+    
+}
+
+.find_conv p{
+    color: gray;
+    font-size: 1.2em;
+}
+
+.find_conv i{
+    font-size: 5rem;
+    line-height: 1;
+    color: #1BA7A0;
+}
+
+.find_friends{
+    width: 12rem;
+    height: 4rem;
+    border-radius: 1rem;
+    background-color: #1BA7A0;
+    color: rgb(21, 21, 21);
+    font-size: 1.5em;
+    font-family: "Actor";
+}
+
 /*
 
 sm: '2rem',
@@ -603,3 +686,5 @@ sm: '2rem',
         xl: '5rem',
         '2xl': '6rem',
         */
+
+        

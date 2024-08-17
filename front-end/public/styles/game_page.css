@@ -6,7 +6,7 @@
     backdrop-filter: blur(1rem);
     height: 85vh;
     width: 100%;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     display: grid;
     justify-content: center;
     align-items: center;

@@ -29,7 +29,7 @@ body {
 
 .sidebar_wrapper{
     position: relative;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     width: 100%;
     border-radius: 15px;
 }
@@ -58,7 +58,7 @@ body {
 
 .right_sidebar_wrapper{
     position: relative;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     width: fit-content;
     border-radius: 15px;
     /* flex: 4; */
@@ -67,7 +67,7 @@ body {
     backdrop-filter: blur(10px);
     height: 90vh!important;
     color: #fff;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 15px;
 }
 
@@ -133,7 +133,7 @@ body {
     color: white;
     height: 90vh!important;
     width: 80vw;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 15px;
     display: flex;
     flex: 10;
@@ -162,7 +162,7 @@ body {
     box-sizing: border-box;
     align-items: center;
     color: #fff;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 15px;
     padding: 15px;
     margin: 10px;
@@ -207,7 +207,7 @@ body {
     height: 40vh;
     min-width: 400px;
     box-sizing: border-box; 
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 15px;
     margin: 10px;
 }
@@ -279,7 +279,7 @@ button {
     display: flex;
     box-sizing: border-box;
     color: #fff;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 15px;
     padding: 15px;
     margin: 10px;
@@ -298,7 +298,7 @@ button {
     display: flex;
     box-sizing: border-box;
     color: #fff;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 15px;
     padding: 15px;
     margin: 10px;

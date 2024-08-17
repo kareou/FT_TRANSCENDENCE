@@ -45,7 +45,7 @@ h1{
     align-items: center;
     justify-content: space-around;
     padding: 1rem;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     background-color: rgba(27, 167, 160, 0.05);
     border-radius: 1rem;
     backdrop-filter: blur(1rem);
@@ -54,7 +54,7 @@ h1{
 .game_wrapper {
     grid-area: game;
     margin-top: 1rem;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 1rem;
     backdrop-filter: blur(1rem);
     background: url("/public/assets/pong_animation.gif") no-repeat center center / cover;
@@ -72,7 +72,7 @@ h1{
     display: flex;
     align-items: center;
     margin-top: 1rem;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 1rem;
     backdrop-filter: blur(1rem);
     background-color: rgba(27, 167, 160, 0.05);
@@ -83,7 +83,7 @@ h1{
     grid-area: rank;
     display: flex;
     align-items: center;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 1rem;
     background-color: rgba(27, 167, 160, 0.05);
 

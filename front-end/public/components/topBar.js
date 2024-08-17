@@ -35,9 +35,7 @@ export default class TopBar extends HTMLElement {
                     <input type="text" name="search" id="search_chat" class="search_chat"
                         placeholder="Search Everything">
                 </div>
-                <div class="notification_wrapper">
-                    <i class="fa-thin fa-bell fa-xl notification_icon" style="color: white;"></i>
-                </div>
+                <notification-icon></notification-icon>
             </div>
             </div>
         `;
