@@ -13,6 +13,8 @@ export default class TopBar extends HTMLElement {
 
   checkAndRender() {
     const path = window.location.pathname;
+    if (path === "/" || path.startsWith("/auth"))
+      return;
     if (path === "/dashboard")
       this.welcome = true;
     else
@@ -21,7 +23,6 @@ export default class TopBar extends HTMLElement {
   }
 
   initURLChangeDetection() {
-    this.selected = window.location.pathname;
     // Listen for popstate, hashchange, and custom locationchange events
     window.addEventListener("locationchange", this.checkAndRender.bind(this));
   }

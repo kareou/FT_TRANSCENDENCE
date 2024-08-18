@@ -1,12 +1,19 @@
+import Http from '../http/http.js';
+
 export default class Notification extends HTMLElement{
     constructor(){
         super();
-        this.state = this.getAttribute('state');
-        this.img = this.getAttribute('image');
-        this.width = this.getAttribute('width');
-        this.height = this.getAttribute('height');
+        Http.website_stats.addObserver({
+            update: () => this.update(),
+            event: "notification",
+            data: this.matchmakingstate,
+        });
     }
     connectedCallback(){
+        this.render();
+    }
+
+    update(){
         this.render();
     }
 
@@ -19,7 +26,6 @@ export default class Notification extends HTMLElement{
             credentials: 'include',
         });
         const data = await response.json();
-        console.log(data)
         const notificationContainer = this.querySelector('.notification_container');
         const dropdown = document.querySelector('.notification_dropdown');
         if (data.length > 0){
@@ -62,15 +68,15 @@ export default class Notification extends HTMLElement{
     render(){
         this.innerHTML = `
             <div style="position: relative;">
-            <button class="notification_wrapper">
-            <i class="fa-thin fa-bell fa-xl notification_icon" style="color: white;"></i>
-            </button>
-            <div class="notification_dropdown ">
-                <h1>Notifications</h1>
-                <div class="notification_container">
+                <button class="notification_wrapper">
+                <i class="fa-light fa-bell fa-2xl notification_icon" style="color: white;"></i>
+                </button>
+                <div class="notification_dropdown ">
+                    <h1>Notifications</h1>
+                    <div class="notification_container">
+                    </div>
+                    <button class="notification_button">View All</button>
                 </div>
-                <button class="notification_button">View All</button>
-            </div>
             </div>
             `;
         this.getNotification();

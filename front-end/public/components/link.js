@@ -59,7 +59,7 @@ export default class Link extends HTMLAnchorElement {
     }
     catch (e) {
       if (e.message === "Unauthorized") {
-        window.location.href = "/login";
+        window.location.href = "/auth/login";
         return;
       }
       window.location.href = "/404";

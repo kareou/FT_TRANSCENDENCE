@@ -20,7 +20,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
 	def get_unread(self, request):
 		unread = Notification.objects.filter(receiver=self.request.user, read=False)
 		return Response(self.get_serializer(unread, many=True).data, status=status.HTTP_200_OK)
-	
+
 	@action(detail=False, methods=['PUT'])
 	def mark_all_read(self, request):
 		Notification.objects.filter(receiver=self.request.user).update(read=True)
