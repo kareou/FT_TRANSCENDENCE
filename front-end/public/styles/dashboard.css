@@ -8,6 +8,11 @@
     src: url("../assets/fonts/Actor-Regular.ttf");
 }
 
+body{
+    max-width: 1800px;
+    margin: auto;
+}
+
 h1{
     color: white;
     font-family: "Coolvetica";
@@ -76,7 +81,8 @@ h1{
     border-radius: 1rem;
     backdrop-filter: blur(1rem);
     background-color: rgba(27, 167, 160, 0.05);
-
+    flex-direction: column;
+  padding: 15px;
 }
 
 .rank{
@@ -217,8 +223,7 @@ h1{
     display: flex;
     flex-direction: column;
     justify-content: center;
-
-    background-color: #778FB8;
+    background-image: url("../assets/bg_img.png");
     display: none;
 }
 
@@ -226,11 +231,41 @@ h1{
     display: flex;
 }
 
+.wrapper_modal{
+    position: relative;
+}
+
+.msg-prompt_sub2{
+    position: relative;
+}
+
+.send_btn_modal{
+    position: absolute;
+    background: none!important;
+    left: 87%;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.message-input{
+    width: 100%;
+    padding: 10px 10px;
+    border-radius: 15px;
+    border: none;
+    background-color: #778FB8;
+    outline: none;
+}
 .close-btn {
     position: absolute;
-    left: 0;
-    top: 5%;
+    right: 5px;
+    top: 0px;
     transform: translateY(-50%);
+    background: none;
+  border: none;
+}
+
+.close-btn:hover{
+    color: #047e5c;
 }
 
 .msg-prompt_sub1 {

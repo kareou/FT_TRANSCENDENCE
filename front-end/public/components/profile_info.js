@@ -142,7 +142,15 @@ async sendMessage() {
     });
   }
   render() {
+      
     this.innerHTML = /*HTML*/ `
+    <style>
+    .infos{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    </style>
         <div class="profile" >
           <div class="profile_img">
             <img src='http://localhost:8000${this.user.profile_pic}' class="profile_img" alt="profile">
@@ -159,11 +167,12 @@ async sendMessage() {
               </span>
               <span id="user_coins">2300$
               </span>
+              <button class="new-msg send_msg no_style">
+                <i class="fa-regular fa-message"></i>
+              </button>
               </h2>
             </div>
-            <div class="">
-              <button class="new-msg">Message</button>
-            </div>
+          
             <div class="achievement">
               <h1>Achievements</h1>
               <div class="achievement_list">
@@ -184,15 +193,25 @@ async sendMessage() {
               </div>
             </div>
           </div>
-          <div class="msg-prompt hidden" >
+
+          <div class="msg-prompt hidden" style="height: 150px;padding: 25px;border-radius: 12px;border: 1px solid white;">
+            <div class="wrapper_modal" style="height: 100%;display: flex;flex-direction: column;justify-content: space-around;">
+
+              <button class="close-btn">
+                <i class="fa fa-close"> </i>
+              </button>
             <div class="msg-prompt_sub1">
-              <p>message to ${this.user.username}</p>
-              <button class="close-btn">close</button>
+              <!-- <p>message to ${this.user.username}</p> -->
+              <br><br><br>
             </div>
             <div class="msg-prompt_sub2">
-              <input type="text" class="message-input">
-              <button class="send-button">Send</button>
+              <input type="text" class="message-input" placeholder="Write your message here...">
+              <button class="send-button send_btn_modal">
+                <i class="fa fa-send"></i>
+              </button>
             </div>
+          </div>
+
           </div>
     </div>
     `;
