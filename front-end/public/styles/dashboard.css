@@ -24,7 +24,17 @@ h1{
         'profile rank'
         'game friends';
     grid-gap: 1rem;
-    height: 85vh;
+    height: 100%;
+    animation: fadein .5s ease-in-out;
+}
+
+@keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 .game_n_friends,

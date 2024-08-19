@@ -1,10 +1,10 @@
 @import url("./dashboard.css");
 
-.game_page{
+.game_page {
     /* background: rgba(27, 167, 160, 0.05); */
     border-radius: 1rem;
     backdrop-filter: blur(1rem);
-    height: 85vh;
+    height: 100%;
     width: 100%;
     border: 0.6px solid #778FB8;
     display: grid;
@@ -12,11 +12,11 @@
     align-items: center;
 }
 
-.game_page h1{
+.game_page h1 {
     font-family: "Actor";
 }
 
-.players_info{
+.players_info {
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -24,7 +24,8 @@
     color: white;
 }
 
-.player1, .player2{
+.player1,
+.player2 {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -32,29 +33,31 @@
     font-size: 1em;
 }
 
-#player_1_input,#player_2_input{
+#player_1_input,
+#player_2_input {
     width: 100%;
     height: 3rem;
     border-radius: .5rem;
     background: rgba(119, 143, 184, 0.2);
     padding: .5rem;
     font-size: 1em;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     backdrop-filter: blur(1rem);
     color: white;
 }
 
-#roles{
+#roles {
     font-size: 1.5em;
     text-decoration: underline;
     font-weight: 100;
 }
 
-#player_1_input,#player_2_input:focus{
+#player_1_input,
+#player_2_input:focus {
     outline: none;
 }
 
-.game_theme button{
+.game_theme button {
     border: none;
     width: 20rem;
     height: 12rem;
@@ -66,49 +69,50 @@
     background-position: center;
 }
 
-.game_theme{
+.game_theme {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2rem;
 }
 
-.game_theme h1{
+.game_theme h1 {
     font-size: x-large;
     font-weight: 100;
 
 }
 
-#classic{
+#classic {
     background-image: url("../assets/game_theme/classic.png");
 }
 
-#mod{
+#mod {
     background-image: url("../assets/game_theme/mod.png");
 }
 
-#sky{
+#sky {
     background-image: url("../assets/game_theme/sky.png");
 }
 
-.themes{
+.themes {
     display: flex;
     align-items: center;
     gap: 2rem;
 }
 
-.selected_theme{
+.selected_theme {
     /* width: 23rem!important;
     height: 15rem!important; */
-    border: 1px solid #017ba4!important;
+    border: 0.6px solid #017ba4 !important;
 }
 
-.game_start{
+.game_start {
     display: flex;
     justify-content: center;
     align-items: center;
 }
-#start_ev{
+
+#start_ev {
     text-decoration: none;
     color: black;
     background-color: #04BF8A;
@@ -121,14 +125,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     font-family: "Actor";
     font-weight: 100;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 }
 
-#start_ev:disabled{
+#start_ev:disabled {
     font-family: "Actor";
     font-weight: 100;
     background-color: #037655;
@@ -137,20 +141,20 @@
     cursor: not-allowed;
 }
 
-#start_ev:enabled:hover{
+#start_ev:enabled:hover {
     box-shadow: 0 5px 20px rgba(255, 255, 255, 0.5);
     background-color: #04BF8A;
     color: white;
 }
 
-.start_game{
+.start_game {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
 }
 
-.ready_button{
+.ready_button {
     width: 8rem;
     height: 2.5rem;
     font-size: 1.5em;
@@ -161,66 +165,71 @@
 
 }
 
-#p1_ready{
+#p1_ready {
     background-color: #00BFFF;
     box-shadow: 5px 5px 0px #017ba4;
     color: white;
     transition: all 0.3s ease-in-out;
 }
 
-#p2_ready{
+#p2_ready {
     background-color: #FFA500;
     box-shadow: 5px 5px 0px #976201;
     color: white;
     transition: all 0.3s ease-in-out;
 }
 
-#p1_ready:hover{
+#p1_ready:hover {
     background-color: #017ba4;
     box-shadow: none;
 }
 
-#p2_ready:hover{
+#p2_ready:hover {
     background-color: #976201;
     box-shadow: none;
 }
 
-.active#p1_ready{
+.active#p1_ready {
     background-color: #017ba4;
     box-shadow: none;
 }
 
-.active#p2_ready{
+.active#p2_ready {
     background-color: #976201;
     box-shadow: none;
 }
 
-.shake#player_1_input{
-    animation: shake 0.5s ease-in-out;
-}
-.shake#player_2_input{
+.shake#player_1_input {
     animation: shake 0.5s ease-in-out;
 }
 
-@keyframes shake{
-    0%{
+.shake#player_2_input {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0% {
         transform: translateX(0);
     }
-    25%{
+
+    25% {
         transform: translateX(1rem);
     }
-    50%{
+
+    50% {
         transform: translateX(-1rem);
     }
-    75%{
+
+    75% {
         transform: translateX(1rem);
     }
-    100%{
+
+    100% {
         transform: translateX(0);
     }
 }
 
-.theme:disabled{
+.theme:disabled {
     /* pointer-events: none; */
     cursor: not-allowed;
     opacity: 0.5;

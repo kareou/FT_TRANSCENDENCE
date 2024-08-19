@@ -27,6 +27,7 @@ export default class Notification extends HTMLElement{
         });
         const data = await response.json();
         const notificationContainer = this.querySelector('.notification_container');
+        notificationContainer.innerHTML = '';
         const dropdown = document.querySelector('.notification_dropdown');
         if (data.length > 0){
             data.forEach(notification => {
@@ -48,8 +49,10 @@ export default class Notification extends HTMLElement{
                     <h2>No Notifications</h2>
                 </div>
             `;
-            notificationContainer.appendChild(notificationDiv);
-        }
+            // notificationContainer.addEventListener("animationend", () => {
+                notificationContainer.appendChild(notificationDiv);
+            // });
+        };
     }
 
     async markAllRead(){
@@ -75,15 +78,18 @@ export default class Notification extends HTMLElement{
                     <h1>Notifications</h1>
                     <div class="notification_container">
                     </div>
-                    <button class="notification_button">View All</button>
                 </div>
             </div>
             `;
-        this.getNotification();
-        const notification = this.querySelector('.notification_wrapper');
-        notification.addEventListener('click', () => {
-            document.querySelector('.notification_dropdown').classList.toggle('show');
+            const notification = this.querySelector('.notification_wrapper');
+            notification.addEventListener('click', () => {
+                document.querySelector('.notification_dropdown').classList.toggle('show');
+                document.querySelector(".notification_dropdown").style.top = "3.5rem";
+                document.querySelector(".notification_dropdown").style.right = "-1rem";
+                document.querySelector(".notification_dropdown").style.width = "20rem";
+                document.querySelector(".notification_dropdown").addEventListener("animationend", this.getNotification().bind(this));
         });
+
         const notificationButton = this.querySelector('.notification_button');
         notificationButton.addEventListener('click', this.markAllRead.bind(this));
     }

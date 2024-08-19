@@ -1,33 +1,35 @@
-*{
+* {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 
 }
+
 body {
     background-image: url("../assets/Login page.svg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    background-attachment: fixed!important;
+    background-attachment: fixed !important;
     font-family: Arial, Helvetica, sans-serif;
 }
 
 @media only screen and (max-width: 768px) {
-  body {
-    background-size: 100vw 100vh;
-  }
+    body {
+        background-size: 100vw 100vh;
+    }
 }
 
-.body_wrapper{
+.body_wrapper {
     display: flex;
     align-items: center;
     justify-content: flex-start;
     padding: 40px 35px;
     gap: 10px;
+    
 }
 
-.sidebar_wrapper{
+.sidebar_wrapper {
     position: relative;
     border: 0.6px solid #778FB8;
     width: 100%;
@@ -35,37 +37,38 @@ body {
 }
 
 
-.sidebar_wrapper{
+.sidebar_wrapper {
     backdrop-filter: blur(10px);
     display: flex;
     justify-content: space-between;
     flex-direction: column;
     width: fit-content;
-    height: 90vh!important;
+    height: 90vh !important;
     /* flex: 1; */
 }
 
-.icon_side_bar{
+.icon_side_bar {
     width: 37px;
     margin: 20px;
 }
 
 
-.dash_logos_wrapper{
+.dash_logos_wrapper {
     display: flex;
     flex-direction: column;
 }
 
-.right_sidebar_wrapper{
+.right_sidebar_wrapper {
     position: relative;
     border: 0.6px solid #778FB8;
     width: fit-content;
     border-radius: 15px;
     /* flex: 4; */
 }
+
 .right_sidebar_wrapper {
     backdrop-filter: blur(10px);
-    height: 90vh!important;
+    height: 90vh !important;
     color: #fff;
     border: 0.6px solid #778FB8;
     border-radius: 15px;
@@ -85,6 +88,7 @@ body {
     color: red;
     cursor: pointer;
 }
+
 .account_settings_wrapper .delete-account p:hover {
 
     display: inline-block;
@@ -104,12 +108,14 @@ body {
     text-decoration: none;
 
 }
+
 .settings_menu li {
     margin: 10px 0;
 }
+
 .settings_title {
     font-size: 30px;
-    
+
 }
 
 .settings_menu li p {
@@ -131,7 +137,7 @@ body {
     filter: blur(0.23px) saturate(0.5);
     position: relative;
     color: white;
-    height: 90vh!important;
+    height: 90vh !important;
     width: 80vw;
     border: 0.6px solid #778FB8;
     border-radius: 15px;
@@ -144,11 +150,13 @@ body {
     flex-grow: 1;
 
 }
-.profile_title{
+
+.profile_title {
     font-size: 30px;
     /* flex: 3; */
     padding: 15px;
 }
+
 .profile {
     top: 0;
     padding: 0;
@@ -176,10 +184,11 @@ body {
     margin-right: 10px;
 }
 
-.profile_info .name{
+.profile_info .name {
     font-size: 25px;
 }
-.profile_info .username{
+
+.profile_info .username {
     font-size: 18px;
     color: #989898;
     display: block;
@@ -206,7 +215,7 @@ body {
     /* flex: auto; */
     height: 40vh;
     min-width: 400px;
-    box-sizing: border-box; 
+    box-sizing: border-box;
     border: 0.6px solid #778FB8;
     border-radius: 15px;
     margin: 10px;
@@ -214,9 +223,9 @@ body {
 
 .infos {
     padding: 40px;
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-gap: 5vh 10vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 5vh 10vw;
     min-width: max-content;
 
 }
@@ -233,7 +242,7 @@ body {
     justify-content: space-between;
 }
 
-.infos_bar p{
+.infos_bar p {
     font-size: 27px;
 }
 
@@ -259,7 +268,7 @@ body {
 
 
 button img {
-    margin-left: 10px; 
+    margin-left: 10px;
     height: 21px;
 }
 
@@ -284,10 +293,12 @@ button {
     padding: 15px;
     margin: 10px;
 }
+
 .security-container p {
     font-size: 30px;
     padding: 50px;
 }
+
 .notifications-container {
     top: 0;
     padding: 0;
@@ -303,6 +314,7 @@ button {
     padding: 15px;
     margin: 10px;
 }
+
 .notifications-container p {
     font-size: 30px;
     padding: 50px;

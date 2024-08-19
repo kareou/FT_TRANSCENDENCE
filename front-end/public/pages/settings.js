@@ -7,87 +7,223 @@ export default class Settings extends HTMLElement {
 	}
 	connectedCallback() {
 		this.render();
+
+		const lws = document.querySelectorAll('.link_wrapper_settings')
+		let old_lws = lws[0];
+		const content_ = document.querySelector(".content_")
+		const forms = {
+			'one': `
+				<div>
+				<h2 class="info_h">
+					your infomations
+				</h2>
+				<p class="info_p">
+					update your informations
+				</p>
+			</div>
+				<div class="form_settings_wrapper_one">
+					<div class="input_settings_wrapper">
+						<lable class="label_txt" for="fullname">
+							Full Name:
+						</lable>
+						<input type="text" name="fullname" id="fullname" class="fullname" value="${this.user.full_name}">
+					</div>
+					<div class="input_settings_wrapper">
+						<lable class="label_txt" for="username">
+							Username:
+						</lable>
+						<input type="text" name="username" id="username" class="username" value="${this.user.username}">
+					</div>
+					<div class="input_settings_wrapper">
+						<lable class="label_txt" for="email">
+							Email:
+						</lable>
+						<input type="email" name="email" id="email" class="email" value="${this.user.email}">
+					</div>
+					<div class="buttons_wrapper">
+						<div class="submit_btn">
+							<button type="submit" class="submit_infos">Update Info</button>
+						</div>
+					</div>
+				</div>
+				<h1 class="info_h">Blockes</h1>
+				<div class="bolcked_users">
+					<div class="blocked_users_list">
+						<div>
+							<h1 class="info_h">
+								blocked users list
+							</h1>
+							<p class="info_p">
+								view all blocked users
+							</p>
+						</div>
+						<button class="view_blocked_users">
+							View list
+						</button>
+					</div>
+				</>
+				`
+			,
+
+			'two': `
+
+    <div class="players_info_ setting_1">
+        <div class="player1">
+            <div class="bold_txt_white">Paddle Theme</div>
+            <paddle-option player="player1" class="player1_paddle"></paddle-option>
+          </div>
+    </div>
+    <div class="game_theme setting_2">
+        <div class="bold_txt_white">Table Theme</div>
+        <div class="themes">
+            <button id="classic" class="theme st"></button>
+            <button id="mod" class="theme st selected_theme"></button>
+            <button id="sky" class="theme st"></button>
+        </div>
+    </div>
+    <div class="start_game_ setting_3">
+      <button id="start_btn" disabled>Update Info</button>
+    </div>
+		`,
+			'three': `
+				<div class="bold_txt">
+					Security Informations
+				</div>
+				<div class="form_settings_wrapper_one">
+					<div class="input_settings_wrapper">
+						<div class="label_txt">
+							Old Password:
+						</div>
+						<input type="password" name="oldpass" id="oldpass" class="oldpass">
+					</div>
+					<div class="input_settings_wrapper">
+						<div class="label_txt">
+							New Password:
+						</div>
+						<input type="password" name="newpass" id="newpass" class="newpass">
+					</div>
+					<div class="input_settings_wrapper">
+						<div class="label_txt">
+							Confirm Password:
+						</div>
+						<input type="password" name="confirmpass" id="confirmpass" class="confirmpass">
+					</div>
+					<div class="buttons_wrapper">
+						<div class="submit_btn">
+							<button type="submit" class="submit_infos">Update Info</button>
+						</div>
+					</div>
+				</div>
+				<h1 class="info_h">
+					2FA
+				</h1>
+				<div class="form_settings_wrapper_one">
+				</div>
+				<h1 class="info_h">
+					Delete Account
+				</h1>
+				<div class="form_settings_wrapper_one">
+					<div class="buttons_wrapper">
+						<div class="submit_btn
+						">
+							<button type="submit" class="submit_infos">Delete Account</button>
+						</div>
+					</div>
+				</div>
+
+		`
+		}
+		content_.innerHTML = forms['one']
+
+		lws.forEach((e) => {
+			e.addEventListener('click', () => {
+				if (old_lws)
+					old_lws.classList.remove('active_btn_settings')
+				e.classList.add('active_btn_settings')
+
+				for (let key in forms)
+					if (e.classList[1] == key)
+						content_.innerHTML = forms[key]
+
+				old_lws = e;
+			})
+		})
+		const submit_btn = document.querySelector('.submit_infos');
+		const collectedSettingsData = {};
+
+
+		submit_btn.addEventListener('click', () => {
+			collectedSettingsData["full_name"] = document.querySelector('.fullname').value ?? null;
+			collectedSettingsData["username"] = document.querySelector('.username').value ?? null;
+			collectedSettingsData["email"] = document.querySelector('.email').value ?? null;
+
+			const baseUrl = "http://localhost:8000"
+			const endPoint = "/api/user/update/"
+			const rs = fetch(baseUrl + endPoint, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${this.token}`
+				},
+				credentials: 'include',
+				body: JSON.stringify({ collectedSettingsData }),
+			}).then(response => {
+				return response.json();
+			}).then(data => {
+				console.log(data)
+			})
+		})
 	}
 	render() {
-		this.innerHTML = /*html*/`
-		<div class="setting_wrapper">
-		<div class="right_sidebar_wrapper">
-			<div class="account_settings_wrapper">
-				<h1 class="settings_title">Account Settings</h1>
-				<div>
-					<ul class="settings_menu">
-						<li class="sidebar-item" data-target="profile-container">
-							<p>Profile</p>
-						</li>
-						<li class="sidebar-item" data-target="security-container">
-							<p>Security</p>
-						</li>
-						<li class="sidebar-item" data-target="notifications-container">
-							<p>Notifications</p>
-						</li>
-					</ul>
+		this.innerHTML = /*html*/ `
+<div class="setting_wrapper_">
+	<div class="left_side_settings_wrapper">
+		<div class="infos_wrapper">
+			<div class="img_wrapper">
+				<img src='http://localhost:8000${this.user.profile_pic}' alt="img user" class="img_user_settings">
+				<i class="fa fa-edit"></i>
+			</div>
+			<div class="infos_details_wrapper">
+				<div class="bold_txt">
+					${this.user.fullname}
 				</div>
-				<a class="delete-account">
-					<p href="#">Delete Account</p>
-				</a>
+				<div class="under_txt">
+					Art Director
+				</div>
 			</div>
 		</div>
-		<div id="content_wrapper" class="content_wrapper">
-			<div id="profile-container" class="content-item profile-container active">
-				<div>
-					<p class="profile_title">My profile</p>
-				</div>
-				<div class="settings_profile">
-					<img src="http://localhost:8000${this.user.profile_pic}" alt="Profile Picture" class="profile-picture">
-					<div class="profile_info">
-						<p class="name">${this.user.full_name}</p>
-						<p class="username">${this.user.username}</p>
-					</div>
-					<button class="button_edit">Edit <i class="fa-light fa-pen-to-square"></i></button>
-				</div>
-				<div class="infos_container">
-					<div class="infos_bar">
-						<p>Personal Information</p>
-						<button class="button_edit">Edit <i class="fa-light fa-pen-to-square"></i></button>
-					</div>
-					<div class="infos">
-						<p>
-							<label>First Name</label>
-							<span>Othmane</span>
-						</p>
-						<p>
-							<label>Last Name</label>
-							<span>Guennach</span>
-						</p>
-						<p>
-							<label>Email address</label>
-							<span>${this.user.email}</span>
-						</p>
-						<p>
-							<label>Phone</label>
-							<span>212 67 674 645 77</span>
-						</p>
-					</div>
+		<div class="links_wrapper_swapper">
+			<div class="link_wrapper_settings one active_btn_settings">
+				<i class="fa fa-user"></i>
+				<span class="txt___sett">
+					General Information
+				</span>
+			</div>
+			<div class="link_wrapper_settings two">
+				<i class="fa-solid fa-game-console-handheld"></i>
+				<span class="txt___sett">
+					Game
+				</span>
+			</div>
+			<div class="link_wrapper_settings three">
+				<i class="fa-solid fa-lock"></i>
+				<span class="txt___sett">
+					Security
+				</span>
+			</div>
 
-				</div>
-				<div>
-					<button class="button_save">Save</button>
-				</div>
-			</div>
-			<div id="security-container" class="content-item security-container">
-				<div>
-					<p class="security_title">Security</p>
-				</div>
-			</div>
-			<div id="notifications-container" class=" content-item notifications-container">
-				<div>
-					<p class="notifications_title">Notifications</p>
-				</div>
+		</div>
+	</div>
+	<div class="right_side_settings_wrapper">
+		<div class="marg_wrapper">
+			<h1 class="setting_h">Settings</h1>
+			<div class="content_">
 			</div>
 		</div>
 	</div>
-`
+</div>
+`;
 	}
 }
 
-customElements.define('settings-page', Settings);
+customElements.define("settings-page", Settings);
