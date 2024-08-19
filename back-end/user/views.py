@@ -108,7 +108,7 @@ class UserAction(ModelViewSet):
         serializer = UserSerializer(data=request.data, context={'partial': False}) 
         if serializer.is_valid():
             if User.objects.filter(email=request.data['email']).exists():
-                return Response({'message': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'Email already exists'}, status=status.HTTP_409_CONFLICT)
             user = serializer.save()
             # send verification email  
             current_site = get_current_site(request)
