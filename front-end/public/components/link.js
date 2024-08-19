@@ -1,6 +1,9 @@
 import { routes } from "../router/routes.js";
 import Http from "../http/http.js";
 
+const root = document.getElementById("app");
+
+
 export default class Link extends HTMLAnchorElement {
   constructor() {
     super();
@@ -18,7 +21,7 @@ export default class Link extends HTMLAnchorElement {
   }
 
 
-  static async findRoute(routers, path, parent_path = "", isAuth ) {
+  static findRoute(routers, path, parent_path = "", isAuth ) {
     let route = null;
     for (let i = 0; i < routers.length; i++) {
       if (routers[i].requireAuth === true) {
@@ -26,7 +29,7 @@ export default class Link extends HTMLAnchorElement {
           throw new Error("Unauthorized");
         }
         if (routers[i].children) {
-          route = await Link.findRoute(routers[i].children, path, parent_path + routers[i].path, isAuth);
+          route = Link.findRoute(routers[i].children, path, parent_path + routers[i].path, isAuth);
           if (route) return route;
         }
         if (Link.matchUrl(path, parent_path+routers[i].path)) {
@@ -34,7 +37,7 @@ export default class Link extends HTMLAnchorElement {
         }
       }else{
         if (routers[i].children) {
-          route = await Link.findRoute(routers[i].children, path, parent_path + routers[i].path, isAuth);
+          route = Link.findRoute(routers[i].children, path, parent_path + routers[i].path, isAuth);
           if (route) return route;
         }
         if (Link.matchUrl(path, parent_path+routers[i].path)) {
@@ -54,7 +57,7 @@ export default class Link extends HTMLAnchorElement {
     const path = url.slice(0, pos);
     const isAuth = await Http.verifyToken();
     try{
-      var route = await Link.findRoute(routes, path, "", isAuth);
+      var route =  Link.findRoute(routes, path, "", isAuth);
       if (!route) throw new Error("Not Found");
     }
     catch (e) {
@@ -65,13 +68,10 @@ export default class Link extends HTMLAnchorElement {
       window.location.href = "/404";
     }
     if (!route) route = routes[0];
-    const root = document.getElementById("app");
     try {
       const component = await route.component();
       const componentToRender = new component.default();
-      if (root.firstChild) {
-        root.removeChild(root.firstChild);
-      }
+      root.innerHTML = '';
       root.appendChild(componentToRender);
       const event = new CustomEvent("locationchange", {detail: path});
       window.dispatchEvent(event);
@@ -80,13 +80,19 @@ export default class Link extends HTMLAnchorElement {
     }
   }
 
+  disconnectedCallback() {
+    this.removeEventListener("click", this.handleClick);
+  }
+  
   connectedCallback() {
-    this.addEventListener("click", (e) => {
-      e.preventDefault();
-      const href = this.getAttribute("href");
-      window.history.pushState({}, "", href);
-      Link.navigateTo(href);
-    });
+    this.addEventListener("click", this.handleClick);
+  }
+
+  handleClick(e) {
+    e.preventDefault();
+    const href = this.getAttribute("href");
+    window.history.pushState({}, "", href);
+    Link.navigateTo(href);
   }
 }
 

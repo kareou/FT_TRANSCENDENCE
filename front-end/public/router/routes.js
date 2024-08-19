@@ -1,20 +1,4 @@
-import Link from "../components/link.js";
-import SideBar from "../components/sidebar.js";
-import TopBar from "../components/topBar.js";
-import Game_Option from "../components/game_option.js";
-import Game_Starter from "../components/game_starter.js";
-import Paddle_Option from "../components/paddle_option.js";
-import Toast from "../components/toast.js";
-import MatchmakingStats from "../components/matchmaking_stats.js";
-import MatchMakingAvatar from "../components/matchmaking_avatar.js";
-import GameScore from "../components/game_score.js";
-import WinnerModal from "../components/winner_modal.js";
-import MatchData from "../components/match_data.js";
-import ProfileInfor from "../components/profile_info.js";
-import MatchHistory from "../components/matchHistory.js";
-import UserStats from "../components/user_stats.js";
-import UserAvatar from "../components/user_avatar.js";
-import Notification from "../components/notification.js";
+
 
 export const routes = [
   {

@@ -10,6 +10,9 @@ class friendList(models.Model):
 
     user1_blocked_user2 = models.BooleanField(default=False)
     user2_blocked_user1 = models.BooleanField(default=False)
-    
+
+    user1_invited_user2 = models.BooleanField(default=False)
+    user2_invited_user1 = models.BooleanField(default=False)
+
     def __str__(self):
         return self.user1.username

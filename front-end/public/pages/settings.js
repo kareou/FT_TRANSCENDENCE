@@ -180,7 +180,7 @@ export default class Settings extends HTMLElement {
 	<div class="left_side_settings_wrapper">
 		<div class="infos_wrapper">
 			<div class="img_wrapper">
-				<img src='http://localhost:8000${this.user.profile_pic}' alt="img user" class="img_user_settings">
+				<img src='http://localhost:8000${this.user.profile_pic}' alt="img user" class="img_user_settings" loading="lazy">
 				<i class="fa fa-edit"></i>
 			</div>
 			<div class="infos_details_wrapper">
@@ -224,6 +224,7 @@ export default class Settings extends HTMLElement {
 </div>
 `;
 	}
+
 }
 
 customElements.define("settings-page", Settings);

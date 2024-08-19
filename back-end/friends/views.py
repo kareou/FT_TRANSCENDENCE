@@ -7,6 +7,7 @@ from .serializer import friendListSerializer
 from django.db.models import Q
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
+from rest_framework import status
 
 class friends_viewset(viewsets.ModelViewSet):
     queryset = friendList.objects.all()
@@ -26,10 +27,13 @@ class friends_viewset(viewsets.ModelViewSet):
         if serializer.is_valid():
             user1 = serializer.validated_data['user1']
             user2 = serializer.validated_data['user2']
-            if friendList.objects.filter(Q(user1=user1, user2=user2) | Q(user1=user2, user2=user1)).first():
-                return Response(status=400)
+            if friendList.objects.filter(Q(user1=user1, user2=user2) | Q(user1=user2, user2=user1)).exists():
+                return Response({"error": "already friends"}, status=status.HTTP_400_BAD_REQUEST)
             if user1 != user2:
-                serializer.save(are_friends=True)
+                if request.user == user1:
+                    serializer.save(user1_invited_user2=True)
+                elif request.user == user2:
+                    serializer.save(user2_invited_user1=True)
                 return Response(serializer.data, status=201)
         return Response(serializer.errors, status=401)
 
@@ -43,7 +47,7 @@ class friends_viewset(viewsets.ModelViewSet):
             return Response(status=400)
         return Response(status=400)
 
-    @action(detail=True, methods=['GET', 'POST'])
+    @action(detail=False, methods=['GET', 'POST'])
     def block(self, request, pk=None):
         if request.method == 'POST':
             serializer = friendListSerializer(data=request.data)
@@ -59,25 +63,51 @@ class friends_viewset(viewsets.ModelViewSet):
                     friendShip.are_friends = False
                     friendShip.save()
                     return Response(status=200)
-            # f = open('POST', 'a')
-            # f.write(serializer.__str__())
         if request.method == 'GET':
             queryset = friendList.objects.filter(
-                ((Q(user1=request.user) & Q(user1_blocked_user2=True)) |
-                (Q(user2=request.user) & Q(user2_blocked_user1=True)))
+                (Q(user1=request.user) & Q(user1_blocked_user2=True)) |
+                (Q(user2=request.user) & Q(user2_blocked_user1=True))
             )
             blockList = friendListSerializer(queryset, many=True)
             return Response(blockList.data)
         return Response(status=400)
 
-    @action(detail=True, methods=['GET', 'POST'])
+    @action(detail=False, methods=['GET', 'POST'])
     def unblock(self, request, pk=None):
         if request.method == 'POST':
             queryset = friendList.objects.filter(
-                (Q(user1=request.user) & Q(user1_blocked_user2=True)) |
-                (Q(user2=request.user) & Q(user2_blocked_user1=True))
-            )
-            queryset.delete()
-            return Response(status=200)
-        # GET
+            (Q(user1=request.user) & Q(user1_blocked_user2=True)) |
+            (Q(user2=request.user) & Q(user2_blocked_user1=True))
+        )
+            if queryset:
+                queryset.delete()
+                return Response(status=200)
         return Response(status=400)
+
+    @action(detail=False, methods=['GET', 'POST'])
+    def accept(self, request, pk=None):
+        if request.method == 'POST':
+            queryset = friendList.objects.filter(
+                (Q(user1=request.user) & Q(user2_invited_user1=True)) |
+                (Q(user2=request.user) & Q(user1_invited_user2=True))
+            ).first()
+            if not queryset:
+                return Response({"detail": "No pending invitation found."}, status=400)
+            friend_relation = queryset.first()
+            friend_relation.are_friends = True
+            friend_relation.user1_invited_user2 = False
+            friend_relation.user2_invited_user1 = False
+            friend_relation.save()
+            serializer = friendListSerializer(friend_relation)
+            return Response(serializer.data, status=200)
+        if request.method == 'GET':
+            queryset = friendList.objects.filter(
+                (Q(user1=request.user) & Q(user2_invited_user1=True)) |
+                (Q(user2=request.user) & Q(user1_invited_user2=True))
+            )
+            if queryset:
+                serializer = friendListSerializer(queryset, many=True)
+                return (Response(serializer.data))
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -1,17 +1,29 @@
 
 from django.db import models
-from user.models import User
-from django.utils import timezone
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
+
+class Conversation(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='conv_starter')
+    receiver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='conv_participant')
+    last_message_time = models.DateTimeField(null=True, blank=True)
+    def __str__(self):
+        return str(self.id)
 
 class ChatMessage(models.Model):
-    sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
-    receiver = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField()
-    #add chat_id
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f'{self.sender} to {self.receiver}: {self.message[:20]}'
+    class Meta:
+        ordering = ['-timestamp',]
 
-#add chat_model
+    def __str__(self):
+        return self.content
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.conversation.last_message_time = self.timestamp
+        self.conversation.save()

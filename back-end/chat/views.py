@@ -1,14 +1,57 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.db.models import Q
-from .models import ChatMessage
-from .serializers import ChatMessageSerializer
-import logging
+from django.db.models import Q, Max, Case, When
+# from user.serializers import BlockUserSerializer
+from .serializers import ConversationSerializer, ChatMessageSerializer
+from .models import Conversation, ChatMessage
 from user.models import User
+from django.contrib.auth import get_user_model
 from user.serializers import UserSerializer
+from django.db import models
+from django.contrib.auth.decorators import login_required
+User = get_user_model()
+from django.shortcuts import get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 
-logger = logging.getLogger(__name__)
+class UserConversationViewSet(viewsets.ModelViewSet):
+    queryset = Conversation.objects.all()
+    serializer_class = ConversationSerializer
+    permission_classes = [permissions.AllowAny]
+
+    @action(detail=False, methods=['post'], url_path='fetch_or_create')
+    def fetch_or_create_conversation(self, request):
+        sender_id = request.data.get('sender')
+        receiver_id = request.data.get('receiver')
+
+        if not sender_id or not receiver_id:
+            return Response({"detail": "Missing sender or receiver", "case": "missing_data"}, status=status.HTTP_400_BAD_REQUEST)
+
+        conversation = Conversation.objects.filter(
+            (Q(sender_id=sender_id) & Q(receiver_id=receiver_id)) | 
+            (Q(sender_id=receiver_id) & Q(receiver_id=sender_id))
+        ).first()
+
+        try:
+            sender = User.objects.get(pk=sender_id)
+            receiver = User.objects.get(pk=receiver_id)
+        except ObjectDoesNotExist:
+            return Response({"detail": "One of the users does not exist", "case": "user_not_found"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if conversation:
+            if receiver in sender.blocked_users.all():
+                return Response({"detail": "You have blocked this user", "case": "sender_blocked_receiver", "conversation": ConversationSerializer(conversation).data}, status=status.HTTP_200_OK)
+            if sender in receiver.blocked_users.all():
+                return Response({"detail": "You are blocked by this user", "case": "receiver_blocked_sender", "conversation": ConversationSerializer(conversation).data}, status=status.HTTP_200_OK)
+
+        if not conversation:
+            conversation = Conversation.objects.create(sender_id=sender_id, receiver_id=receiver_id)
+            return Response({"detail": "Conversation created", "case": "conversation_created", "conversation": ConversationSerializer(conversation).data}, status=status.HTTP_201_CREATED)
+
+        return Response({"detail": "Conversation fetched", "case": "conversation_fetched", "conversation": ConversationSerializer(conversation).data}, status=status.HTTP_200_OK)
+
+
+
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = ChatMessage.objects.all()
@@ -16,100 +59,143 @@ class MessageViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
 
     @action(detail=False, methods=['get'])
-    def conversations(self, request):
-        user = request.user
-        sent_messages = ChatMessage.objects.filter(sender=user).values('receiver').distinct()
-        received_messages = ChatMessage.objects.filter(receiver=user).values('sender').distinct()
+    def fetch_messages(self, request):
+        conversation_id = request.query_params.get('conversation_id')
 
-        user_ids = set()
-        user_ids.update(msg['receiver'] for msg in sent_messages)
-        user_ids.update(msg['sender'] for msg in received_messages)
+        if not conversation_id:
+            return Response({"detail": "Conversation ID is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        users = User.objects.filter(id__in=user_ids)
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=['get'])
-    def conversation(self, request):
-        try:
-            sender_id = request.query_params.get('sender_id')
-            receiver_id = request.query_params.get('receiver_id')
-
-            if not sender_id or not receiver_id:
-                return Response({"detail": "Both sender_id and receiver_id must be provided as query parameters."}, status=400)
-
-            messages = ChatMessage.objects.filter(
-                Q(sender_id=sender_id, receiver_id=receiver_id) |
-                Q(sender_id=receiver_id, receiver_id=sender_id)
-            )
-
-            serializer = self.get_serializer(messages, many=True)
-            return Response(serializer.data)
-        
-        except Exception as e:
-            logger.error(f"Error fetching conversation: {str(e)}")
-            return Response({"detail": "An error occurred while fetching conversation."}, status=500)
+        messages = ChatMessage.objects.filter(conversation_id=conversation_id).order_by('timestamp')
+        return Response(ChatMessageSerializer(messages, many=True).data, status=status.HTTP_200_OK)
 
 
-
-# this view just get the users who the logged user already had a conversation with witout any constaraints
-
-# from rest_framework import viewsets, permissions
-# from rest_framework.response import Response
-# from .models import ChatMessage
-# from .serializers import UserSerializer, ChatMessageSerializer
-
-# class UserConversationViewSet(viewsets.ViewSet):
-#     permission_classes = [permissions.AllowAny]
-
-#     def list(self, request):
-#         user = request.user
-
-#         # Retrieve users with whom the logged-in user has had conversations
-#         sender_conversations = ChatMessage.objects.filter(sender=user).values('receiver').distinct()
-#         receiver_conversations = ChatMessage.objects.filter(receiver=user).values('sender').distinct()
-#         user_ids = set([conv['receiver'] for conv in sender_conversations] + [conv['sender'] for conv in receiver_conversations])
-
-#         # Exclude current logged-in user from the list
-#         user_ids.discard(user.id)
-
-#         # Fetch the user objects based on the retrieved user IDs
-#         users = User.objects.filter(id__in=user_ids)
-
-#         # Serialize the user objects
-#         serializer = UserSerializer(users, many=True)
-
-#         return Response(serializer.data)
-from django.db.models import OuterRef, Subquery, Q
-from django.db.models.functions import Coalesce
-from rest_framework import viewsets, permissions
-from rest_framework.response import Response
-from .models import ChatMessage
-from user.serializers import UserSerializer
-from user.models import User
-
-class UserConversationViewSet(viewsets.ViewSet):
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
 
-    def list(self, request):
-        user = request.user
+    def get_queryset(self):
+        user = self.request.user
 
-        sender_conversations = ChatMessage.objects.filter(sender=user).values('receiver').distinct()
-        receiver_conversations = ChatMessage.objects.filter(receiver=user).values('sender').distinct()
-        user_ids = set([conv['receiver'] for conv in sender_conversations] + [conv['sender'] for conv in receiver_conversations])
+        # Get conversations where the logged-in user is either sender or receiver, ordered by last_message_time
+        conversations = Conversation.objects.filter(
+            Q(sender=user) | Q(receiver=user)
+        ).order_by('-last_message_time')
 
-        user_ids.discard(user.id)
+        # Maintain an ordered list of active user IDs based on the conversation order
+        ordered_user_ids = []
+        for conversation in conversations:
+            if conversation.sender.id != user.id:
+                ordered_user_ids.append(conversation.sender.id)
+            if conversation.receiver.id != user.id:
+                ordered_user_ids.append(conversation.receiver.id)
 
-        latest_sender_message = ChatMessage.objects.filter(sender=user, receiver=OuterRef('pk')).order_by('-timestamp')
-        latest_receiver_message = ChatMessage.objects.filter(receiver=user, sender=OuterRef('pk')).order_by('-timestamp')
+        # Use Django's `Case` and `When` to maintain the order
+        preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(ordered_user_ids)])
 
-        users = User.objects.filter(id__in=user_ids).annotate(
-            latest_message_timestamp=Coalesce(
-                Subquery(latest_sender_message.values('timestamp')[:1]),
-                Subquery(latest_receiver_message.values('timestamp')[:1])
-            )
-        ).order_by('-latest_message_timestamp')
+        # Queryset of users who have had conversations with the logged-in user, ordered by last_message_time
+        active_users = User.objects.filter(id__in=ordered_user_ids).order_by(preserved_order)
 
-        serializer = UserSerializer(users, many=True)
+        return active_users
 
+# class UserViewSet(viewsets.ModelViewSet):
+#     serializer_class = UserSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def get_queryset(self):
+#         user = self.request.user
+
+#         conversations = Conversation.objects.filter(
+#             Q(sender=user) | Q(receiver=user)
+#         ).annotate(
+#             last_message_time=Max('chatmessage__timestamp')
+#         ).order_by('-last_message_time')
+
+#         ordered_user_ids = []
+#         for conversation in conversations:
+#             if conversation.sender.id != user.id:
+#                 ordered_user_ids.append(conversation.sender.id)
+#             if conversation.receiver.id != user.id:
+#                 ordered_user_ids.append(conversation.receiver.id)
+
+#         seen = set()
+#         ordered_user_ids = [x for x in ordered_user_ids if not (x in seen or seen.add(x))]
+
+#         active_users = User.objects.filter(id__in=ordered_user_ids).order_by(
+#             models.Case(
+#                 *[models.When(id=pk, then=pos) for pos, pk in enumerate(ordered_user_ids)]
+#             )
+#         )
+
+#         return active_users
+
+    @action(detail=False, methods=['post'])
+    def block(self, request, pk=None):
+        data = request.data
+        user_to_block_id = data.get('blocked')
+        blocker_id = data.get('blocker')
+
+        required_fields = {'blocked', 'blocker'}
+        if not required_fields.issubset(data.keys()):
+            return Response({"detail": "User To Block ID and Blocker ID are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_to_block = get_object_or_404(User, pk=user_to_block_id)
+        user = get_object_or_404(User, pk=blocker_id)
+        user.blocked_users.add(user_to_block)
+        user.save()
+
+        return Response({'status': 'success', 'message': 'User blocked successfully.', 'user': UserSerializer(user).data}, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['post'])
+    def unblock(self, request, pk=None):
+        data = request.data
+        user_to_unblock_id = data.get('blocked')
+        blocker_id = data.get('blocker')
+
+        required_fields = {'blocked', 'blocker'}
+        if not required_fields.issubset(data.keys()):
+            return Response({"detail": "User To Block ID and Blocker ID are required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user_to_unblock = get_object_or_404(User, pk=user_to_unblock_id)
+        user = get_object_or_404(User, pk=blocker_id)
+        user.blocked_users.remove(user_to_unblock)
+
+        user.save()
+
+        return Response({'status': 'success', 'message': 'User unblocked successfully.', 'user': UserSerializer(user).data}, status=status.HTTP_200_OK)
+
+
+
+    @action(detail=False, methods=['get'])
+    def blocked_users(self, request):
+        user_id = request.query_params.get('user_id')
+        
+        if not user_id:
+            return Response({"detail": "User ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = get_object_or_404(User, pk=user_id)
+        blocked_users = user.blocked_users.all()cf
+        serializer = UserSerializer(blocked_users, many=True)
         return Response(serializer.data)
+
+
+class BlockUserView(viewsets.ViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @action(detail=True, methods=['POST'])
+    def block(self, request, pk=None):
+        blocker = request.user
+        user_to_block = get_object_or_404(User, pk=pk)
+        if user_to_block == blocker:
+            return Response({'error': 'You cannot block yourself.'}, status=status.HTTP_400_BAD_REQUEST)
+        if user_to_block in blocker.blocked_users.all():
+            return Response({'error': 'User already blocked.'}, status=status.HTTP_400_BAD_REQUEST)
+        blocker.blocked_users.add(user_to_block)
+        return Response({'status': 'success', 'message': 'User blocked successfully.'}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['GET'])
+    def blocked_users(self, request):
+        user = request.user
+        blocked_users = user.blocked_users.all()
+        serializer = self.get_serializer(blocked_users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

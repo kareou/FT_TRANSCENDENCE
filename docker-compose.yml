@@ -25,6 +25,8 @@ services:
       - db
     networks:
       - local
+    env_file:
+      - ./back-end/.env
   db:
     container_name: postgres_container
     image: postgres

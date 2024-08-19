@@ -89,9 +89,6 @@ export default class Notification extends HTMLElement{
                 document.querySelector(".notification_dropdown").style.width = "20rem";
                 document.querySelector(".notification_dropdown").addEventListener("animationend", this.getNotification().bind(this));
         });
-
-        const notificationButton = this.querySelector('.notification_button');
-        notificationButton.addEventListener('click', this.markAllRead.bind(this));
     }
 }
 

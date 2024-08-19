@@ -12,7 +12,7 @@ export default class UserAvatar extends HTMLElement{
     }
     render(){
         this.innerHTML = `
-            <img src="${this.img}" alt="avatar" class="avatar_icon">
+            <img src="${this.img}" alt="avatar" class="avatar_icon" style="width: ${this.width}px; height: ${this.height}px;" loading="lazy" />
             <div class="avatar_overlay ${this.state}" style="width: ${this.width}px; height: ${this.height}px;"></div>
             <div class="status_indicator ${this.state}"></div>
         `;

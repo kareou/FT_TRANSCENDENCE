@@ -56,13 +56,15 @@ export default class SideBar extends HTMLElement {
   }
 
   disconnectedCallback() {
+    window.removeEventListener('locationchange', this.checkAndRender);
+    
   }
 
   render() {
     this.innerHTML = /*HTML*/ `
 <div class="sidebar_wrapper">
     <div class="logo_wrapper">
-      <img src="/public/assets/gamelogo.png" alt="game logo" class="icon_side_bar">
+      <img src="/public/assets/gamelogo.png" alt="game logo" class="icon_side_bar" loading="lazy">
     </div>
     <div class="dash_logos_wrapper">
       <a is="co-link" href="/dashboard" class="active">

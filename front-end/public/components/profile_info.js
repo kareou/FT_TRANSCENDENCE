@@ -31,7 +31,7 @@ export default class ProfileInfo extends HTMLElement {
     this.innerHTML = /*HTML*/ `
         <div class="profile" >
       <div class="profile_img">
-        <img src='http://localhost:8000${this.user.profile_pic}' class="profile_img" alt="profile">
+        <img src='http://localhost:8000${this.user.profile_pic}' class="profile_img" alt="profile" loading="lazy">
       </div>
       <div class="profile_info">
         <div class="name_n_login">
@@ -48,13 +48,13 @@ export default class ProfileInfo extends HTMLElement {
         <div class="achievement">
           <h1>Achievements</h1>
           <div class="achievement_list">
-          <img src="/public/assets/ranks/1.png" alt="medal">
-          <img src="/public/assets/ranks/2.png" alt="medal">
-          <img src="/public/assets/ranks/3.png" alt="medal">
-          <img src="/public/assets/ranks/4.png" alt="medal">
-          <img src="/public/assets/ranks/5.png" alt="medal">
-          <img src="/public/assets/ranks/6.png" alt="medal">
-          <img src="/public/assets/ranks/7.png" alt="medal">
+          <img src="/public/assets/ranks/1.png" alt="medal" loading="lazy">
+          <img src="/public/assets/ranks/2.png" alt="medal" loading="lazy">
+          <img src="/public/assets/ranks/3.png" alt="medal" loading="lazy">
+          <img src="/public/assets/ranks/4.png" alt="medal" loading="lazy">
+          <img src="/public/assets/ranks/5.png" alt="medal" loading="lazy">
+          <img src="/public/assets/ranks/6.png" alt="medal" loading="lazy">
+          <img src="/public/assets/ranks/7.png" alt="medal" loading="lazy">
           </div>
           <h4 class="level">
             <span>${this.user.level}</span>

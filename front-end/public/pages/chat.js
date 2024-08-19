@@ -99,7 +99,7 @@ export default class Chat extends HTMLElement {
     const userContainer = this.querySelector(".first_section_wrapper_chat");
     userContainer.innerHTML = `<div class="first_profile_wrapper_chat">
                         <div class="pdp_warpper">
-                            <img src="http://localhost:8000${this.user.profile_pic}" class="pfp_logo">
+                            <img src="http://localhost:8000${this.user.profile_pic}" class="pfp_logo" alt="profile picture" loading="lazy">
                             <div class="txt_one">Chats</div>
 
                         </div>

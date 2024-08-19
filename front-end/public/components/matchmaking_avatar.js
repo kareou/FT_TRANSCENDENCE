@@ -41,10 +41,10 @@ export default class MatchMakingAvatar extends HTMLElement {
   render() {
     this.innerHTML =  /*html*/`
       <div class="avatar">
-        ${this.user ? `<img src="http://localhost:8000${this.user.profile_pic}" alt="avatar" /> 
+        ${this.user ? `<img src="http://localhost:8000${this.user.profile_pic}" alt="avatar" loading="lazy"/>
         <h1 id="opponents_name">${this.user.username}</h1>
         ` : 
-         `<img src="${this.profile_pic}" alt="avatar" id="loading_img"/>
+         `<img src="${this.profile_pic}" alt="avatar" id="loading_img" loading="lazy"/>
          <h1 class="search_player">
          searching for opponent <span class="dot"></span>
           <span class="dot"></span>
@@ -58,7 +58,4 @@ export default class MatchMakingAvatar extends HTMLElement {
 
     
   }
-  // <h1 id="opponents_name">${this.user ? this.user.username : "Looking for opponent ..."}</h1>
-
-  // <img src="http://localhost:8000${this.user.profile_pic}" alt="avatar" />
 customElements.define("matchmaking-avatar", MatchMakingAvatar);

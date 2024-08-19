@@ -1,11 +1,11 @@
 @font-face {
     font-family: "roboto";
-    src: url("/public/assets/fonts/Roboto-Regular.ttf");
+    src: url("/public/assets/fonts/Roboto-Regular.ttf") format("truetype");
 }
 
 @font-face {
     font-family: "Almarai";
-    src: url('/public/assets/fonts/Almarai-Regular.ttf');
+    src: url('/public/assets/fonts/Almarai-Regular.ttf') format("truetype");
 }
 
 .conv_data_container_chat__ {
@@ -263,7 +263,7 @@ body {
 
 @font-face {
     font-family: "Actor";
-    src: url("../assets/fonts/Actor-Regular.ttf");
+    src: url("../assets/fonts/Actor-Regular.ttf") format("truetype");
 }
 
 .chat_wrapper_ {
