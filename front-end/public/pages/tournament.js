@@ -135,26 +135,38 @@ export default class Tournament extends HTMLElement {
 				</div>
 			</div>
 			<div class="tournament">
+			<div className="players_n_generate">
+
 				<button id="start" disabled>generate Bracket</button>
-				<div class="tournament_player">
-					<h1>Player : </h1>
+					<table class="tournament_player">
+					<tbody>
+						<tr>
+						<th>Players</th>
+						</tr>
+					</tbody>
+					</table>
 				</div>
-				<h1>Tournament</h1>
 				<div class="bracket">
+				<h1>Tournament</h1>
 				</div>
 				</div>
 			</div>
 		`;
 	}
 
-	renderPlayers() {
+	renderPlayers(player) {
 		const players = this.querySelector('.tournament_player');
-		this.players.forEach(player => {
-			const playerDiv = document.createElement('div');
-			playerDiv.className = 'player_name';
-			playerDiv.innerHTML = `<h1>${player} ,</h1>`;
-			players.appendChild(playerDiv);
-		});
+		const tr = document.createElement('tr');
+		const td = document.createElement('td');
+		const deleteButton = document.createElement('button');
+		deleteButton.textContent = 'remove';
+		deleteButton.className = 'delete';
+		deleteButton.id = player;
+		console.log(deleteButton);
+		td.textContent = player;
+		tr.appendChild(td);
+		tr.appendChild(deleteButton);
+		players.querySelector('tbody').appendChild(tr);
 	}
 
 	addPlayerHandler() {
@@ -168,7 +180,7 @@ export default class Tournament extends HTMLElement {
 			if (this.players.length === 8) {
 				document.getElementById("addPlayer").setAttribute('disabled', 'disabled');
 			}
-			this.renderPlayers();
+			this.renderPlayers(player);
 			this.querySelector('#player').value = '';
 		}
 	}

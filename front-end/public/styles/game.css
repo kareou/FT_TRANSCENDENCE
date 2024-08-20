@@ -18,7 +18,7 @@
   flex-direction: column;
   width: 100rem;
   height: 65rem;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 0.6px solid rgba(0, 0, 0, 0.2);
 }
 
 .board{

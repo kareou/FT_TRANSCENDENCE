@@ -1,6 +1,9 @@
 import { routes } from "../router/routes.js";
 import Http from "../http/http.js";
 
+const root = document.getElementById("app");
+
+
 export default class Link extends HTMLAnchorElement {
   constructor() {
     super();
@@ -18,16 +21,15 @@ export default class Link extends HTMLAnchorElement {
   }
 
 
-  static async findRoute(routers, path, parent_path = "") {
+  static findRoute(routers, path, parent_path = "", isAuth ) {
     let route = null;
-    const isAuth = await Http.verifyToken();
     for (let i = 0; i < routers.length; i++) {
       if (routers[i].requireAuth === true) {
         if (isAuth === false) {
-          return Link.findRoute(routers[i].children, "/auth/signin", "");
+          throw new Error("Unauthorized");
         }
         if (routers[i].children) {
-          route = await Link.findRoute(routers[i].children, path, parent_path + routers[i].path);
+          route = Link.findRoute(routers[i].children, path, parent_path + routers[i].path, isAuth);
           if (route) return route;
         }
         if (Link.matchUrl(path, parent_path+routers[i].path)) {
@@ -35,7 +37,7 @@ export default class Link extends HTMLAnchorElement {
         }
       }else{
         if (routers[i].children) {
-          route = await Link.findRoute(routers[i].children, path, parent_path + routers[i].path);
+          route = Link.findRoute(routers[i].children, path, parent_path + routers[i].path, isAuth);
           if (route) return route;
         }
         if (Link.matchUrl(path, parent_path+routers[i].path)) {
@@ -53,30 +55,48 @@ export default class Link extends HTMLAnchorElement {
       pos = url.length;
     }
     const path = url.slice(0, pos);
-    var route = await Link.findRoute(routes, path);
+    const isAuth = await Http.verifyToken();
+    try{
+      var route =  Link.findRoute(routes, path, "", isAuth);
+      if (!route) throw new Error("Not Found");
+    }
+    catch (e) {
+      if (e.message === "Unauthorized") {
+        window.location.href = "/auth/login";
+        return;
+      }
+      window.location.href = "/404";
+    }
     if (!route) route = routes[0];
-    const root = document.getElementById("app");
     try {
       const component = await route.component();
       const componentToRender = new component.default();
-      if (root.firstChild) {
-        root.removeChild(root.firstChild);
-      }
+      root.innerHTML = '';
       root.appendChild(componentToRender);
       const event = new CustomEvent("locationchange", {detail: path});
-      window.dispatchEvent(event);
+      if (window && typeof window.dispatchEvent === 'function' && event instanceof Event) {
+        window.dispatchEvent(event);
+      } else {
+          console.error('Cannot dispatch event: ', event);
+      }
 
     } catch (e) {
     }
   }
 
+  disconnectedCallback() {
+    this.removeEventListener("click", this.handleClick);
+  }
+
   connectedCallback() {
-    this.addEventListener("click", (e) => {
-      e.preventDefault();
-      const href = this.getAttribute("href");
-      window.history.pushState({}, "", href);
-      Link.navigateTo(href);
-    });
+    this.addEventListener("click", this.handleClick);
+  }
+
+  handleClick(e) {
+    e.preventDefault();
+    const href = this.getAttribute("href");
+    window.history.pushState({}, "", href);
+    Link.navigateTo(href);
   }
 }
 

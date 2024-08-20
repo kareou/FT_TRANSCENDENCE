@@ -5,10 +5,10 @@ export default class SideBar extends HTMLElement {
   constructor() {
     super();
     this.active = false;
+    this.boundCheckAndRender = this.checkAndRender.bind(this);
   }
 
   connectedCallback() {
-    this.initURLChangeDetection();
     this.checkAndRender();
   }
 
@@ -27,6 +27,13 @@ export default class SideBar extends HTMLElement {
     }
   }
 
+  handellogout() {
+    Http.logout().then(() =>{
+      Link.navigateTo("/");
+    }
+    );
+  }
+
   // Check the current URL and render if it matches certain criteria
   checkAndRender() {
     const path = window.location.pathname;
@@ -36,19 +43,14 @@ export default class SideBar extends HTMLElement {
     this.render();
     this.findSelected();
     const logoutBtn = this.querySelector(".logout_logo_wrapper");
-    logoutBtn.addEventListener("click", () => {
-      Http.logout().then(() =>{
-        Link.navigateTo("/");
-      }
-      );
-    });
+    logoutBtn.addEventListener("click", this.handellogout);
     this.initURLChangeDetection();
   }
 
   // Initialize URL change detection
   initURLChangeDetection() {
-    // Listen for popstate, hashchange, and custom locationchange events
-    window.addEventListener('locationchange', this.checkAndRender.bind(this));
+    window.removeEventListener("locationchange", this.boundCheckAndRender);
+    window.addEventListener("locationchange", this.boundCheckAndRender);
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -56,13 +58,15 @@ export default class SideBar extends HTMLElement {
   }
 
   disconnectedCallback() {
+    window.removeEventListener('locationchange', this.checkAndRender);
+
   }
 
   render() {
     this.innerHTML = /*HTML*/ `
 <div class="sidebar_wrapper">
     <div class="logo_wrapper">
-      <img src="/public/assets/gamelogo.png" alt="game logo" class="icon_side_bar">
+      <img src="/public/assets/gamelogo.png" alt="game logo" class="icon_side_bar" loading="lazy">
     </div>
     <div class="dash_logos_wrapper">
       <a is="co-link" href="/dashboard" class="active">
@@ -72,7 +76,7 @@ export default class SideBar extends HTMLElement {
         <i class="fa-light fa-gamepad-modern fa-2xl icon_side_bar"></i>
       </a>
       <a is="co-link" href="/dashboard/chat">
-        <i class="fa-light fa-message-dots fa-2xl icon_side_bar"></i>
+        <i class="fa-light fa-message-dots fa-2xl icon_side_bar chat_icon"></i>
       </a>
       <a is="co-link" href="/dashboard/profile">
         <i class="fa-thin fa-user fa-2xl icon_side_bar"></i>

@@ -77,7 +77,7 @@ body {
     width: 646px;
     height: 815px;
     border-radius: 30px;
-    border: solid 1px #b072d29f;
+    border: solid 0.6px #b072d29f;
     background-clip:border-box;
     backdrop-filter: blur(15px);
 }

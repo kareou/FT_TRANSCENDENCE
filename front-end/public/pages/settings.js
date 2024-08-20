@@ -1,58 +1,72 @@
 import Http from "../http/http.js";
 
 export default class Settings extends HTMLElement {
-  constructor() {
-    super();
-    this.user = Http.user;
-  }
-  connectedCallback() {
-    this.render();
+	constructor() {
+		super();
+		this.user = Http.user;
+	}
+	connectedCallback() {
+		this.render();
 
-	const lws = document.querySelectorAll('.link_wrapper_settings')
-	let old_lws = lws[0];
-	const content_ = document.querySelector(".content_")
-	const forms = {
-		'one' : `
-						<div class="bold_txt">
-					General Information
-				</div>
+		const lws = document.querySelectorAll('.link_wrapper_settings')
+		let old_lws = lws[0];
+		const content_ = document.querySelector(".content_")
+		const forms = {
+			'one': `
+				<div>
+				<h2 class="info_h">
+					your infomations
+				</h2>
+				<p class="info_p">
+					update your informations
+				</p>
+			</div>
 				<div class="form_settings_wrapper_one">
 					<div class="input_settings_wrapper">
-						<div class="label_txt">
+						<lable class="label_txt" for="fullname">
 							Full Name:
-						</div>
-						<input type="text" name="fullname" id="fullname" class="fullname">
+						</lable>
+						<input type="text" name="fullname" id="fullname" class="fullname" value="${this.user.full_name}">
 					</div>
 					<div class="input_settings_wrapper">
-						<div class="label_txt">
+						<lable class="label_txt" for="username">
 							Username:
-						</div>
-						<input type="text" name="username" id="username" class="username">
+						</lable>
+						<input type="text" name="username" id="username" class="username" value="${this.user.username}">
 					</div>
 					<div class="input_settings_wrapper">
-						<div class="label_txt">
+						<lable class="label_txt" for="email">
 							Email:
-						</div>
-						<input type="email" name="email" id="email" class="email">
-					</div>
-					<div class="input_settings_wrapper">
-						<div class="label_txt">
-							Phone Number:
-						</div>
-						<input type="text" name="phone" id="phone" class="phone">
+						</lable>
+						<input type="email" name="email" id="email" class="email" value="${this.user.email}">
 					</div>
 					<div class="buttons_wrapper">
 						<div class="submit_btn">
 							<button type="submit" class="submit_infos">Update Info</button>
 						</div>
-						<div class="cancel_btn">
-							<button type="submit" class="cancel_infos">Cancel</button>
-						</div>
 					</div>
-				</div>`,
+				</div>
+				<h1 class="info_h">Blockes</h1>
+				<div class="bolcked_users">
+					<div class="blocked_users_list">
+						<div>
+							<h1 class="info_h">
+								blocked users list
+							</h1>
+							<p class="info_p">
+								view all blocked users
+							</p>
+						</div>
+						<button class="view_blocked_users">
+							View list
+						</button>
+					</div>
+				</>
+				`
+			,
 
-		'two' : `
-		
+			'two': `
+
     <div class="players_info_ setting_1">
         <div class="player1">
             <div class="bold_txt_white">Paddle Theme</div>
@@ -71,7 +85,7 @@ export default class Settings extends HTMLElement {
       <button id="start_btn" disabled>Update Info</button>
     </div>
 		`,
-		'three': `
+			'three': `
 				<div class="bold_txt">
 					Security Informations
 				</div>
@@ -98,41 +112,80 @@ export default class Settings extends HTMLElement {
 						<div class="submit_btn">
 							<button type="submit" class="submit_infos">Update Info</button>
 						</div>
-						<div class="cancel_btn">
-							<button type="submit" class="cancel_infos">Cancel</button>
+					</div>
+				</div>
+				<h1 class="info_h">
+					2FA
+				</h1>
+				<div class="form_settings_wrapper_one">
+				</div>
+				<h1 class="info_h">
+					Delete Account
+				</h1>
+				<div class="form_settings_wrapper_one">
+					<div class="buttons_wrapper">
+						<div class="submit_btn
+						">
+							<button type="submit" class="submit_infos">Delete Account</button>
 						</div>
 					</div>
 				</div>
+
 		`
-	}
-	content_.innerHTML = forms['one']
+		}
+		content_.innerHTML = forms['one']
 
-	lws.forEach((e) =>{
-		e.addEventListener('click', ()=>{
-			if (old_lws)
-				old_lws.classList.remove('active_btn_settings')
-			e.classList.add('active_btn_settings')
+		lws.forEach((e) => {
+			e.addEventListener('click', () => {
+				if (old_lws)
+					old_lws.classList.remove('active_btn_settings')
+				e.classList.add('active_btn_settings')
 
-			for (let key in forms)
-				if (e.classList[1] == key)
-					content_.innerHTML = forms[key]
-			
-			old_lws = e;
+				for (let key in forms)
+					if (e.classList[1] == key)
+						content_.innerHTML = forms[key]
+
+				old_lws = e;
+			})
 		})
-	})
-  }
-  render() {
-    this.innerHTML = /*html*/ `
+		const submit_btn = document.querySelector('.submit_infos');
+		const collectedSettingsData = {};
+
+
+		submit_btn.addEventListener('click', () => {
+			collectedSettingsData["full_name"] = document.querySelector('.fullname').value ?? null;
+			collectedSettingsData["username"] = document.querySelector('.username').value ?? null;
+			collectedSettingsData["email"] = document.querySelector('.email').value ?? null;
+
+			const baseUrl = "http://localhost:8000"
+			const endPoint = "/api/user/update/"
+			const rs = fetch(baseUrl + endPoint, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${this.token}`
+				},
+				credentials: 'include',
+				body: JSON.stringify({ collectedSettingsData }),
+			}).then(response => {
+				return response.json();
+			}).then(data => {
+				console.log(data)
+			})
+		})
+	}
+	render() {
+		this.innerHTML = /*html*/ `
 <div class="setting_wrapper_">
 	<div class="left_side_settings_wrapper">
 		<div class="infos_wrapper">
 			<div class="img_wrapper">
-				<img src='http://localhost:8000${this.user.profile_pic}' alt="img user" class="img_user_settings">
+				<img src='http://localhost:8000${this.user.profile_pic}' alt="img user" class="img_user_settings" loading="lazy">
 				<i class="fa fa-edit"></i>
 			</div>
 			<div class="infos_details_wrapper">
 				<div class="bold_txt">
-					Kida Leafea
+					${this.user.fullname}
 				</div>
 				<div class="under_txt">
 					Art Director
@@ -147,13 +200,13 @@ export default class Settings extends HTMLElement {
 				</span>
 			</div>
 			<div class="link_wrapper_settings two">
-				<i class="fa fa-user"></i>
+				<i class="fa-solid fa-game-console-handheld"></i>
 				<span class="txt___sett">
-					Theme
+					Game
 				</span>
 			</div>
 			<div class="link_wrapper_settings three">
-				<i class="fa fa-user"></i>
+				<i class="fa-solid fa-lock"></i>
 				<span class="txt___sett">
 					Security
 				</span>
@@ -163,13 +216,15 @@ export default class Settings extends HTMLElement {
 	</div>
 	<div class="right_side_settings_wrapper">
 		<div class="marg_wrapper">
+			<h1 class="setting_h">Settings</h1>
 			<div class="content_">
 			</div>
 		</div>
 	</div>
 </div>
 `;
-  }
+	}
+
 }
 
 customElements.define("settings-page", Settings);

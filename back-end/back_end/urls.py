@@ -26,7 +26,9 @@ urlpatterns = [
     path('api/', include('user.urls')),
     path('api/token/verify', CustomTokenVerifyView.as_view(), name='token_verify'),
     path('api/token/refresh', CustomTokenRefreshView.as_view(), name='token_refresh'),
+    path("api/", include("notification.urls")),
     path("api/", include("game.urls")),
+    path("api/", include("friends.urls")),
     path("chat/", include("chat.urls")),
 ]
 

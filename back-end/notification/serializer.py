@@ -7,3 +7,9 @@ class NotificationSerializer(serializers.ModelSerializer):
         model = Notification
         fields = '__all__'
 
+    extra_kwargs = {
+        'read': {'required': False},
+        'receiver': {'required': False},
+        'type': {'required': False},
+        'data': {'required': False},
+    }
