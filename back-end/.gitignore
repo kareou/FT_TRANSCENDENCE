@@ -1,6 +1,5 @@
 # Python
 *.pyc
-*/__pycache__/
 
 # Django
 *.log
@@ -29,6 +28,8 @@ media/
 *.pot~
 *.py[cod]
 __pycache__/
+*/__pycache__/
+*/*/__pycache__/
 *.swp
 *.swo
 *.DS_Store
