@@ -6,7 +6,7 @@ from io import BytesIO
 import requests
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, username, full_name='', password=None):
+    def create_user(self, email, username, full_name='', password=None, profile_pic_url=None):
         if not email:
             raise ValueError('User must have an email address')
         if not username:
@@ -14,7 +14,8 @@ class UserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             username=username,
-            full_name=full_name
+            full_name=full_name,
+            profile_pic_url=profile_pic_url
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -24,9 +25,11 @@ class User(AbstractBaseUser):
     email = models.EmailField(verbose_name='email', max_length=60, unique=True)
     username = models.CharField(max_length=30, unique=True, default='')
     full_name = models.CharField(max_length=60, default='')
+    profile_pic_url = models.URLField(default=None, null=True)
     profile_pic = models.ImageField(upload_to='users_pfp/', default=None)
     level = models.IntegerField(default=1)
     exp = models.IntegerField(default=0)
+    is_email_verified = models.BooleanField(default=False)
     _2fa_enabled = models.BooleanField(default=False)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -34,13 +37,18 @@ class User(AbstractBaseUser):
 
     def save(self, *args, **kwargs):
         if not self.profile_pic:
-            url = f'https://api.dicebear.com/8.x/bottts-neutral/svg?seed={self.username}'
-            response = requests.get(url)
-            if response.status_code == 200:
-                self.profile_pic.save(f'{self.username}.svg', BytesIO(response.content), save=False)
-                self.profile_pic.name = f'users_pfp/{self.username}.svg'
-        else:
-            self.profile_pic.save(self.profile_pic.name, self.profile_pic, save=False)
+            if not self.profile_pic_url:
+                self.profile_pic_url = f'https://api.dicebear.com/8.x/bottts-neutral/svg?seed={self.username}'
+                response = requests.get(self.profile_pic_url)
+                if response.status_code == 200:
+                    self.profile_pic.save(f'{self.username}.svg', BytesIO(response.content), save=False)
+                    self.profile_pic.name = f'users_pfp/{self.username}.svg'
+            else:
+                response = requests.get(self.profile_pic_url)
+                if response.status_code == 200:
+                    self.profile_pic.save(f'{self.username}.jpg', BytesIO(response.content), save=False)
+                    self.profile_pic.name = f'users_pfp/{self.username}.jpg'
+    
         if self.exp >= 100:
             self.level += 1
             self.exp = 0
