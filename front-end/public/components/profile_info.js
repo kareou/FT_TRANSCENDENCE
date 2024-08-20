@@ -5,16 +5,17 @@ export default class ProfileInfo extends HTMLElement {
     super();
     this.user = Http.user;
     this.id = this.getAttribute("id");
+    console.log(this.id);
   }
   connectedCallback() {
     if (this.id != this.user.id) {
-      Http.getData("Get",`api/user/${this.id}`).then((data) => {
+      Http.getData("Get", `api/user/${this.id}`).then((data) => {
         this.user = data;
         this.render();
         this.markUnearnedAchievements();
       });
     }
-    else{
+    else {
       this.render();
       this.markUnearnedAchievements();
     }

@@ -8,6 +8,7 @@ from django.db.models import Q
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 class friends_viewset(viewsets.ModelViewSet):
     queryset = friendList.objects.all()
@@ -93,12 +94,11 @@ class friends_viewset(viewsets.ModelViewSet):
             ).first()
             if not queryset:
                 return Response({"detail": "No pending invitation found."}, status=400)
-            friend_relation = queryset.first()
-            friend_relation.are_friends = True
-            friend_relation.user1_invited_user2 = False
-            friend_relation.user2_invited_user1 = False
-            friend_relation.save()
-            serializer = friendListSerializer(friend_relation)
+            queryset.are_friends = True
+            queryset.user1_invited_user2 = False
+            queryset.user2_invited_user1 = False
+            queryset.save()
+            serializer = friendListSerializer(queryset)
             return Response(serializer.data, status=200)
         if request.method == 'GET':
             queryset = friendList.objects.filter(

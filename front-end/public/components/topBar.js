@@ -4,10 +4,10 @@ export default class TopBar extends HTMLElement {
   constructor() {
     super();
     this.welcome = false;
+    this.boundCheckAndRender = this.checkAndRender.bind(this);
   }
 
   connectedCallback() {
-    this.initURLChangeDetection();
     this.checkAndRender();
   }
 
@@ -19,12 +19,14 @@ export default class TopBar extends HTMLElement {
       this.welcome = true;
     else
       this.welcome = false;
+    this.initURLChangeDetection();
     this.render();
   }
 
   initURLChangeDetection() {
     // Listen for popstate, hashchange, and custom locationchange events
-    window.addEventListener("locationchange", this.checkAndRender.bind(this));
+    window.removeEventListener("locationchange", this.boundCheckAndRender);
+    window.addEventListener("locationchange", this.boundCheckAndRender);
   }
 
   render() {

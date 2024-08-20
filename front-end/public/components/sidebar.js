@@ -5,10 +5,10 @@ export default class SideBar extends HTMLElement {
   constructor() {
     super();
     this.active = false;
+    this.boundCheckAndRender = this.checkAndRender.bind(this);
   }
 
   connectedCallback() {
-    this.initURLChangeDetection();
     this.checkAndRender();
   }
 
@@ -27,6 +27,13 @@ export default class SideBar extends HTMLElement {
     }
   }
 
+  handellogout() {
+    Http.logout().then(() =>{
+      Link.navigateTo("/");
+    }
+    );
+  }
+
   // Check the current URL and render if it matches certain criteria
   checkAndRender() {
     const path = window.location.pathname;
@@ -36,19 +43,14 @@ export default class SideBar extends HTMLElement {
     this.render();
     this.findSelected();
     const logoutBtn = this.querySelector(".logout_logo_wrapper");
-    logoutBtn.addEventListener("click", () => {
-      Http.logout().then(() =>{
-        Link.navigateTo("/");
-      }
-      );
-    });
+    logoutBtn.addEventListener("click", this.handellogout);
     this.initURLChangeDetection();
   }
 
   // Initialize URL change detection
   initURLChangeDetection() {
-    // Listen for popstate, hashchange, and custom locationchange events
-    window.addEventListener('locationchange', this.checkAndRender.bind(this));
+    window.removeEventListener("locationchange", this.boundCheckAndRender);
+    window.addEventListener("locationchange", this.boundCheckAndRender);
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -57,7 +59,7 @@ export default class SideBar extends HTMLElement {
 
   disconnectedCallback() {
     window.removeEventListener('locationchange', this.checkAndRender);
-    
+
   }
 
   render() {

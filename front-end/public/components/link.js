@@ -74,7 +74,11 @@ export default class Link extends HTMLAnchorElement {
       root.innerHTML = '';
       root.appendChild(componentToRender);
       const event = new CustomEvent("locationchange", {detail: path});
-      window.dispatchEvent(event);
+      if (window && typeof window.dispatchEvent === 'function' && event instanceof Event) {
+        window.dispatchEvent(event);
+      } else {
+          console.error('Cannot dispatch event: ', event);
+      }
 
     } catch (e) {
     }
@@ -83,7 +87,7 @@ export default class Link extends HTMLAnchorElement {
   disconnectedCallback() {
     this.removeEventListener("click", this.handleClick);
   }
-  
+
   connectedCallback() {
     this.addEventListener("click", this.handleClick);
   }

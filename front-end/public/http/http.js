@@ -9,7 +9,7 @@ class Http {
   }
 
   notifyStats(data) {
-    console.log("test socket", data);
+    this.website_stats.notify("toast", data);
   }
 
   async register(data, url) {
