@@ -1,14 +1,40 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.db.models import Q
-from .models import ChatMessage
-from .serializers import ChatMessageSerializer
-import logging
-from user.models import User
+from django.db.models import Q, Max, Case, When
+from .serializers import ConversationSerializer, ChatMessageSerializer
+from .models import Conversation, ChatMessage
+from django.contrib.auth import get_user_model
 from user.serializers import UserSerializer
+from django.db import models
 
-logger = logging.getLogger(__name__)
+User = get_user_model()
+
+class UserConversationViewSet(viewsets.ModelViewSet):
+    queryset = Conversation.objects.all()
+    serializer_class = ConversationSerializer
+    permission_classes = [permissions.AllowAny]
+
+    @action(detail=False, methods=['post'], url_path='fetch_or_create')
+    def fetch_or_create_conversation(self, request):
+        sender_id = request.data.get('sender')
+        receiver_id = request.data.get('receiver')
+
+        if not sender_id or not receiver_id:
+            return Response({"detail": "sender and receiver are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        conversation = Conversation.objects.filter(
+            (Q(sender_id=sender_id) & Q(receiver_id=receiver_id)) | 
+            (Q(sender_id=receiver_id) & Q(receiver_id=sender_id))
+        ).first()
+
+        if not conversation:
+            conversation = Conversation.objects.create(sender_id=sender_id, receiver_id=receiver_id)
+
+        return Response(ConversationSerializer(conversation).data, status=status.HTTP_200_OK)
+
+
+
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = ChatMessage.objects.all()
@@ -16,100 +42,76 @@ class MessageViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
 
     @action(detail=False, methods=['get'])
-    def conversations(self, request):
-        user = request.user
-        sent_messages = ChatMessage.objects.filter(sender=user).values('receiver').distinct()
-        received_messages = ChatMessage.objects.filter(receiver=user).values('sender').distinct()
+    def fetch_messages(self, request):
+        conversation_id = request.query_params.get('conversation_id')
 
-        user_ids = set()
-        user_ids.update(msg['receiver'] for msg in sent_messages)
-        user_ids.update(msg['sender'] for msg in received_messages)
+        if not conversation_id:
+            return Response({"detail": "Conversation ID is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        users = User.objects.filter(id__in=user_ids)
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=['get'])
-    def conversation(self, request):
-        try:
-            sender_id = request.query_params.get('sender_id')
-            receiver_id = request.query_params.get('receiver_id')
-
-            if not sender_id or not receiver_id:
-                return Response({"detail": "Both sender_id and receiver_id must be provided as query parameters."}, status=400)
-
-            messages = ChatMessage.objects.filter(
-                Q(sender_id=sender_id, receiver_id=receiver_id) |
-                Q(sender_id=receiver_id, receiver_id=sender_id)
-            )
-
-            serializer = self.get_serializer(messages, many=True)
-            return Response(serializer.data)
-        
-        except Exception as e:
-            logger.error(f"Error fetching conversation: {str(e)}")
-            return Response({"detail": "An error occurred while fetching conversation."}, status=500)
+        messages = ChatMessage.objects.filter(conversation_id=conversation_id).order_by('timestamp')
+        return Response(ChatMessageSerializer(messages, many=True).data, status=status.HTTP_200_OK)
 
 
+class UserViewSet(viewsets.ModelViewSet):
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-# this view just get the users who the logged user already had a conversation with witout any constaraints
+    def get_queryset(self):
+        user = self.request.user
 
-# from rest_framework import viewsets, permissions
-# from rest_framework.response import Response
-# from .models import ChatMessage
-# from .serializers import UserSerializer, ChatMessageSerializer
+        # Get conversations where the logged-in user is either sender or receiver, ordered by last_message_time
+        conversations = Conversation.objects.filter(
+            Q(sender=user) | Q(receiver=user)
+        ).order_by('-last_message_time')
 
-# class UserConversationViewSet(viewsets.ViewSet):
+        # Maintain an ordered list of active user IDs based on the conversation order
+        ordered_user_ids = []
+        for conversation in conversations:
+            if conversation.sender.id != user.id:
+                ordered_user_ids.append(conversation.sender.id)
+            if conversation.receiver.id != user.id:
+                ordered_user_ids.append(conversation.receiver.id)
+
+        # Use Django's `Case` and `When` to maintain the order
+        preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(ordered_user_ids)])
+
+        # Queryset of users who have had conversations with the logged-in user, ordered by last_message_time
+        active_users = User.objects.filter(id__in=ordered_user_ids).order_by(preserved_order)
+
+        return active_users
+
+# class UserViewSet(viewsets.ModelViewSet):
+#     serializer_class = UserSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def get_queryset(self):
+#         user = self.request.user
+
+#         conversations = Conversation.objects.filter(
+#             Q(sender=user) | Q(receiver=user)
+#         ).annotate(
+#             last_message_time=Max('chatmessage__timestamp')
+#         ).order_by('-last_message_time')
+
+#         ordered_user_ids = []
+#         for conversation in conversations:
+#             if conversation.sender.id != user.id:
+#                 ordered_user_ids.append(conversation.sender.id)
+#             if conversation.receiver.id != user.id:
+#                 ordered_user_ids.append(conversation.receiver.id)
+
+#         seen = set()
+#         ordered_user_ids = [x for x in ordered_user_ids if not (x in seen or seen.add(x))]
+
+#         active_users = User.objects.filter(id__in=ordered_user_ids).order_by(
+#             models.Case(
+#                 *[models.When(id=pk, then=pos) for pos, pk in enumerate(ordered_user_ids)]
+#             )
+#         )
+
+#         return active_users
+
+# class UserViewSet(viewsets.ModelViewSet):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
 #     permission_classes = [permissions.AllowAny]
-
-#     def list(self, request):
-#         user = request.user
-
-#         # Retrieve users with whom the logged-in user has had conversations
-#         sender_conversations = ChatMessage.objects.filter(sender=user).values('receiver').distinct()
-#         receiver_conversations = ChatMessage.objects.filter(receiver=user).values('sender').distinct()
-#         user_ids = set([conv['receiver'] for conv in sender_conversations] + [conv['sender'] for conv in receiver_conversations])
-
-#         # Exclude current logged-in user from the list
-#         user_ids.discard(user.id)
-
-#         # Fetch the user objects based on the retrieved user IDs
-#         users = User.objects.filter(id__in=user_ids)
-
-#         # Serialize the user objects
-#         serializer = UserSerializer(users, many=True)
-
-#         return Response(serializer.data)
-from django.db.models import OuterRef, Subquery, Q
-from django.db.models.functions import Coalesce
-from rest_framework import viewsets, permissions
-from rest_framework.response import Response
-from .models import ChatMessage
-from user.serializers import UserSerializer
-from user.models import User
-
-class UserConversationViewSet(viewsets.ViewSet):
-    permission_classes = [permissions.AllowAny]
-
-    def list(self, request):
-        user = request.user
-
-        sender_conversations = ChatMessage.objects.filter(sender=user).values('receiver').distinct()
-        receiver_conversations = ChatMessage.objects.filter(receiver=user).values('sender').distinct()
-        user_ids = set([conv['receiver'] for conv in sender_conversations] + [conv['sender'] for conv in receiver_conversations])
-
-        user_ids.discard(user.id)
-
-        latest_sender_message = ChatMessage.objects.filter(sender=user, receiver=OuterRef('pk')).order_by('-timestamp')
-        latest_receiver_message = ChatMessage.objects.filter(receiver=user, sender=OuterRef('pk')).order_by('-timestamp')
-
-        users = User.objects.filter(id__in=user_ids).annotate(
-            latest_message_timestamp=Coalesce(
-                Subquery(latest_sender_message.values('timestamp')[:1]),
-                Subquery(latest_receiver_message.values('timestamp')[:1])
-            )
-        ).order_by('-latest_message_timestamp')
-
-        serializer = UserSerializer(users, many=True)
-
-        return Response(serializer.data)

@@ -1,10 +1,10 @@
 import Link from "./link.js";
+import Http from "../http/http.js";
 
 export default class SideBar extends HTMLElement {
   constructor() {
     super();
     this.active = false;
-    this.selected = "";
   }
 
   connectedCallback() {
@@ -37,13 +37,16 @@ export default class SideBar extends HTMLElement {
     this.findSelected();
     const logoutBtn = this.querySelector(".logout_logo_wrapper");
     logoutBtn.addEventListener("click", () => {
-      Link.navigateTo("/");
+      Http.logout().then(() =>{
+        Link.navigateTo("/");
+      }
+      );
     });
+    this.initURLChangeDetection();
   }
 
   // Initialize URL change detection
   initURLChangeDetection() {
-    this.selected = window.location.pathname;
     // Listen for popstate, hashchange, and custom locationchange events
     window.addEventListener('locationchange', this.checkAndRender.bind(this));
   }

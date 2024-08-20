@@ -4,6 +4,8 @@
     }
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
 .right_sidebar_wrapper {
     position: relative;
     border: 1px solid #778FB8;
@@ -12,7 +14,7 @@
     color: #fff;
     backdrop-filter: blur(10px);
     background-color: rgba(27, 167, 160, 0.05);
-    height: 90vh !important;
+    height: fit-content;
     /* flex: 4; */
 }
 
@@ -23,7 +25,8 @@
 
 .content_wrapper{
     background-color: rgba(27, 167, 160, 0.05);
-    
+    width: 100%;
+
 }
 
 .account_settings_wrapper {
@@ -34,10 +37,12 @@
     height: 60%;
     padding: 10%;
     min-width: 300px;
+    height: 89.4vh !important;
+
 }
 
 .account_settings_wrapper .delete-account p {
-    font-size: 26px;
+    font-size: 16px;
     color: rgb(255, 0, 0, 0.5);
     cursor: pointer;
     padding: 10px;
@@ -69,12 +74,12 @@
 }
 
 .settings_title {
-    font-size: 30px;
+    font-size: 20px;
     font-family: 'actor';
 }
 
 .settings_menu li p {
-    font-size: 26px;
+    font-size: 16px;
     display: inline-block;
     width: 100%;
     padding: 1rem;
@@ -93,22 +98,22 @@
     /* filter: blur(0.23px) saturate(0.5); */
     backdrop-filter: blur(10px);
     position: relative;
-    height: 90vh !important;
-    width: 80vw;
+    height: fit-content;
     border: 1px solid #778FB8;
     border-radius: 15px;
     display: flex;
     flex: 10;
     flex-direction: column;
     min-width: max-content;
-    padding: 15px;
-    margin: 10px;
+    padding: 0 15px;
+    margin: 0 10px;
     flex-grow: 1;
+    /* height: 89.4vh !important; */
 
 }
 
 .profile_title {
-    font-size: 30px;
+    font-size: 13px;
     /* flex: 3; */
     padding: 15px;
     color: #fff;
@@ -142,7 +147,7 @@
 }
 
 .profile_info .name {
-    font-size: 25px;
+    font-size: 15px;
 }
 
 .profile_info .username {
@@ -155,7 +160,7 @@
 .button_edit {
     background-color: #04BF8A;
     position: relative;
-    font-size: 23px;
+    font-size: 13px;
     width: 130px;
     height: 50px;
     border-radius: 30px;
@@ -172,7 +177,7 @@
     /* justify-content: s; */
     /* flex: auto; */
     color: #fff;
-    height: 40vh;
+    height: fit-content;
     min-width: 400px;
     box-sizing: border-box;
     border: 1px solid #778FB8;
@@ -190,7 +195,7 @@
 }
 
 .infos span {
-    font-size: 25px;
+    font-size: 15px;
     padding: 20px;
 }
 
@@ -202,7 +207,7 @@
 }
 
 .infos_bar p {
-    font-size: 27px;
+    font-size: 17px;
 }
 
 
@@ -213,16 +218,16 @@
 }
 
 .button_save {
-    flex: 1;
     background-color: #04BF8A;
-    font-size: 30px;
+    font-size: 14px;
     align-content: center;
-    position: absolute;
+    /* position: absolute; */
     bottom: 100px;
     right: 100px;
-    width: 15vw;
-    height: 70px;
+    width: fit-content;
     border-radius: 40px;
+    font-weight: bold;
+    padding: 15px 25px;
 }
 
 
@@ -243,7 +248,7 @@ button {
     position: fixed;
     position: relative;
     width: 67vw;
-    height: 90vh;
+    /* height: 90vh; */
     display: flex;
     box-sizing: border-box;
     color: #fff;
@@ -254,7 +259,7 @@ button {
 }
 
 .security-container p {
-    font-size: 30px;
+    font-size: 20px;
     padding: 50px;
 }
 
@@ -264,7 +269,7 @@ button {
     position: fixed;
     position: relative;
     width: 67vw;
-    height: 90vh;
+    /* height: 90vh; */
     display: flex;
     box-sizing: border-box;
     color: #fff;
@@ -275,7 +280,7 @@ button {
 }
 
 .notifications-container p {
-    font-size: 30px;
+    font-size: 20px;
     padding: 50px;
 }
 
@@ -291,8 +296,281 @@ button {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    height: 90vh;
-    min-width: 300px;
     font-weight: lighter;
     font-family: 'actor';
+}
+
+
+.input_disabled_edit{
+    background-color: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+.input_enabled_edit{
+    transition: all 0.2s ease-in-out;
+    opacity: 0;
+    background-color: #282f54;
+    /* border: 1px solid black; */
+    color: white;
+    padding: 5px 10px;
+    outline: none;
+    box-shadow: 0.55px 0.55px 0.55px 1px black;
+}
+
+.save_wrapper_btn{
+    display: block;
+    text-align: end;
+}
+
+.item-2{
+    flex-direction: column-reverse;
+}
+
+
+.notification_icon{
+    width: 30px!important;
+}
+
+i::before {
+    font-size: 25px!important;
+}
+
+/* .infos_wrapper{
+    text-align: center;
+} */
+
+.setting_wrapper_{
+    display: flex;
+}
+
+.infos_wrapper
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.img_wrapper{
+    width: fit-content;
+}
+
+.img_wrapper > img
+{
+    width: 130px;
+    border-radius: 10px;
+}
+
+.img_wrapper {
+    position: relative;
+}
+
+.fa-edit{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: white;
+    cursor: pointer;
+}
+
+.fa-edit:hover{
+    color: black;
+}
+
+.bold_txt{
+    font-weight: bold;
+}
+
+*{
+    font-family: "Poppins", sans-serif;
+}
+
+.under_txt
+{
+    font-size: 12px;
+    color: #919191;
+}
+
+.link_wrapper_settings > i{
+    /* color: white; */
+    color: #919191;
+}
+
+.left_side_settings_wrapper{
+    width: 30%;
+    /* height: 88vh; */
+    display: flex;
+    flex-direction: column;
+}
+
+.infos_details_wrapper{
+    text-align: center;
+}
+
+.link_wrapper_settings{
+    padding: 15px;
+}
+
+.txt___sett{
+    /* font-weight: bold; */
+    font-size: 14px;
+    padding: 0 25px;
+    color: #919191;
+}
+
+.link_wrapper_settings{
+    display: flex;
+    align-items: center;
+}
+
+.link_wrapper_settings:hover{
+    background-color: #04BF8A;
+    cursor: pointer;
+}
+
+.link_wrapper_settings:hover > .txt___sett,
+.link_wrapper_settings:hover  > i{
+    color: white;
+}
+
+
+.left_side_settings_wrapper {
+    position: relative;
+    border: 1px solid #778FB8;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    background-color: rgba(27, 167, 160, 0.05);
+    justify-content: space-around;
+}
+
+.infos_wrapper{
+    padding: 15px;
+}
+
+.links_wrapper_swapper{
+    flex: 0.8;
+}
+
+.input_settings_wrapper > input{
+    width: 450px;
+    height: 35px;
+    border-radius: 3px;
+    border: 1px solid #919191;
+    background-color: #dbdbdb;
+    padding: 0 15px;
+    outline: none;
+    font-size: 12px;
+}
+
+.label_txt{
+    color: #919191;
+    font-size: 12px;
+    padding: 10px 0;
+}
+
+.buttons_wrapper{
+    display: flex;
+    align-items: center;
+    padding: 25px 0;
+}
+
+.submit_btn > button{
+    background-color: #04BF8A;
+    color: white;
+    padding: 10px 30px;
+    border-radius: 5px;
+    border: none;
+}
+
+.cancel_btn > button{
+    background-color: white;
+    padding: 10px 30px;
+    border-radius: 5px;
+    border: none;
+    margin: 0 0 0 10px;
+}
+
+.right_side_settings_wrapper{
+    position: relative;
+    border: 1px solid #778FB8;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    background-color: rgba(27, 167, 160, 0.05);
+    justify-content: space-around;
+    margin: 0 20px;
+    width: 90%;
+}
+
+.marg_wrapper{
+    padding: 50px;
+}
+
+.input_settings_wrapper{
+    margin: 25px 0;
+}
+
+/* .setting_wrapper_{
+    padding: 5% 150px 0 150px;
+} */
+
+.sidebar_wrapper{
+    height: 100%;
+}
+
+.active_btn_settings{
+    background-color: #04BF8A;
+    color: white;
+}
+
+.active_btn_settings > .fa,
+.active_btn_settings > .txt___sett {
+    color: white;
+}
+
+
+.content_{
+    height: 80vh!important;
+}
+
+.players_info_{
+    padding: 35px 0;
+}
+
+.setting_1 > div > h1{
+    font-size: 13px!important;
+}
+
+.setting_3{
+    padding: 25px 0;
+}
+
+#start_btn{
+    background-color: #04BF8A;
+    color: white;
+    padding: 15px 35px;
+    border: none;
+    border-radius: 5px;
+}
+
+#start_btn:hover{
+    background-color: #095c45;
+}
+
+.bold_txt_white{
+    padding: 10px 0;
+    font-size: 16px;
+    color: white;
+}
+
+.st{
+    width: 260px!important;
+    height: 160px!important;
+}
+
+.start_game_{
+    padding: 50px 0;
+    text-align: center;
 }
