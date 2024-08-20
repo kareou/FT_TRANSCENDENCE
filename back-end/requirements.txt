@@ -2,7 +2,6 @@ django
 channels
 daphne
 psycopg2-binary>=2.9
-django-environ
 django-cors-headers
 djangorestframework
 djangorestframework-simplejwt
@@ -10,3 +9,4 @@ pillow
 requests
 pyotp
 qrcode
+python-environ

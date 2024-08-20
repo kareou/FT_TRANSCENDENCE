@@ -4,7 +4,7 @@ export default class Profile extends HTMLElement {
   constructor() {
     super();
     document.title = "profile";
-    this.id = Http.user.username;
+    this.id = Http.user.id;
   }
 
   connectedCallback() {

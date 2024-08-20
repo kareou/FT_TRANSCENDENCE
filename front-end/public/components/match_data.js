@@ -16,13 +16,13 @@ export default class MatchData extends HTMLElement{
         this.innerHTML = /*html*/`
             <div class="matchdata ${this.winner === this.user ? "win" : "lose"}">
                 <div class="player">
-                    <img src="https://api.dicebear.com/9.x/bottts-neutral/svg" alt="avatar" />
+                    <img src="https://api.dicebear.com/9.x/bottts-neutral/svg" alt="avatar" loading="lazy" />
                     <h1>${this.p1score}</h1>
                 </div>
                 <h1>VS</h1>
                 <div class="player">
                     <h1>${this.p2score}</h1>
-                    <img src="https://api.dicebear.com/9.x/bottts-neutral/svg" alt="avatar" />
+                    <img src="https://api.dicebear.com/9.x/bottts-neutral/svg" alt="avatar" loading="lazy" />
                 </div>
             </div>
         `;

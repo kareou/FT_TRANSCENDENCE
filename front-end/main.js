@@ -25,6 +25,7 @@ const path = require("path");
 // Serve static files from the "public" directory
 app.use("/public", express.static(path.resolve("./", "public")));
 
+
 // Catch-all route for your SPA
 app.get("/*", (req, res) => {
   try {

@@ -36,7 +36,7 @@ export default class SignIn extends HTMLElement {
             <input type="password" name="pwd" id="pwd" placeholder="Enter your password" required>
             <button type="submit" class="signInButton" >login</button>
             <button class="signInButton"><img src="images/42_logo.svg" alt="42 logo" class="intra_logo"> Sign In with Intra</button>
-            <p> Don't have an account yet ? <a is="co-link" href="/signup" class="signUpLink" >Sign Up</a></p>
+            <p> Don't have an account yet ? <a is="co-link" href="/auth/register" class="signUpLink" >Sign Up</a></p>
         </form>
       </div>
         `;

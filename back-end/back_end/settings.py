@@ -23,6 +23,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 env = environ.Env()
 
 # Quick-start development settings - unsuitable for production
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -97,6 +98,8 @@ INSTALLED_APPS = [
     'user',
     'chat',
     'game',
+    'friends',
+    'notification',
 ]
 
 MIDDLEWARE = [

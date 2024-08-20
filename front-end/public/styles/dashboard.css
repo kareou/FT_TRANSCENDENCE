@@ -1,18 +1,12 @@
 @font-face {
     font-family: "Coolvetica";
-    src: url("../assets/fonts/coolvetica\ rg.otf");
+    src: url("../assets/fonts/coolvetica rg.otf") format("opentype");
 }
 
 @font-face {
     font-family: "Actor";
-    src: url("../assets/fonts/Actor-Regular.ttf");
+    src: url("../assets/fonts/Actor-Regular.ttf") format("truetype");
 }
-
-body{
-    max-width: 1800px;
-    margin: auto;
-}
-
 h1{
     color: white;
     font-family: "Coolvetica";
@@ -24,12 +18,22 @@ h1{
     padding: 1rem;
     display: grid;
     grid-template-columns: 2fr 1fr;
-    grid-template-rows: 1fr 2fr;
+    grid-template-rows: 1fr 1fr;
     grid-template-areas:
         'profile rank'
         'game friends';
     grid-gap: 1rem;
-    height: 85vh;
+    height: 100%;
+    animation: fadein .5s ease-in-out;
+}
+
+@keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 .game_n_friends,
@@ -50,7 +54,7 @@ h1{
     align-items: center;
     justify-content: space-around;
     padding: 1rem;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     background-color: rgba(27, 167, 160, 0.05);
     border-radius: 1rem;
     backdrop-filter: blur(1rem);
@@ -59,7 +63,7 @@ h1{
 .game_wrapper {
     grid-area: game;
     margin-top: 1rem;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 1rem;
     backdrop-filter: blur(1rem);
     background: url("/public/assets/pong_animation.gif") no-repeat center center / cover;
@@ -77,19 +81,18 @@ h1{
     display: flex;
     align-items: center;
     margin-top: 1rem;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 1rem;
     backdrop-filter: blur(1rem);
     background-color: rgba(27, 167, 160, 0.05);
-    flex-direction: column;
-  padding: 15px;
+
 }
 
 .rank{
     grid-area: rank;
     display: flex;
     align-items: center;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 1rem;
     background-color: rgba(27, 167, 160, 0.05);
 
@@ -206,70 +209,4 @@ h1{
     color: white;
     font-family: "Actor";
     font-weight: 100;
-}
-
-.hidden {
-    display: none;
-}
-
-.visible {
-    display: block;
-}
-
-.msg-prompt {
-    position: absolute;
-    height: 100px;
-    width: 500px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background-image: url("../assets/bg_img.png");
-    display: none;
-}
-
-.msg-prompt.visible {
-    display: flex;
-}
-
-.wrapper_modal{
-    position: relative;
-}
-
-.msg-prompt_sub2{
-    position: relative;
-}
-
-.send_btn_modal{
-    position: absolute;
-    background: none!important;
-    left: 87%;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.message-input{
-    width: 100%;
-    padding: 10px 10px;
-    border-radius: 15px;
-    border: none;
-    background-color: #778FB8;
-    outline: none;
-}
-.close-btn {
-    position: absolute;
-    right: 5px;
-    top: 0px;
-    transform: translateY(-50%);
-    background: none;
-  border: none;
-}
-
-.close-btn:hover{
-    color: #047e5c;
-}
-
-.msg-prompt_sub1 {
-    display: flex;
-    flex-direction: row;
-    justify-content:space-evenly;
 }
