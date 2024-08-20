@@ -18,11 +18,11 @@ export default class GameScore extends HTMLElement {
     this.innerHTML = /*html*/ `
         <div class="players">
             <div class="p_info">
-                ${this.players.player1 ? `<img id="player_img" src="http://localhost:8000${this.players.player1.profile_pic}" alt="avatar" />
+                ${this.players.player1 ? `<img id="player_img" src="http://localhost:8000${this.players.player1.profile_pic}" alt="avatar" loading="lazy" />
                     <h1>${this.players.player1.username}</h1> 
                     `:
                 `<h1>waitin for opponent</h1>
-                <img id="player_img" src="https://api.dicebear.com/9.x/bottts-neutral/svg" alt="avatar" />
+                <img id="player_img" src="https://api.dicebear.com/9.x/bottts-neutral/svg" alt="avatar" loading="lazy" />
                 `}
                 <h1 id="p1_score">0</h1>
             </div>
@@ -34,9 +34,9 @@ export default class GameScore extends HTMLElement {
             <div class="p_info">
                 <h1 id="p2_score">0</h1>
                 ${this.players.player2 ? `<h1>${this.players.player2.username}</h1>
-                <img id="player_img" src="http://localhost:8000${this.players.player2.profile_pic}" alt="avatar" />` :
+                <img id="player_img" src="http://localhost:8000${this.players.player2.profile_pic}" alt="avatar" loading="lazy" />` :
                 `<h1>waitin for opponent</h1>
-                <img id="player_img" src="https://api.dicebear.com/9.x/bottts-neutral/svg" alt="avatar" />
+                <img id="player_img" src="https://api.dicebear.com/9.x/bottts-neutral/svg" alt="avatar" loading="lazy" />
                 `}
             </div>
         </div>

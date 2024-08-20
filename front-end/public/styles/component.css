@@ -50,7 +50,7 @@
 }
 
 .paddle_info {
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 1rem;
     backdrop-filter: blur(1rem);
     width: 9rem;
@@ -112,7 +112,7 @@
     animation: slideInFromRight .5s ease-in-out;
 }
 
-.toast-body{
+.toast-body {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -130,7 +130,7 @@
     }
 }
 
-.timer-bar{
+.timer-bar {
     width: 100%;
     height: .3rem;
     align-self: flex-end;
@@ -148,7 +148,7 @@
     }
 }
 
-.modal{
+.modal {
     /* display: none; */
     position: absolute;
     z-index: 1;
@@ -160,18 +160,18 @@
     background-color: rgba(0, 0, 0, 0.4);
 }
 
-.modal_content{
+.modal_content {
     background-color: #778FB8;
     margin: 15% auto;
     padding: 20px;
-    border: 1px solid #888;
+    border: 0.6px solid #888;
     width: 80%;
     height: 80%;
     border-radius: 1rem;
     font-family: "Coolvetica";
 }
 
-.matchdata{
+.matchdata {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -183,32 +183,33 @@
     border-radius: 1rem;
 }
 
-.matchdata.win{
+.matchdata.win {
     background-color: rgba(27, 167, 64, 0.25);
 }
 
-.matchdata.lose{
+.matchdata.lose {
     background-color: rgba(167, 27, 27, 0.25);
 }
 
-.matchdata h1{
+.matchdata h1 {
     font-size: 2em;
     color: white;
     font-family: "Coolvetica";
 }
 
-.matchdata .player{
+.matchdata .player {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
-.matchdata .player img{
+
+.matchdata .player img {
     border-radius: 50%;
     width: 4rem;
     height: 4rem;
 }
 
-.user_stats{
+.user_stats {
     padding: 1rem 0;
     background-color: rgba(27, 167, 160, 0.05);
     backdrop-filter: blur(1rem);
@@ -218,7 +219,7 @@
     border-radius: 1rem;
 }
 
-.win_rate{
+.win_rate {
     display: flex;
     justify-content: space-between;
     background-color: #085E6D;
@@ -231,31 +232,36 @@
 }
 
 
-.win_rate>div{
+.win_rate>div {
     display: flex;
     flex-direction: column;
 }
-.stat_type .stat_label{
+
+.stat_type .stat_label {
     font-size: 1.25rem;
 }
-.stat_label{
+
+.stat_label {
     font-size: 1.25rem;
 }
-.stat_value{
+
+.stat_value {
     font-size: 2rem;
     font-weight: 500;
+    font-family: "Coolvetica";
 }
-.stat_subtext{
+
+.stat_subtext {
     font-size: 1rem;
 
 }
 
-.stat_type .stat_subtext{
+.stat_type .stat_subtext {
     font-size: 1.5rem;
 
 }
 
-.extra_stats{
+.extra_stats {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -267,7 +273,7 @@
     margin-top: -1rem;
 }
 
-.stat_type{
+.stat_type {
     color: white;
     display: grid;
     font-family: "Coolvetica";
@@ -288,7 +294,8 @@
 
 .step {
     text-align: start;
-    width: 4rem; /* Added width to center the steps */
+    width: 4rem;
+    /* Added width to center the steps */
 }
 
 .graph {
@@ -307,8 +314,10 @@
     color: white;
     border-right: 1px solid white;
     width: max-content;
-    padding: 0; /* Removed padding to align the text */
-    margin: 0; /* Removed margin to align the text */
+    padding: 0;
+    /* Removed padding to align the text */
+    margin: 0;
+    /* Removed margin to align the text */
 }
 
 .graph ol li {
@@ -321,18 +330,20 @@
 }
 
 #stat {
-    margin-left: 0; /* Changed margin to 0 to align text properly */
-    padding-left: 0.5rem; /* Added padding for better spacing */
+    margin-left: 0;
+    /* Changed margin to 0 to align text properly */
+    padding-left: 0.5rem;
+    /* Added padding for better spacing */
 }
 
-#progress{
+#progress {
     position: absolute;
     left: 101%;
     height: 100%;
     background-color: #085E6D;
 }
 
-.match_history{
+.match_history {
     padding: 1rem;
     width: 100%;
     height: 100%;
@@ -342,19 +353,133 @@
     grid-area: friends;
 }
 
-.achievement_list{
+.achievement_list {
     display: flex;
     justify-content: space-between;
     width: 100%;
 }
 
-.achievement_list img{
+.achievement_list img {
     height: 5rem;
     border-radius: 50%;
     filter: opacity(0.5);
 }
-.achievement_list img.earned{
+
+.achievement_list img.earned {
     height: 5rem;
     border-radius: 50%;
     filter: opacity(1);
+}
+
+
+/* 04D98B */
+.notification_wrapper {
+    background-color: rgba(4, 217, 139, 0.25);
+    backdrop-filter: blur(1rem);
+    border-radius: 50%;
+    height: 3rem;
+    width: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+}
+
+.notification_wrapper::after {
+    content: "";
+    position: absolute;
+    width: .8rem;
+    height: .8rem;
+    border-radius: 50%;
+    background-color: red;
+    top: 0;
+    right: 0;
+}
+
+.notification_wrapper:hover {
+    background-color: rgba(4, 217, 139, 0.5);
+}
+
+
+/*
+top: 3.5rem;
+right: -1rem;
+width: 20rem;
+*/
+
+.notification_dropdown {
+    position: absolute;
+    top: 0rem;
+    z-index: 1;
+    right: 0rem;
+    width:  3rem;
+    background-color: rgba(4, 217, 139, 0.5);
+    box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(1rem);
+    border-radius: 1rem;
+    padding: 1rem;
+    color: white;
+    display: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-wrap: ellipsis;
+    /* display: flex; */
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
+}
+
+
+.notification_dropdown.show {
+    display: flex;
+    animation: dropdownShow .5s ease-in-out;
+}
+
+@keyframes dropdownShow {
+   from{
+        top: 0rem;
+        right: 0rem;
+        width: 3rem;
+   }
+   to{
+        top: 3.5rem;
+        right: -1rem;
+        width: 20rem;
+   }
+
+}
+
+.avatar_icon {
+    position: relative;
+}
+
+.status_indicator {
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    bottom: .4rem;
+    right: .9rem;
+}
+
+.avatar_overlay {
+    position: absolute;
+    border-radius: 50%;
+    top: 0;
+}
+
+.avatar_overlay.online {
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 30%, rgba(4, 217, 139, 0.7) 100%);
+}
+
+.avatar_overlay.offline {
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 30%, rgba(217, 4, 4, 0.7) 100%);
+}
+
+.status_indicator.online {
+    background-color: #04D98B;
+}
+
+.status_indicator.offline {
+    background-color: #D90404;
 }

@@ -9,3 +9,4 @@ pillow
 requests
 pyotp
 qrcode
+python-environ

@@ -13,6 +13,8 @@ import MatchData from "../components/match_data.js";
 import ProfileInfor from "../components/profile_info.js";
 import MatchHistory from "../components/matchHistory.js";
 import UserStats from "../components/user_stats.js";
+import UserAvatar from "../components/user_avatar.js";
+import Notification from "../components/notification.js";
 
 export const routes = [
   {

@@ -13,9 +13,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 90vh;
+    height: 100%;
     backdrop-filter: blur(10px);
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     background-color: rgba(27, 167, 160, 0.05);
     border-radius: 1rem;
 }
@@ -39,7 +39,7 @@
     font-size: 2em;
     color: #04D98B;
     font-family: "Coolvetica";
-    
+
 }
 
 #vspng{

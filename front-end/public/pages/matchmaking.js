@@ -98,7 +98,7 @@ export default class MatchMaking extends HTMLElement {
           <matchmaking-avatar id="1"></matchmaking-avatar>
           <matchmaking-stats id="1"></matchmaking-stats>
         </div>
-        <img src="/public/assets/VS.png" alt="" id="vspng"/>
+        <img src="/public/assets/VS.png" alt="vs" id="vspng" loading="lazy" />
         <div className="mm_player2">
           <matchmaking-avatar id="2"></matchmaking-avatar>
           <matchmaking-stats id="2"></matchmaking-stats>

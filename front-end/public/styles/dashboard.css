@@ -1,18 +1,12 @@
 @font-face {
     font-family: "Coolvetica";
-    src: url("../assets/fonts/coolvetica\ rg.otf");
+    src: url("../assets/fonts/coolvetica rg.otf") format("opentype");
 }
 
 @font-face {
     font-family: "Actor";
-    src: url("../assets/fonts/Actor-Regular.ttf");
+    src: url("../assets/fonts/Actor-Regular.ttf") format("truetype");
 }
-
-body{
-    max-width: 1800px;
-    margin: auto;
-}
-
 h1{
     color: white;
     font-family: "Coolvetica";
@@ -29,7 +23,17 @@ h1{
         'profile rank'
         'game friends';
     grid-gap: 1rem;
-    height: 85vh;
+    height: 100%;
+    animation: fadein .5s ease-in-out;
+}
+
+@keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 .game_n_friends,
@@ -50,24 +54,35 @@ h1{
     align-items: center;
     justify-content: space-around;
     padding: 1rem;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     background-color: rgba(27, 167, 160, 0.05);
     border-radius: 1rem;
     backdrop-filter: blur(1rem);
 }
 
 .game_wrapper {
+    position: relative;
+    overflow: hidden;
     grid-area: game;
     margin-top: 1rem;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 1rem;
-    backdrop-filter: blur(1rem);
-    background: url("/public/assets/pong_animation.gif") no-repeat center center / cover;
-    object-fit: cover;
     display: flex;
     align-items: center;
     justify-content: space-around;
-    padding: 1rem;
+}
+
+.game_wrapper::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("/public/assets/pong2.webp") no-repeat center center / cover;
+    object-fit: cover;
+    filter: blur(5px);  
+    z-index: -1;
 }
 
 
@@ -77,19 +92,18 @@ h1{
     display: flex;
     align-items: center;
     margin-top: 1rem;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 1rem;
     backdrop-filter: blur(1rem);
     background-color: rgba(27, 167, 160, 0.05);
-    flex-direction: column;
-  padding: 15px;
+
 }
 
 .rank{
     grid-area: rank;
     display: flex;
     align-items: center;
-    border: 1px solid #778FB8;
+    border: 0.6px solid #778FB8;
     border-radius: 1rem;
     background-color: rgba(27, 167, 160, 0.05);
 
@@ -107,38 +121,40 @@ h1{
 }
 
 .game_button#local{
-    background-color: #FFA500;
+    background-color: #0d7ea8;
 }
 .game_button#local:hover{
-    background-color: #a95f05;
+    background-color: #0ad6ff;
     filter: drop-shadow(rgba(2,115,94,0.3) 0px 5px 5px);
+    transform: scale(1.1);
+    translate: ease-in-out .5s;
 }
 
 .game_button{
     color: white;
     text-decoration: none;
-    width: 20rem;
-    height: 15rem;
     font-size: 2em;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
     border: none;
+    padding: 1.8rem;
     border-radius:1ren;
-    padding: 5px;
     cursor: pointer;
     border-radius: 20px;
-    filter: drop-shadow(rgba(2,115,94,0.3) 0px 5px 5px);
+    filter: drop-shadow(rgba(0, 0, 0, 0.3) 0px 5px 5px);
     transition: ease-in-out .5s;
 }
 
 .game_button#online{
-    background-color: #04BF8A;
+    background-color: #770886;
 }
 .game_button#online:hover{
-    background-color: #047e5c;
-    filter: drop-shadow(rgba(2,115,94,0.3) 0px 5px 5px);
+    background-color: #b80fc7;
+    filter: drop-shadow(rgba(7, 9, 9, 0.3) 0px 5px 5px);
+    transform: scale(1.1);
+    translate: ease-in-out .5s;
 }
 
 
@@ -146,13 +162,12 @@ h1{
     font-family: "Actor";
     color: rgba(149, 149, 149, 0.36);
     font-size: 1em;
-    margin-top: -.5rem;
 }
 
 #user_name{
-    color: #04BF8A;
+    color: #cd10cd;
     font-family: "Coolvetica";
-    font-size: 3em;
+    font-size: 2em;
     font-weight: 100;
     margin-left: -1rem;
 }
@@ -186,9 +201,9 @@ h1{
     display: flex;
     justify-content: start;
     align-items: center;
-    background-color: #075F49;
+    background-color: #0faade;
     width: 100%;
-    height: 1rem;
+    height: 10px;
     gap: 1rem;
     border-radius: 1rem;
 }
@@ -205,8 +220,48 @@ h1{
     align-items: center;
     color: white;
     font-family: "Actor";
+    font-size: 12px;
     font-weight: 100;
+    margin: 5px 0;
 }
+
+
+
+@media screen and (min-width: 1250px)
+{
+    .av_img{
+        height: 80px!important;
+        width: 80px!important;
+    }
+}
+
+.profile{
+    height: 100%;
+    padding: 35px;
+}
+
+.profile_info{
+    height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.name_n_login
+{
+    display: flex;
+  flex-direction: column;
+  align-items: baseline;
+}
+
+.wrapper_info_profile
+{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+}
+
 
 .hidden {
     display: none;
@@ -262,14 +317,4 @@ h1{
     transform: translateY(-50%);
     background: none;
   border: none;
-}
-
-.close-btn:hover{
-    color: #047e5c;
-}
-
-.msg-prompt_sub1 {
-    display: flex;
-    flex-direction: row;
-    justify-content:space-evenly;
 }

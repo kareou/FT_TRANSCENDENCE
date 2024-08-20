@@ -43,7 +43,7 @@ render() {
         <label for="password">Password</label>
         <input type="password" name="pwd" id="pwd" placeholder="Enter your password" required>
         <button  class="signUpButton" type="submit">Sign up</button>
-        <p>Already have an account? <a is="co-link" href="/signin" class="signInLink">Sign In</a></p>
+        <p>Already have an account? <a is="co-link" href="/auth/login" class="signInLink">Sign In</a></p>
       </form>
   </div>
 `;

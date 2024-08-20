@@ -65,7 +65,7 @@ export default class Game extends HTMLElement {
                     <div class="players">
 
                     <div class="p_info">
-                        <img id="player_img" src="/public/assets/bg_img.png" alt="">
+                        <img id="player_img" src="/public/assets/bg_img.png" alt="" loading="lazy">
                         <h1>${this.data.player1.name}</h1>
                         <h1 id="p1_score">0</h1>
                     </div>
@@ -77,7 +77,7 @@ export default class Game extends HTMLElement {
                         <div class="p_info">
                             <h1 id="p2_score">0</h1>
                             <h1>${this.data.player2.name}</h1>
-                            <img id="player_img" src="/public/assets/bg_img.png" alt="">
+                            <img id="player_img" src="/public/assets/bg_img.png" alt="" loading="lazy">
                         </div>
                     </div>
                     <canvas class="board"></canvas>

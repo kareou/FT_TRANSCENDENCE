@@ -11,4 +11,6 @@ router.register(r'conversations', UserConversationViewSet, basename='conversatio
 urlpatterns = [
     path('', include(router.urls)),
     path('conversations/fetch_or_create/', UserConversationViewSet.as_view({'post': 'fetch_or_create_conversation'}), name='fetch_or_create_conversation'),
+    # path('block/<int:user_id>/', block_user, name='block_user'),
+    # path('block/', BlockViewSet.as_view({'post': 'block_user'}), name='block_user'),
 ]

@@ -5,18 +5,19 @@ export default class ProfileInfo extends HTMLElement {
     super();
     this.user = Http.user;
     this.id = this.getAttribute("id");
-    this.websocket = null;
+    console.log(this.id);
   }
   connectedCallback() {
-    if (this.id != this.user.username) {
-      Http.getData("Get",`api/user/${this.id}`).then((data) => {
+    if (this.id != this.user.id) {
+      Http.getData("Get", `api/user/${this.id}`).then((data) => {
         this.user = data;
         this.render();
         this.markUnearnedAchievements();
         this.setupEventListeners();
+
       });
     }
-    else{
+    else {
       this.render();
       this.markUnearnedAchievements();
       this.setupEventListeners();
@@ -141,78 +142,79 @@ async sendMessage() {
       buttonClose.click();
     });
   }
+
   render() {
-      
     this.innerHTML = /*HTML*/ `
     <style>
-    .infos{
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+      .profile_img > img{
+        width:150px;
+        height:150px;
+        margin: 0 25px ;
+      }
+      .av_img{
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        margin: 15px 5px 0 5px;
+      }
     </style>
         <div class="profile" >
-          <div class="profile_img">
-            <img src='http://localhost:8000${this.user.profile_pic}' class="profile_img" alt="profile">
-          </div>
-          <div class="profile_info">
-            <div class="infos">
-              <div class="name_n_login">
-                <h1 id="user_name">${this.user.full_name}</h1>
-                <h6 id="login">${this.user.username}</h6>
-              </div>
-              <h2>
-              <span>
-              <i class="fa-sharp fa-light fa-coins" style="color: #04BF8A;"></i>
-              </span>
-              <span id="user_coins">2300$
-              </span>
-              <button class="new-msg send_msg no_style">
+      <div class="profile_img">
+        <img src='http://localhost:8000${this.user.profile_pic}' class="profile_img" alt="profile" loading="lazy">
+      </div>
+      <div class="profile_info">
+      <div class="wrapper_info_profile">
+        <div class="name_n_login">
+          <h1 id="user_name">${this.user.full_name}</h1>
+          <h6 id="login">${this.user.username}</h6>
+        </div>
+        <div class="wallet_data_wrapper">
+        <span>
+        <i class="fa-sharp fa-light fa-coins" style="color: #04BF8A;"></i>
+        </span>
+        <span id="user_coins">2300$
+        </span>
+        <button class="new-msg send_msg no_style">
                 <i class="fa-regular fa-message"></i>
               </button>
-              </h2>
-            </div>
-          
-            <div class="achievement">
-              <h1>Achievements</h1>
-              <div class="achievement_list">
-              <img src="/public/assets/ranks/1.png" alt="medal">
-              <img src="/public/assets/ranks/2.png" alt="medal">
-              <img src="/public/assets/ranks/3.png" alt="medal">
-              <img src="/public/assets/ranks/4.png" alt="medal">
-              <img src="/public/assets/ranks/5.png" alt="medal">
-              <img src="/public/assets/ranks/6.png" alt="medal">
-              <img src="/public/assets/ranks/7.png" alt="medal">
-              </div>
-              <h4 class="level">
-                <span>${this.user.level}</span>
-                <span>${this.user.exp}%</span>
-              </h4>
-              <div class="level-bar">
-                <span style="width: ${this.user.exp}%;"></span>
-              </div>
-            </div>
+        </div>
+      </div>
+        <div class="achievement">
+          <div class="achievement_list">
+          <img src="/public/assets/ranks/1.png" alt="medal" loading="lazy" class="av_img">
+          <img src="/public/assets/ranks/2.png" alt="medal" loading="lazy" class="av_img">
+          <img src="/public/assets/ranks/3.png" alt="medal" loading="lazy" class="av_img">
+          <img src="/public/assets/ranks/4.png" alt="medal" loading="lazy" class="av_img">
+          <img src="/public/assets/ranks/5.png" alt="medal" loading="lazy" class="av_img">
+          <img src="/public/assets/ranks/6.png" alt="medal" loading="lazy" class="av_img">
+          <img src="/public/assets/ranks/7.png" alt="medal" loading="lazy" class="av_img">
           </div>
-
-          <div class="msg-prompt hidden" style="height: 150px;padding: 25px;border-radius: 12px;border: 1px solid white;">
-            <div class="wrapper_modal" style="height: 100%;display: flex;flex-direction: column;justify-content: space-around;">
-
-              <button class="close-btn">
-                <i class="fa fa-close"> </i>
-              </button>
-            <div class="msg-prompt_sub1">
-              <!-- <p>message to ${this.user.username}</p> -->
-              <br><br><br>
-            </div>
-            <div class="msg-prompt_sub2">
-              <input type="text" class="message-input" placeholder="Write your message here...">
-              <button class="send-button send_btn_modal">
-                <i class="fa fa-send"></i>
-              </button>
-            </div>
+          <h4 class="level">
+            <span>${this.user.level}</span>
+            <span>${this.user.exp}%</span>
+          </h4>
+          <div class="level-bar">
+            <span style="width: ${this.user.exp}%;"></span>
           </div>
+        </div>
+        <div class="msg-prompt hidden" style="height: 150px;padding: 25px;border-radius: 12px;border: 1px solid white;">
+        <div class="wrapper_modal" style="height: 100%;display: flex;flex-direction: column;justify-content: space-around;">
 
-          </div>
+          <button class="close-btn">
+            <i class="fa fa-close"> </i>
+          </button>
+        <div class="msg-prompt_sub1">
+          <!-- <p>message to ${this.user.username}</p> -->
+          <br><br><br>
+        </div>
+        <div class="msg-prompt_sub2">
+          <input type="text" class="message-input" placeholder="Write your message here...">
+          <button class="send-button send_btn_modal">
+            <i class="fa fa-send"></i>
+          </button>
+        </div>
+      </div>
+      </div>
     </div>
     `;
   }

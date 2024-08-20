@@ -18,7 +18,7 @@ export default class ThemeSelector extends HTMLElement {
             </div>
             <div class="theme_preview">
                 <div class="theme_preview_board">
-                    <img src="${this.theme_image}" alt="">
+                    <img src="${this.theme_image}" alt="board" loading="lazy" />
                 </div>
             </div>
         </div>
