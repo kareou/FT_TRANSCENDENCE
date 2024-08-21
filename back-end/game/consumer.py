@@ -10,6 +10,7 @@ from user.models import Stats
 from user.serializers import StatsSerializer
 from django.db import transaction
 from .models import Match
+import asyncio
 
 @database_sync_to_async
 def GetUser(scope):
@@ -38,7 +39,6 @@ def updateGameScore(game_id, player1_score = None, player2_score = None, player1
             if winner is not None:
                 game.winner = winner
             game.save()
-            print(winner, flush=True)
             return winner
     except Exception as e:
         return None
@@ -64,11 +64,94 @@ def updateUserStats(user, winner, goals_scored, goals_conceded):
     except Exception as e:
         pass
 
+class GameState():
+    def __init__(self):
+        self.screen_width = 800
+        self.screen_height = 600
+        self.p1x = 40
+        self.p1y = self.screen_height / 2 - 50
+        self.p2x = self.screen_width - 50
+        self.p2y = self.screen_height / 2 - 50
+        self.ballx = self.screen_width / 2
+        self.bally = self.screen_height / 2
+        self.ballvx = 1
+        self.ballvy = 1
+        self.p1score = 0
+        self.p2score = 0
+        self.game_progress = "start"
+
+    def __json__(self):
+        return {"p1": {"x": self.p1x, "y": self.p1y}, "p2": {"x": self.p2x, "y": self.p2y}, "ball": {"x": self.ballx, "y": self.bally}, "p1score": self.p1score, "p2score": self.p2score, "screen_width": self.screen_width, "screen_height": self.screen_height, "game_progress": self.game_progress}
+
+    def __str__(self) -> str:
+        return f"p1: {self.p1}, p2: {self.p2}, ball: {self.ball}"
+
+    def __repr__(self) -> str:
+        return f"p1: {self.p1}, p2: {self.p2}, ball: {self.ball}"
+
+def MovePlayer(state, direction, player):
+    if player == "player1":
+        if direction == "up":
+            state.p1y -= 10
+        elif direction == "down":
+            state.p1y += 10
+        if state.p1y < 0:
+            state.p1y = 0
+        elif state.p1y > state.screen_height - 100:
+            state.p1y = state.screen_height - 100
+    elif player == "player2":
+        if direction == "up":
+            state.p2y -= 10
+        elif direction == "down":
+            state.p2y += 10
+        if state.p2y < 0:
+            state.p2y = 0
+        elif state.p2y > state.screen_height - 100:
+            state.p2y = state.screen_height - 100
+    return state
+
+def check_game_end(state):
+    if state.p1score == 3:
+        return "player1"
+    elif state.p2score == 3:
+        return "player2"
+    return None
+
+def update_game_state(state: GameState):
+    state.ballx += state.ballvx
+    state.bally += state.ballvy
+    if state.bally <= 0 or state.bally >= state.screen_height:
+        state.ballvy *= -1
+    if state.ballx <= 0:
+        state.p2score += 1
+        state.ballx = state.screen_width / 2
+        state.bally = state.screen_height / 2
+        state.ballvx *= -1
+        if check_game_end(state):
+            state.game_progress = "end"
+        else:
+            state.game_progress = "pause"
+    elif state.ballx >= state.screen_width:
+        state.p1score += 1
+        state.ballx = state.screen_width / 2
+        state.bally = state.screen_height / 2
+        state.ballvx *= -1
+        if check_game_end(state):
+            state.game_progress = "end"
+        else:
+            state.game_progress = "pause"
+    if state.ballx <= 40 + 10 and state.p1y <= state.bally <= state.p1y + 100:
+        state.ballvx *= -1
+    if state.ballx >= state.screen_width - 40 and state.p2y <= state.bally <= state.p2y + 100:
+        state.ballvx *= -1
+    return state
+
 class GameConsumer(AsyncWebsocketConsumer):
 
     # Static variable to keep track of the number of connections
     game_users_count = {}
     game_users_data = {}
+    game_state_ = {}
 
     async def connect(self):
         self.user,self.user_id = await GetUser(self.scope)
@@ -92,6 +175,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.accept()
         await self.send(text_data=json.dumps({"role": role}))
         if GameConsumer.game_users_count[self.game_id] == 2:
+            GameConsumer.game_state_[self.game_id] = GameState()
             await self.channel_layer.group_send(
                 self.game_id,
                 {
@@ -100,6 +184,32 @@ class GameConsumer(AsyncWebsocketConsumer):
                     "users": GameConsumer.game_users_data[self.game_id]
                 }
             )
+            async def send_state():
+                while GameConsumer.game_state_[self.game_id].game_progress != "end":
+                    game_state = GameConsumer.game_state_[self.game_id]
+                    game_state = update_game_state(game_state)
+                    GameConsumer.game_state_[self.game_id] = game_state
+                    await self.channel_layer.group_send(
+                        self.game_id,
+                        {
+                            "type": "game_state",
+                            "state": GameConsumer.game_state_[self.game_id].__json__()
+                        }
+                    )
+                    if GameConsumer.game_state_[self.game_id].game_progress == "pause":
+                        await asyncio.sleep(3)  # Sleep for 3 seconds
+                        GameConsumer.game_state_[self.game_id].game_progress = "start"
+                    else:
+                        await asyncio.sleep(0.0016)
+
+                if GameConsumer.game_state_[self.game_id].game_progress == "end":
+                    try:
+                        self.send_state_task.cancel()
+                    except Exception as e:
+                        print("Task already cancelled or Finished", flush=True)
+            await asyncio.sleep(1)
+            self.send_state_task = asyncio.create_task(send_state())
+
 
     async def disconnect(self, close_code):
         GameConsumer.game_users_count[self.game_id] -= 1
@@ -107,92 +217,44 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.game_id,
             self.channel_name
         )
-        if close_code != 3000:
-            opponent = GameConsumer.game_users_data[self.game_id][0]["player1"] if self.user == GameConsumer.game_users_data[self.game_id][1]["player2"] else GameConsumer.game_users_data[self.game_id][1]["player2"]
-            await updateGameScore(game_id=self.game_id, winner=opponent)
-            await self.channel_layer.group_send(
-                self.game_id,
-                {
-                    "type": "game_end",
-                    "winner": opponent,
-                }
-            )
         await self.close()
 
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        try:
-            state = text_data_json["state"]
-            await self.channel_layer.group_send(
-                self.game_id,
-                {
-                    "type": "game_state",
-                    "state": state,
-                }
-            )
-        except:
-            pass
-        try:
-            ball = text_data_json["ball"]
-            await self.channel_layer.group_send(
-                self.game_id,
-                {
-                    "type": "game_state",
-                    "ball": ball,
-                }
-            )
-        except:
-            pass
-        try:
-            score = text_data_json["score"]
-            await self.channel_layer.group_send(
-                self.game_id,
-                {
-                    "type": "game_state",
-                    "score": score,
-                }
-            )
-        except:
-            pass
+        direction = text_data_json.get("direction")
+        sender = text_data_json.get("sender")
+        new_game_state = GameConsumer.game_state_[self.game_id]
+        new_game_state = MovePlayer(new_game_state, direction, sender)
+        await self.channel_layer.group_send(
+            self.game_id,
+            {
+                "type": "game_state",
+                "state": new_game_state.__json__()
+            }
+        )
+
 
 
     async def game_state(self, event):
-        try:
-            state = event["state"]
-            await self.send(text_data=json.dumps({"state": state}))
-        except:
-            pass
+        state = event["state"]
 
-        try:
-            ball = event["ball"]
-            await self.send(text_data=json.dumps({"ball": ball}))
-        except:
-            pass
-
-        try:
-            score = event["score"]
-            await self.send(text_data=json.dumps({"score": score}))
-            await self.checkGameEnd(event)
-        except:
-            pass
+        state["p1"]["x"] = state["p1"]["x"] / state["screen_width"]
+        state["p1"]["y"] = state["p1"]["y"] / state["screen_height"]
+        state["p2"]["x"] = state["p2"]["x"] / state["screen_width"]
+        state["p2"]["y"] = state["p2"]["y"] / state["screen_height"]
+        state["ball"]["x"] = state["ball"]["x"] / state["screen_width"]
+        state["ball"]["y"] = state["ball"]["y"] / state["screen_height"]
+        await self.send(text_data=json.dumps({"state": state}))
 
     async def checkGameEnd(self, event):
-        p1 = GameConsumer.game_users_data[self.game_id][0]["player1"]
-        p2 = GameConsumer.game_users_data[self.game_id][1]["player2"]
-        winner = None
-        if self.user == GameConsumer.game_users_data[self.game_id][0]["player1"]:
-            winner = await updateGameScore(self.game_id, event["score"]["p1"], event["score"]["p2"], p1, p2, None)
-            await updateUserStats(p2, winner, event["score"]["p2"], event["score"]["p1"])
-            await updateUserStats(p1, winner, event["score"]["p1"], event["score"]["p2"])
-        if winner is not None:
-            await self.channel_layer.group_send(
-                self.game_id,
-                {
-                    "type": "game_end",
-                    "winner": winner,
-                }
-            )
+        await self.channel_layer.group_send(
+            self.game_id,
+            {
+                "type": "game_end",
+                "winner": winner,
+            }
+        )
 
     async def game_end(self, event):
         winner = event["winner"]
@@ -214,7 +276,6 @@ def generateGameId(user1, user2):
 
 @database_sync_to_async
 def deleteGame(game_id):
-    print(game_id, flush=True)
     try:
         game = get_object_or_404(Match, id=game_id)
         game.delete()

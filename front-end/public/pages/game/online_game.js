@@ -14,6 +14,21 @@ export default class OnlineGame extends HTMLElement {
     this.role = null;
     this.game_started = false;
     this.keyStates = {};
+    this.game_progress = "starting";
+  }
+
+  updateGameStats(newstate) {
+    this.player1.x = newstate.p1.x * this.player1.ctx.canvas.width;
+    this.player1.y = newstate.p1.y * this.player1.ctx.canvas.height;
+    this.player2.x = newstate.p2.x * this.player2.ctx.canvas.width;
+    this.player2.y = newstate.p2.y * this.player2.ctx.canvas.height;
+    this.ball.x = newstate.ball.x * this.ball.ctx.canvas.width;
+    this.ball.y = newstate.ball.y * this.ball.ctx.canvas.height;
+    this.player1.score = newstate.p1score;
+    this.player2.score = newstate.p2score;
+    this.game_progress = newstate.game_progress;
+    document.getElementById("p1_score").innerText = this.player1.score;
+    document.getElementById("p2_score").innerText = this.player2.score;
   }
 
   connectedCallback() {
@@ -36,37 +51,8 @@ export default class OnlineGame extends HTMLElement {
         this.role = data.role;
         Http.website_stats.notify("gameusers", { [this.role]: Http.user });
       }
-      if (data.state) {
-        if (data.state.sender !== this.role) {
-          if (this.role === "player1") {
-            this.player2.y = data.state.py;
-          } else {
-            this.player1.y = data.state.py;
-          }
-        }
-      }
-      if (data.winner) {
-        if (data.winner.id === Http.user.id) this.winner = "You";
-        else this.winner = data.winner.username;
-        this.game_ended = true;
-      }
-      if (data.ball) {
-        if (this.role === "player2") {
-          this.ball.x = data.ball.x;
-          this.ball.y = data.ball.y;
-          this.ball.dx = data.ball.dx;
-          this.ball.dy = data.ball.dy;
-        }
-      }
-      if (data.score) {
-        if (this.role === "player2") {
-          this.player1.score += data.score.p1;
-          this.player2.score += data.score.p2;
-          document.getElementById("p1_score").innerText =
-            this.player1.score.toString();
-          document.getElementById("p2_score").innerText =
-            this.player2.score.toString();
-        }
+      if (data.state){
+        this.updateGameStats(data.state);
       }
       if (data.message) {
         if (data.users) Http.website_stats.notify("gameusers", data.users);
@@ -112,23 +98,26 @@ export default class OnlineGame extends HTMLElement {
 
   #update(ctx) {
     var id = requestAnimationFrame(() => this.#update(ctx));
-    if (this.game_ended) {
+    console.log(this.game_progress);
+    if (this.game_progress === "end") {
       cancelAnimationFrame(id);
       this.declareWinner();
       return;
     }
+    if (this.game_progress === "pause") {
+      // Disable keypress event
+      document.removeEventListener('keypress', yourKeyPressFunction);
+
+      (async () => {
+          await new Promise(resolve => setTimeout(resolve, 3000)); // Delay for 5 seconds
+
+          // Enable keypress event
+          document.addEventListener('keypress', yourKeyPressFunction);
+      })();
+  }
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     this.#drawBoard(ctx);
     this.#drawPaddles(ctx);
-    if (this.role === "player1") {
-      this.ball.move(this.player1, this.player2);
-      if (this.#marked(ctx)) {
-        this.ball.resetPosition();
-        this.player1.resetPosition();
-        this.player2.resetPosition();
-      }
-      this.sendBallState();
-    }
     this.ball.draw();
     this.#updatePlayerPositions();
   }
@@ -170,48 +159,11 @@ export default class OnlineGame extends HTMLElement {
 
   #updatePlayerPositions() {
     if (this.keyStates["KeyW"]) {
-      if (this.role === "player1") {
-        this.player1.movePlayer("up");
-        this.websocket.send(
-          JSON.stringify({ state: { py: this.player1.y, sender: this.role } })
-        );
-      } else {
-        this.player2.movePlayer("up");
-        this.websocket.send(
-          JSON.stringify({ state: { py: this.player2.y, sender: this.role } })
-        );
-      }
+      this.websocket.send(JSON.stringify({ direction: "up", sender: this.role }));
     }
     if (this.keyStates["KeyS"]) {
-      if (this.role === "player1") {
-        this.player1.movePlayer("down");
-        this.websocket.send(
-          JSON.stringify({ state: { py: this.player1.y, sender: this.role } })
-        );
-      } else {
-        this.player2.movePlayer("down");
-        this.websocket.send(
-          JSON.stringify({ state: { py: this.player2.y, sender: this.role } })
-        );
-      }
+      this.websocket.send(JSON.stringify({ direction: "down", sender: this.role }));
     }
-  }
-
-  #marked(ctx) {
-    if (this.ball.x - this.ball.size < 0) {
-      this.player2.score++;
-      document.getElementById("p2_score").innerText =
-        this.player2.score.toString();
-      this.websocket.send(JSON.stringify({ score: { p2: 1, p1: 0 } }));
-      return true;
-    } else if (this.ball.x + this.ball.size > ctx.canvas.width) {
-      this.player1.score++;
-      this.websocket.send(JSON.stringify({ score: { p2: 0, p1: 1 } }));
-      document.getElementById("p1_score").innerText =
-        this.player1.score.toString();
-      return true;
-    }
-    return false;
   }
 
   #timeCountUp() {
