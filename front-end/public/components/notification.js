@@ -14,18 +14,13 @@ export default class Notification extends HTMLElement{
     }
 
     update(){
+        document.querySelector('.notification_wrapper').classList.add("notification_alert");
         this.render();
     }
 
     async getNotification(){
-        const response = await fetch('http://localhost:8000/api/notification/get_unread/', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-        });
-        const data = await response.json();
+        const data = await Http.getData("GET", "api/notification/");
+        console.log(data);
         const notificationContainer = this.querySelector('.notification_container');
         notificationContainer.innerHTML = '';
         const dropdown = document.querySelector('.notification_dropdown');
@@ -35,8 +30,16 @@ export default class Notification extends HTMLElement{
                 notificationDiv.classList.add('notification');
                 notificationDiv.innerHTML = `
                     <div class="notification_content">
-                        <h2>${notification.type}</h2>
-                        <p>${notification.message}</p>
+                        <img src="http://localhost:8000${notification.sender.profile_pic}" alt="profile" class="notification_user_image" loading="lazy">
+                        <div>
+                        <h2>${notification.sender.username}</h2>
+                        <p>
+                            has sent you a ${notification.type}
+                        </p>
+                        </div>
+                        <button class="notification_action">
+                            <i class="fa-solid fa-turn-right"></i>
+                        </button>
                     </div>
                 `;
                 notificationContainer.appendChild(notificationDiv);
@@ -83,6 +86,7 @@ export default class Notification extends HTMLElement{
             `;
             const notification = this.querySelector('.notification_wrapper');
             notification.addEventListener('click', () => {
+                document.querySelector('.notification_wrapper').classList.remove("notification_alert");
                 document.querySelector('.notification_dropdown').classList.toggle('show');
                 document.querySelector(".notification_dropdown").style.top = "3.5rem";
                 document.querySelector(".notification_dropdown").style.right = "-1rem";

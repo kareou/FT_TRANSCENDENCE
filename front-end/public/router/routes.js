@@ -90,7 +90,7 @@ export const routes = [
                 path: "/tournament", // Changed from "/tournament" to "tournament"
                 requireAuth: true,
                 component: () => import("../pages/tournament.js"),
-              }
+              },
             ],
           },
         ],
@@ -110,7 +110,7 @@ export const routes = [
         path: "/online",
         requireAuth: true,
         component: () => import("../pages/game/online_game.js"),
-      }
+      },
     ],
   },
 ];

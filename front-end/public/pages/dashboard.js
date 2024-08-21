@@ -5,6 +5,7 @@ export default class Dashboard extends HTMLElement {
     super();
     document.title = "dashboard";
     this.user = Http.user;
+    console.log(this.user);
   }
 
   connectedCallback() {

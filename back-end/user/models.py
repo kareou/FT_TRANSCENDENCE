@@ -75,3 +75,4 @@ class Stats(models.Model):
     def save(self, *args, **kwargs):
         self.goals_difference = self.goals_scored - self.goals_conceded
         super().save(*args, **kwargs)
+    

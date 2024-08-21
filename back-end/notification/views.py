@@ -13,15 +13,14 @@ class NotificationViewSet(viewsets.ModelViewSet):
 	serializer_class = NotificationSerializer
 	permission_classes = [IsAuthenticated]
 
+	def create(self, request):
+		return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+	
+	def update(self, request, pk=None):
+		return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+	
+	def destroy(self, request, pk=None):
+		return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 	def get_queryset(self):
-		return Notification.objects.filter(receiver=self.request.user)
-
-	@action(detail=False, methods=['get'])
-	def get_unread(self, request):
-		unread = Notification.objects.filter(receiver=self.request.user, read=False)
-		return Response(self.get_serializer(unread, many=True).data, status=status.HTTP_200_OK)
-
-	@action(detail=False, methods=['PUT'])
-	def mark_all_read(self, request):
-		Notification.objects.filter(receiver=self.request.user).update(read=True)
-		return Response(status=status.HTTP_200_OK)
+		return Notification.objects.filter(receiver=self.request.user).order_by('-created_at')[0:8]

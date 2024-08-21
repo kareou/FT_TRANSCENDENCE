@@ -9,7 +9,10 @@ class Http {
   }
 
   notifyStats(data) {
-    this.website_stats.notify("toast", data);
+    if (data.notification_type === "game_invite") 
+      this.website_stats.notify("toast", data);
+    else
+      this.website_stats.notify("notification", data);
   }
 
   async register(data, url) {

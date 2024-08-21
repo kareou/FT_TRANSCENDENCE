@@ -1,5 +1,9 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
+from channels.db import database_sync_to_async
+from .models import Notification
+from .serializer import NotificationSerializer
+ 
 
 class NotificationConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
@@ -19,14 +23,25 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 			self.channel_name
 		)
 
+	@database_sync_to_async
+	def create_notification(self, message, notification_type, receiver, sender):
+		Notification.objects.create(
+			message=message,
+			type=notification_type,
+			receiver=receiver,
+			sender=sender
+		)
+		
+
 	async def receive(self, text_data):
 		notification = json.loads(text_data)
 		message = notification['message'] or None
 		notification_type = notification['type'] or None
 		receiver = notification['receiver'] or None
-		print(receiver, flush=True)
+		sender = notification['sender'] or None
 		self.group_name = f"notification_{receiver}"
-
+		if notification_type != "game_invite":
+			await self.create_notification(message, notification_type, receiver, sender)
 		await self.channel_layer.group_send(
 			self.group_name,{
 			'type': 'notification_message',
