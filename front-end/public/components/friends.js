@@ -30,6 +30,7 @@ export default class Friends extends HTMLElement {
                     online_friend.style.overflow = "hidden";
                     friends_wrapper.innerHTML =
                         `
+                        <img src="/public/assets/lonely-96.png" alt="empty" style="width: 96px;height: 96px;" lazy="loading">
       <h1>you don't have any friends yet</h1>
       `
                     friends_wrapper.classList.add("center_toggle")

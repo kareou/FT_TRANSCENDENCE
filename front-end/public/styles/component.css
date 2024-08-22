@@ -112,6 +112,57 @@
     animation: slideInFromRight .5s ease-in-out;
 }
 
+/* -ch1: #05478a;
+	--ch2: #0070e0;
+	--ch3: #0070e040;
+	--cs1: #005e38;
+	--cs2: #03a65a;
+	--cs3: #03a65a40;
+	--cw1: #c24914;
+	--cw2: #fc8621;
+	--cw3: #fc862140;
+	--ce1: #851d41;
+	--ce2: #db3056;
+	--ce3: #db305640;
+
+.toast {
+    position: relative;
+    display: block;
+    top: 10%;
+    right: 1%;
+    font-family: "Coolvetica";
+    width: 25rem;
+    height: 5rem;
+    font-size: 1.2rem;
+    animation: slideInFromRight .5s ease-in-out;
+
+    background: linear-gradient(90deg, #1f2333, #22232b);
+    color: #f5f5f5;
+    padding: 1rem 2rem 1rem 6rem;
+    text-align: center;
+    border-radius: 0.25rem;
+    font-weight: 300;
+    margin: 1rem 0;
+    text-align: left;
+    transition: var(--tr);
+    opacity: 1;
+    border: 0.15rem solid #fff2;
+    box-shadow: inset 0 0 0.5rem 0 #1d1e26;
+}
+
+.toast:before {
+	content: "";
+    position: absolute;
+    width: 6.5rem;
+    height: 5rem;
+    bottom: 0rem;
+    left: 0rem;
+    z-index: 0;
+    border-radius: 0.35rem;
+    background: radial-gradient(circle at 0% 50%, #0070e0, #fff0 5rem), radial-gradient(circle at -50% 50%, #05478a, #fff0 5rem);
+    opacity: 0.5;
+} */
+
 .toast-body {
     display: flex;
     justify-content: space-between;

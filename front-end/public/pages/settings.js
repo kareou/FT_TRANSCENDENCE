@@ -118,6 +118,12 @@ export default class Settings extends HTMLElement {
 					2FA
 				</h1>
 				<div class="form_settings_wrapper_one">
+					<div class="buttons_wrapper">
+						<div class="submit_btn
+						">
+							${this.user.two_factor_auth ? "<button type='submit' class='submit_infos'>Disable 2FA</button>" : "<button type='submit' class='submit_infos'>Enable 2FA</button>"}
+						</div>
+					</div>
 				</div>
 				<h1 class="info_h">
 					Delete Account
