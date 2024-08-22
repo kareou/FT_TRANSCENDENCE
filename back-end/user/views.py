@@ -147,9 +147,11 @@ class UserAction(ModelViewSet):
         if user is not None and account_activation_token.check_token(user, token):
             user.is_email_verified = True
             user.save()
-            return Response({'message': 'Account activated successfullyly'}, status=status.HTTP_200_OK)
+            return redirect('http://localhost:3000/login')
+            # return Response({'message': 'Account activated successfullyly'}, status=status.HTTP_200_OK)
         else:
             return Response({'message': 'Activation link is invalid!'}, status=status.HTTP_400_BAD_REQUEST)
+            # return redirect('http://localhost:3000/activation-failed')
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def reset_password(self, request):

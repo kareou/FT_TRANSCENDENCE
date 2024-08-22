@@ -21,6 +21,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
+env = environ.Env()
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-@&4lya)5687y1@z@yf0%=(exz2sxgwn#(m+0(w^-hiq_*gzjev'
 
@@ -227,7 +229,9 @@ CORS_ALLOW_HEADERS = (
 
 CORS_ALLOW_CREDENTIALS = True
 
-EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_HOST_USER = '162f225de2ae12'
-EMAIL_HOST_PASSWORD = '766565eb303f95'
-EMAIL_PORT = '2525'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.nour4.tech'
+EMAIL_HOST_USER = env('EMAIL_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_PASSWORD')
+EMAIL_PORT = '587'
+DEFAULT_FROM_EMAIL = 'libftpong@nour4.tech'
