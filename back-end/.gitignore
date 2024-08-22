@@ -28,7 +28,9 @@ media/
 *.log
 *.pot~
 *.py[cod]
-__pycache__
+__pycache__/
+*/__pycache__/
+*/*/__pycache__/
 *.swp
 *.swo
 *.DS_Store
