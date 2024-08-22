@@ -9,8 +9,13 @@ class Http {
   }
 
   notifyStats(data) {
-    if (data.notification_type === "game_invite") 
-      this.website_stats.notify("toast", data);
+    console.log(data);
+  if (data.type === "game_invite")
+    this.website_stats.notify("toast", data);
+  else if (data.type === "FRQ"){
+
+    this.website_stats.notify("friend_request", data);
+  }
     else
       this.website_stats.notify("notification", data);
   }

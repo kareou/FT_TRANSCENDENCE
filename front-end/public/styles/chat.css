@@ -13,6 +13,10 @@
     overflow: hidden;
 }
 
+:root{
+    --purple : #CD10CD;
+   }
+   
 .slots_messages_container__ {
     height: 100%;
     /* Full height of the parent container */
@@ -86,12 +90,12 @@
 }
 
 body {
-    background-image: linear-gradient(130deg, rgba(29, 41, 72, 1) 10%, rgba(20, 29, 51, 1) 25%, rgba(15, 22, 40, 1) 38%, rgba(5, 10, 22, 1) 100%);
-    /* background-image: url("../assets/bg_img.png"); */
+    background-image: linear-gradient(190deg, rgb(0, 0, 0) 10%, rgb(0, 0, 0) 34%, rgb(0, 0, 0) 38%, rgb(62, 7, 76) 100%);
     background-size: cover;
     background-position-y: bottom;
     background-repeat: no-repeat;
     background-position: center;
+    backdrop-filter: blur(5px);
     /* /* width: 100vw; */
     /* height: 100vh;  */
     overflow: hidden;
@@ -100,7 +104,7 @@ body {
 /*
     background: rgb(244,63,233);
     background: linear-gradient(90deg, rgba(244,63,233,1) 0%, rgba(4,217,139,1) 100%);
-    background-color: #1BA7A0
+    background-color: var(--purple)
 */
 
 /* chat side-bar style */
@@ -170,7 +174,7 @@ body {
 
 .logout_logo_wrapper .icon_side_bar:hover {
     cursor: pointer;
-    color: #1BA7A0;
+    color: var(--purple);
 }
 
 .dash_logos_wrapper {
@@ -181,12 +185,24 @@ body {
 }
 
 .dash_logos_wrapper a.active {
-    border-left: 2px solid #1BA7A0;
+    border-left: 2px solid var(--purple);
 }
 
 .dash_logos_wrapper a.active .icon_side_bar {
-    color: #1BA7A0;
-    filter: drop-shadow(0px 0px 5px #1BA7A0);
+    color: var(--purple);
+    filter: drop-shadow(0px 0px 5px var(--purple));
+}
+
+.fa-ban{
+    color: rgb(158, 24, 0);
+    cursor: pointer;
+}
+
+.second_side_wrapper_con_chat__{
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    padding-right: 30px;
 }
 
 .body_wrapper {
@@ -270,8 +286,12 @@ body {
     height: 100%;
     font-family: "Actor";
     animation: fadein .5s ease-in-out;
+    height: 60vh;
 }
 
+.message_user_content__{
+    font-size: 15px!important;
+}
 @keyframes fadein {
     0% {
         opacity: 0;
@@ -280,6 +300,10 @@ body {
     100% {
         opacity: 1;
     }
+}
+
+.block-state{
+    display: none;
 }
 
 /* end chat side-bar style */
@@ -313,13 +337,15 @@ body {
 .chat_wrapper_ {
     border: 0.6px solid #778FB8;
     border-radius: 15px;
-    margin: 25px 0 0 25px;
+    /* margin: 25px 0 0 25px; */
 }
 
 .first_profile_wrapper_chat {
     width: fit-content;
     width: 100%;
     border-bottom: 0.6px solid #778FB8;
+    display: flex;
+  justify-content: space-between;
 }
 
 /* .chat_bulle_wrapper {
@@ -418,7 +444,7 @@ body {
 }
 
 .chat_bulles_wrapper_:hover {
-    background-color: #1BA7A0;
+    background-color: var(--purple);
     cursor: pointer;
 }
 
@@ -490,10 +516,14 @@ body {
 
 .first_wrapper_info_user_chat_wrapper {
     border-bottom: 0.6px solid #778FB8;
-    height: 131px;
+    height: 141px;
     position: relative;
     backdrop-filter: blur(10px);
     align-items: center;
+}
+
+.chat_bulles_wrapper {
+    cursor: pointer;
 }
 
 .third_section_wrapper_chat {
@@ -554,13 +584,19 @@ body {
 
 .message_user_content__ {
     background-color: rgba(255, 255, 255, 0.13);
-    width: fit-content;
     padding: 10px 15px;
     color: white;
     font-size: 20px;
     font-family: "roboto";
     border-radius: 12px;
     position: relative;
+    display: block;
+    width: 40%;
+    height: fit-content;
+    text-wrap: wrap;
+    text-overflow: clip;
+    overflow: auto; /* Add this line */
+    word-wrap: break-word; /* Add this line */
 }
 
 
@@ -587,6 +623,7 @@ body {
 
 .second_section_wrapper_chat {
     height: 80%;
+    width: 75%;
 }
 
 .con_infos_wrapper_ {
@@ -594,10 +631,10 @@ body {
 }
 
 .input_conv_container__chat {
-    background-color: #323a48;
+    /* background-color: #323a48; */
     display: flex;
     justify-content: space-around;
-    align-items: flex-end;
+    align-items: center;
     padding: .5rem;
     gap: .5rem;
     border-radius: 1rem;
@@ -689,24 +726,26 @@ body {
 
 
 .play_invite {
-    width: 6rem;
     height: 3rem;
     border-radius: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 1rem;
-    background-color: #009F83;
-    box-shadow: 5px 5px 0px #006b57;
+    /* background-color: #009F83; */
+    /* box-shadow: 5px 5px 0px #006b57; */
+    /* color: white; */
     color: white;
+    background: none;
     cursor: pointer;
     transition: all 0.3s ease;
+    border: none;
 }
 
-.play_invite:hover {
+/* .play_invite:hover {
     background-color: #006b57;
     box-shadow: none;
-}
+} */
 
 .find_conv {
     width: 100%;
@@ -717,31 +756,60 @@ body {
     gap: .5rem;
 }
 
-.find_conv h1 {
-    font-size: 2em;
-    font-family: "Actor";
+.no_chat {
+    background-image: url("/public/assets/no_chat.gif");
+    background-size: cover;
+    background-blend-mode: color;
+}
 
+.find_conv h1 {
+    font-family: "Actor";
+    font-size: 1.2rem;
+     padding: 15px 0;
 }
 
 .find_conv p {
     color: gray;
-    font-size: 1.2em;
+    font-size: 1em;
+    padding: 15px 0;
 }
 
-.find_conv i {
+/* .find_conv i {
     font-size: 5rem;
     line-height: 1;
-    color: #1BA7A0;
+    color: var(--purple);
+} */
+
+.fa-duotone
+{
+    color: white;
+    font-size: 55px;
+}
+
+.fa-duotone::before{
+    font-size: 55px!important;
+}
+
+.fa-duotone::before{
+    font-size: 15px;
+    color: white;
 }
 
 .find_friends {
     width: 12rem;
     height: 4rem;
-    border-radius: 1rem;
-    background-color: #1BA7A0;
+    border-radius: 9px;
+    background-color: #A382CC;
     color: rgb(21, 21, 21);
-    font-size: 1.5em;
     font-family: "Actor";
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.find_friends:hover {
+    background-color: #3c2d52;
+    color: white;
 }
 
 /*
@@ -751,3 +819,97 @@ sm: '2rem',
         xl: '5rem',
         '2xl': '6rem',
         */
+
+        /*  */
+
+        .modal_wrapper_chat {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .overlay_chat {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(155, 155, 155, 0.1);
+                }
+
+        .modal_content_wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 400px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            background-image: linear-gradient(190deg, rgb(0, 0, 0) 10%, rgb(0, 0, 0) 34%, rgb(0, 0, 0) 38%, rgb(62, 7, 76) 100%);
+            border: 0.6px solid white;
+
+        }
+
+        .search_input_wrapper_ {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .search {
+            width: 100%;
+            padding: 5px;
+            height: 45px;
+            width: 100%;
+            background-color: rgb(255, 255, 255);
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .users_search_list_wrapper {
+            overflow-y: auto;
+            height: 400px;
+        }
+
+        .user_wrapper_search {
+            display: flex;
+            align-items: center;
+            padding: 10px 25px;
+        }
+        .user_wrapper_search:hover {
+            background-color: #322637;
+            cursor: pointer;
+        }
+
+        .user_img_search {
+            border-radius: 50%;
+        }
+
+        .fullname_search {
+            margin-left: 10px;
+            font-weight: bold;
+            color: #ffe8ff;
+            font-size: 18px;
+        }
+
+        .user_name_search {
+            margin-left: 10px;
+            color: #a4a4a4;
+            font-size: 12px;
+        }
+
+
+        .no_style{
+            background-color: transparent;
+            color: rgb(125, 27, 190);
+            border: none;
+            margin: 0 10px;
+            cursor: pointer;
+        }

@@ -26,7 +26,7 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=30, unique=True, default='')
     full_name = models.CharField(max_length=60, default='')
     profile_pic_url = models.URLField(default=None, null=True)
-    profile_pic = models.ImageField(upload_to='users_pfp/', default=None, null=True)
+    profile_pic = models.ImageField(upload_to='users_pfp/', default=None)
     level = models.IntegerField(default=1)
     exp = models.IntegerField(default=0)
     is_email_verified = models.BooleanField(default=False)
@@ -48,7 +48,7 @@ class User(AbstractBaseUser):
                 if response.status_code == 200:
                     self.profile_pic.save(f'{self.username}.jpg', BytesIO(response.content), save=False)
                     self.profile_pic.name = f'users_pfp/{self.username}.jpg'
-
+    
         if self.exp >= 100:
             self.level += 1
             self.exp = 0
@@ -75,4 +75,3 @@ class Stats(models.Model):
     def save(self, *args, **kwargs):
         self.goals_difference = self.goals_scored - self.goals_conceded
         super().save(*args, **kwargs)
-    

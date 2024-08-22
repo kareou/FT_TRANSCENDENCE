@@ -18,7 +18,7 @@ h1{
     padding: 1rem;
     display: grid;
     grid-template-columns: 2fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr 2fr;
     grid-template-areas:
         'profile rank'
         'game friends';
@@ -61,17 +61,28 @@ h1{
 }
 
 .game_wrapper {
+    position: relative;
+    overflow: hidden;
     grid-area: game;
     margin-top: 1rem;
     border: 0.6px solid #778FB8;
     border-radius: 1rem;
-    backdrop-filter: blur(1rem);
-    background: url("/public/assets/pong_animation.gif") no-repeat center center / cover;
-    object-fit: cover;
     display: flex;
     align-items: center;
     justify-content: space-around;
-    padding: 1rem;
+}
+
+.game_wrapper::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("/public/assets/pong2.webp") no-repeat center center / cover;
+    object-fit: cover;
+    filter: blur(5px);  
+    z-index: -1;
 }
 
 
@@ -85,6 +96,7 @@ h1{
     border-radius: 1rem;
     backdrop-filter: blur(1rem);
     background-color: rgba(27, 167, 160, 0.05);
+    height: 100%;
 
 }
 
@@ -110,38 +122,44 @@ h1{
 }
 
 .game_button#local{
-    background-color: #FFA500;
+    background-color: #0d7ea8;
 }
 .game_button#local:hover{
-    background-color: #a95f05;
+    background-color: #0ad6ff;
     filter: drop-shadow(rgba(2,115,94,0.3) 0px 5px 5px);
+    transform: scale(1.1);
+    translate: ease-in-out .5s;
+}
+
+.text{
+    padding: 0 10px;
 }
 
 .game_button{
     color: white;
     text-decoration: none;
-    width: 20rem;
-    height: 15rem;
-    font-size: 2em;
+    font-size: 20px;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
     border: none;
+    padding: 1.8rem;
     border-radius:1ren;
-    padding: 5px;
     cursor: pointer;
     border-radius: 20px;
-    filter: drop-shadow(rgba(2,115,94,0.3) 0px 5px 5px);
+    filter: drop-shadow(rgba(0, 0, 0, 0.3) 0px 5px 5px);
     transition: ease-in-out .5s;
 }
 
 .game_button#online{
-    background-color: #04BF8A;
+    background-color: #770886;
 }
 .game_button#online:hover{
-    background-color: #047e5c;
-    filter: drop-shadow(rgba(2,115,94,0.3) 0px 5px 5px);
+    background-color: #b80fc7;
+    filter: drop-shadow(rgba(7, 9, 9, 0.3) 0px 5px 5px);
+    transform: scale(1.1);
+    translate: ease-in-out .5s;
 }
 
 
@@ -149,13 +167,12 @@ h1{
     font-family: "Actor";
     color: rgba(149, 149, 149, 0.36);
     font-size: 1em;
-    margin-top: -.5rem;
 }
 
 #user_name{
-    color: #04BF8A;
+    color: #cd10cd;
     font-family: "Coolvetica";
-    font-size: 3em;
+    font-size: 2em;
     font-weight: 100;
     margin-left: -1rem;
 }
@@ -189,9 +206,9 @@ h1{
     display: flex;
     justify-content: start;
     align-items: center;
-    background-color: #075F49;
+    background-color: #0faade;
     width: 100%;
-    height: 1rem;
+    height: 10px;
     gap: 1rem;
     border-radius: 1rem;
 }
@@ -208,5 +225,195 @@ h1{
     align-items: center;
     color: white;
     font-family: "Actor";
+    font-size: 12px;
     font-weight: 100;
+    margin: 5px 0;
 }
+
+
+
+@media screen and (min-width: 1250px)
+{
+    .av_img{
+        height: 80px!important;
+        width: 80px!important;
+    }
+}
+
+.profile{
+    height: 100%;
+    padding: 35px;
+}
+
+.profile_info{
+    height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.name_n_login
+{
+    display: flex;
+  flex-direction: column;
+  align-items: baseline;
+}
+
+.wrapper_info_profile
+{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+}
+
+
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: block;
+}
+
+.msg-prompt {
+    position: absolute;
+    height: 100px;
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-image: url("../assets/bg_img.png");
+    display: none;
+}
+
+.msg-prompt.visible {
+    display: flex;
+}
+
+.wrapper_modal{
+    position: relative;
+}
+
+.msg-prompt_sub2{
+    position: relative;
+}
+
+.send_btn_modal{
+    position: absolute;
+    background: none!important;
+    left: 87%;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.message-input{
+    width: 100%;
+    /* padding: 10px 10px; */
+    border-radius: 25px;
+    border: none;
+    background-color: #778FB8;
+    outline: none;
+    padding: 15px 0 0 25px;
+    font-size: 15px;
+}
+.close-btn {
+    position: absolute;
+    right: 5px;
+    top: 0px;
+    transform: translateY(-50%);
+    background: none;
+  border: none;
+}
+
+.center_toggle{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+    .user_img_rounded {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+    }
+  
+    .friend_online_wrapper {
+      display: flex;
+      align-items: center;
+    }
+  
+    .user_img_rounded {
+      width: 70px;
+      height: 70px;
+      margin: 0px 15px;
+  
+    }
+  
+    .user_name_wrapper {
+      color: white;
+    }
+  
+    .friend_online_wrapper {
+      display: flex;
+      flex-direction: column;
+      padding: 15px 0;
+    }
+  
+    .no_style {
+      background: none;
+      border: none;
+      padding: 0 15px;
+    }
+  
+    .no_style:hover {
+      color: #04BF8A;
+    }
+  
+    .user_data_wrapper {
+      display: flex;
+      align-items: center;
+    }
+  
+    .friend_wrapper__{
+      display: flex;
+      width: 100%;
+      padding: 15px 0;
+    }
+    .online_friend{
+      overflow-y: scroll;
+    }
+  
+      /* For Chrome, Safari and Opera */
+      .online_friend::-webkit-scrollbar {
+        width: 5px; /* Change this to modify scroll size */
+      }
+    
+      .online_friend::-webkit-scrollbar-track {
+        background: #0C1222; /* Change this to modify track color */
+      }
+    
+      .online_friend::-webkit-scrollbar-thumb {
+        background: #16738d; /* Change this to modify scroll color */
+      }
+    
+      .online_friend::-webkit-scrollbar-thumb:hover {
+        background: #16738d; /* Change this to modify scroll color */
+      }
+    
+      /* For IE and Edge */
+      .online_friend {
+        scrollbar-width: thin; /* Change this to modify scroll size */
+        scrollbar-color: #0C1222 #959595; /* Change this to modify scroll and track color */
+      }
+
+      .fq{
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 15px 0;
+      }
+      .first{
+        display: flex;  
+        flex-direction: column;
+        align-items: center;
+      }

@@ -3,7 +3,9 @@ import json
 from channels.db import database_sync_to_async
 from .models import Notification
 from .serializer import NotificationSerializer
- 
+from user.models import User
+from channels.db import database_sync_to_async
+
 
 class NotificationConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
@@ -31,7 +33,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 			receiver=receiver,
 			sender=sender
 		)
-		
+
 
 	async def receive(self, text_data):
 		notification = json.loads(text_data)
@@ -41,7 +43,12 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 		sender = notification['sender'] or None
 		self.group_name = f"notification_{receiver}"
 		if notification_type != "game_invite":
-			await self.create_notification(message, notification_type, receiver, sender)
+			try:
+				receiver_obj = await database_sync_to_async(User.objects.get)(id=receiver)
+				sender_obj = await database_sync_to_async(User.objects.get)(id=sender)
+				await self.create_notification(message, notification_type, receiver_obj, sender_obj)
+			except User.DoesNotExist:
+				return
 		await self.channel_layer.group_send(
 			self.group_name,{
 			'type': 'notification_message',

@@ -15,7 +15,7 @@ from rest_framework.response import Response
 class GameViewSet(viewsets.ModelViewSet):
     queryset = Match.objects.all()
     serializer_class = MatchSerializer
-    
+
     def create(self, request, *args, **kwargs):
         try:
             player1 = request.data.get('player1')
@@ -30,12 +30,13 @@ class GameViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'])
-    def getUserMatches(self, request, user_id):
-        user = get_object_or_404(User, pk=user_id)
+    def getUserMatches(self, request, username):
+        user = get_object_or_404(User, username=username)
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        matches = Match.objects.filter(Q(player1=user) | Q(player2=user)).order_by('-created_at')[0:7]
+        matches = Match.objects.filter(Q(player1=user) | Q(player2=user)).order_by('-created_at')
         if matches is None:
+            print("User not found",flush=True)
             return Response(status=status.HTTP_404_NOT_FOUND)
         serialized = MatchSerializer(matches, many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)

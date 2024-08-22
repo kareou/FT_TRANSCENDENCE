@@ -67,7 +67,7 @@ class UserAction(ModelViewSet):
         return Response({'detail': 'forbidden.'}, status=status.HTTP_403_FORBIDDEN)
 
     def retrieve(self, request, *args, **kwargs):
-        # this is the case when the retrieve method is called with the pk as 'update'
+        # this is the case when the retrieve method is called with the pk as 'update' 
         if kwargs['pk'] == 'update':
             return Response({'detail': 'Method \"GET\" not allowed.'}, status=status.HTTP_200_OK)
         try:
@@ -105,24 +105,24 @@ class UserAction(ModelViewSet):
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def register(self, request):
-        serializer = UserSerializer(data=request.data, context={'partial': False})
+        serializer = UserSerializer(data=request.data, context={'partial': False}) 
         if serializer.is_valid():
             if User.objects.filter(email=request.data['email']).exists():
                 return Response({'message': 'Email already exists'}, status=status.HTTP_409_CONFLICT)
             user = serializer.save()
-            # send verification email
+            # send verification email  
             current_site = get_current_site(request)
             account_activation_token = PasswordResetTokenGenerator()
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = account_activation_token.make_token(user)
             # Construct the verification URL
             verification_url = f"http://{current_site.domain}{reverse('account_activate', kwargs={'uidb64': uid, 'token': token})}"
-            mail_subject = 'ft_transcendence Email verification'
-            message = render_to_string('confirmation_email.html', {
-                'user': user,
-                'domain': current_site.domain,
+            mail_subject = 'ft_transcendence Email verification'  
+            message = render_to_string('confirmation_email.html', {  
+                'user': user,  
+                'domain': current_site.domain,  
                 'verification_url': verification_url,  # Pass the verification URL to the template
-            })
+            })  
             to_email = request.data['email']
             email = EmailMultiAlternatives(
                 subject=mail_subject,
@@ -164,11 +164,11 @@ class UserAction(ModelViewSet):
         #Construct the reset password URL
         reset_password_url = f"http://{current_site.domain}{reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})}"
         mail_subject = 'ft_transcendence password reset'
-        message = render_to_string('password_reset_email.html', {
-                'user': user,
-                'domain': current_site.domain,
+        message = render_to_string('password_reset_email.html', {  
+                'user': user,  
+                'domain': current_site.domain,  
                 'reset_password_url': reset_password_url,  # Pass the reset password URL to the template
-            })
+            })  
         to_email = request.data['email']
         email = EmailMultiAlternatives(
             subject=mail_subject,
@@ -263,11 +263,11 @@ class UserAction(ModelViewSet):
             return response
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+    
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def oauth2_authorize(self, request, provider):
         if provider not in self.OAuth2_providers:
-            return Response({'message': 'Provider not implemented'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Provider not implemented'}, status=status.HTTP_400_BAD_REQUEST)    
         provider_data = self.OAuth2_providers[provider]
         # generate a random string for the state parameter
         request.session['oauth2_state'] = secrets.token_urlsafe(16)
@@ -280,10 +280,10 @@ class UserAction(ModelViewSet):
             'scope': ' '.join(provider_data['scopes']),
             'state': request.session['oauth2_state'],
         })
-
+        request.session['origin'] = request.META.get('HTTP_REFERER')
         # redirect the user to the OAuth2 provider authorization URL
         return redirect(provider_data['authorize_url'] + '?' + qs)
-
+    
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def oauth2_callback(self, request, provider):
         if provider not in self.OAuth2_providers:
@@ -325,11 +325,15 @@ class UserAction(ModelViewSet):
             user.save()
         refresh_token = RefreshToken.for_user(user)
         access_token = str(refresh_token.access_token)
-        response  = Response({'message': 'Login successfully'}, status=status.HTTP_200_OK)
-        response.data = UserSerializer(user).data
+        response = Response({'message': 'Login successfully'}, status=status.HTTP_200_OK)
+        response.data = {"user": UserSerializer(user).data}
         response.set_cookie(key='refresh', value=str(refresh_token), httponly=True)
         response.set_cookie(key='access', value=access_token, httponly=True)
-        return response
+        origin = request.session.get('origin')
+        redirect_response = redirect(f'{origin}dashboard')
+        redirect_response.cookies = response.cookies
+
+        return redirect_response
 
 class CustomTokenVerifyView(TokenVerifyView):
     serializer_class = CustomVerifyTokenSerializer

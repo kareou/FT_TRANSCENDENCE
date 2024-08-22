@@ -10,6 +10,6 @@ router.register(r'matche', views.GameViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('matche/history/<int:user_id>', views.GameViewSet.as_view({'get': 'getUserMatches'})),
+    path('matche/history/<str:username>', views.GameViewSet.as_view({'get': 'getUserMatches'})),
 ]
 

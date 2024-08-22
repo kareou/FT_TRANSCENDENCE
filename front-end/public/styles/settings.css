@@ -12,7 +12,7 @@
     width: fit-content;
     border-radius: 15px;
     color: #fff;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
     background-color: rgba(27, 167, 160, 0.05);
     height: fit-content;
     /* flex: 4; */
@@ -247,11 +247,11 @@ button img {
     height: 21px;
 }
 
-button {
+/* button {
     border-color: green;
     align-items: center;
     cursor: pointer;
-}
+} */
 
 .security-container {
     top: 0;
@@ -377,17 +377,18 @@ i::before {
     justify-content: center;
     width: 8rem;
     height: 3rem;
-    background-color: teal;
-    box-shadow: 3px 3px 0px rgb(0, 94, 94);
+    background-color: #5909b0;
+    box-shadow: 3px 3px 0px rgb(146, 7, 252);
     color: white;
     border-radius: 5px;
     border: none;
     font-size: 1rem;
     transition: all 0.3s ease-in-out;
+    cursor: pointer;
 }
 
 .view_blocked_users:hover {
-    background-color: rgb(0, 94, 94);
+    background-color: rgb(81, 50, 153);
     box-shadow: none;
 }
 
@@ -474,8 +475,8 @@ i::before {
 }
 
 .link_wrapper_settings:hover {
-    background-color: teal;
-    cursor: pointer;
+    background-color: #7f6aa4;
+        cursor: pointer;
 }
 
 .link_wrapper_settings:hover>.txt___sett,
@@ -538,8 +539,8 @@ i::before {
 }
 
 .submit_infos {
-    background-color: #04BF8A;
-    box-shadow: 3px 3px 0px #026247;
+    background-color: #761cba;
+    box-shadow: 3px 3px 0px rgb(98, 17, 125);
     color: white;
     display: flex;
     justify-content: center;
@@ -550,10 +551,11 @@ i::before {
     height: 3rem;
     border: none;
     transition: all 0.3s ease-in-out;
+    cursor: pointer;
 }
 
 .submit_infos:hover {
-    background-color: #026247;
+    background-color: rgb(86, 15, 117);
     box-shadow: none;
 }
 
@@ -612,7 +614,7 @@ i::before {
 }
 
 .active_btn_settings {
-    background-color: teal;
+    background-color: #7f6aa4;
     color: white;
 }
 
@@ -634,15 +636,16 @@ i::before {
 }
 
 #start_btn {
-    background-color: #04BF8A;
+    background-color: #7c39b6;
     color: white;
     padding: 15px 35px;
     border: none;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 #start_btn:hover {
-    background-color: #095c45;
+    background-color: #33095c;
 }
 
 .bold_txt_white {
@@ -659,4 +662,21 @@ i::before {
 .start_game_ {
     padding: 50px 0;
     text-align: center;
+}
+
+.body_wrapper{
+    transition: all 0.3s ease-in-out;
+}
+@media screen and (max-width: 2000px) {
+    .body_wrapper
+    {
+        max-width: 1500px;
+        padding: 15rem 0;
+    }
+    .pfp_logo{
+        width: 80px;
+    }
+    .first_section_wrapper_chat{
+        width: 30%;
+    }
 }

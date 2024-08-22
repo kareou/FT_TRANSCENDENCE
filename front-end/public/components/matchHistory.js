@@ -4,11 +4,11 @@ import Http from "../http/http.js";
 export default class MatchHistory extends HTMLElement {
   constructor() {
     super();
-    this.id = this.getAttribute("id");
+    this.user = this.getAttribute("user");
     this.matches = [];
   }
   connectedCallback() {
-    Http.getData("GET",`api/matche/history/${this.id}`).then((data) => {
+    Http.getData("GET",`api/matche/history/${this.user}`).then((data) => {
       this.matches = data;
       console.log(this.matches);
       this.render();
@@ -21,7 +21,7 @@ export default class MatchHistory extends HTMLElement {
         <div class="matches">
           ${this.matches.map(
             (match) =>
-              `<match-data user="${this.id}" p1="${match.player1}" p2="${match.player2}" p1score="${match.player1_score}" p2score="${match.player2_score}" winner="${match.winner}"></match-data>`
+              `<match-data user="${this.user}" p1="${match.player1}" p2="${match.player2}" p1score="${match.player1_score}" p2score="${match.player2_score}" winner="${match.winner}"></match-data>`
           )}
       </div>
     `;

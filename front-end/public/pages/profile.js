@@ -4,22 +4,17 @@ export default class Profile extends HTMLElement {
   constructor() {
     super();
     document.title = "profile";
-    this.id = Http.user.id;
+    this.user = this.getAttribute("user") || Http.user.username;
   }
 
   connectedCallback() {
-    const urlparams = new URLSearchParams(window.location.search);
-    const id = urlparams.get("user");
-    if (id) {
-      this.id = id;
-    }
     this.render();
   }
 
   render() {
     this.innerHTML = /*HTML*/ `
   <div class="dashboard_wrapper">
-    <profile-info id="${this.id}"></profile-info>
+    <profile-info user="${this.user}"></profile-info>
     <div class="rank">
       <div class="first">
         <img src="/public/assets/medal.png" alt="medal">
@@ -32,8 +27,8 @@ export default class Profile extends HTMLElement {
         <h1>Friends</h1>
       </div>
     </div>
-    <user-stats user="${this.id}"></user-stats>
-    <match-history id="${this.id}"></match-history>
+    <user-stats user="${this.user}"></user-stats>
+    <match-history user="${this.user}"></match-history>
   </div>
 `;
   }

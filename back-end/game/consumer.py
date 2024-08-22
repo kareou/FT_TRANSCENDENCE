@@ -78,7 +78,7 @@ class GameState():
         self.ballvy = 1
         self.p1score = 0
         self.p2score = 0
-        self.game_progress = "start"
+        self.game_progress = "playing"
 
     def __json__(self):
         return {"p1": {"x": self.p1x, "y": self.p1y}, "p2": {"x": self.p2x, "y": self.p2y}, "ball": {"x": self.ballx, "y": self.bally}, "p1score": self.p1score, "p2score": self.p2score, "screen_width": self.screen_width, "screen_height": self.screen_height, "game_progress": self.game_progress}
@@ -198,7 +198,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     )
                     if GameConsumer.game_state_[self.game_id].game_progress == "pause":
                         await asyncio.sleep(3)  # Sleep for 3 seconds
-                        GameConsumer.game_state_[self.game_id].game_progress = "start"
+                        GameConsumer.game_state_[self.game_id].game_progress = "playing"
                     else:
                         await asyncio.sleep(0.0016)
 

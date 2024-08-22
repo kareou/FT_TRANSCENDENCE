@@ -1,5 +1,6 @@
-import { ClassicPaddle } from "./game_objects/player.js";
+import { ClassicPaddle, BlossomPaddle, LightSaber } from "./game_objects/player.js";
 import { Ball } from "./game_objects/ball.js";
+import { Board } from "./game_objects/board.js";
 import Http from "../../http/http.js";
 
 export default class OnlineGame extends HTMLElement {
@@ -11,10 +12,11 @@ export default class OnlineGame extends HTMLElement {
     this.winner = null;
     this.websocket = null;
     this.game_ended = false;
+    this.board;
     this.role = null;
     this.game_started = false;
     this.keyStates = {};
-    this.game_progress = "starting";
+    this.game_progress = "playing";
   }
 
   updateGameStats(newstate) {
@@ -27,6 +29,12 @@ export default class OnlineGame extends HTMLElement {
     this.player1.score = newstate.p1score;
     this.player2.score = newstate.p2score;
     this.game_progress = newstate.game_progress;
+    console.log(this.game_progress);
+    if (this.game_progress === "pause") {
+      document.removeEventListener("keydown", (e) => this.#handleKeyDown(e));
+      this.roundStartCountDown(this.ball.ctx);
+      document.addEventListener("keydown", (e) => this.#handleKeyDown(e));
+    }
     document.getElementById("p1_score").innerText = this.player1.score;
     document.getElementById("p2_score").innerText = this.player2.score;
   }
@@ -45,6 +53,7 @@ export default class OnlineGame extends HTMLElement {
     this.player1 = new ClassicPaddle(0, ctx, "mod");
     this.player2 = new ClassicPaddle(1, ctx, "mod");
     this.ball = new Ball(ctx, "sky");
+    this.board = new Board(ctx, "mod");
     this.websocket.onmessage = (e) => {
       const data = JSON.parse(e.data);
       if (data.role) {
@@ -79,12 +88,12 @@ export default class OnlineGame extends HTMLElement {
 
   render() {
     this.innerHTML = /*html*/ `
-<div class="game_container">
-  <div class="game">
-    <game-score></game-score>
-    <canvas class="board"></canvas>
+  <div class="game_container">
+    <div class="game">
+      <game-score></game-score>
+      <canvas class="board"></canvas>
+    </div>
   </div>
-</div>
 `;
   }
 
@@ -96,30 +105,56 @@ export default class OnlineGame extends HTMLElement {
     this.websocket = null;
   }
 
-  #update(ctx) {
+  roundStartCountDown(ctx) {
+      let count_down = 3;
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      this.board.draw();
+      this.#drawPaddles(ctx);
+      this.ball.draw();
+      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.font = "100px Arial";
+      ctx.fillStyle = "white";
+      ctx.textAlign = "center";
+      ctx.fillText(count_down, ctx.canvas.width / 2, ctx.canvas.height / 2);
+      count_down -= 1;
+      const intervalId = setInterval(() => {
+        console.log(count_down);
+        if (count_down === -1) {
+          clearInterval(intervalId);
+          this.game_progress = "waiting";
+          return;
+        }
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        this.board.draw();
+        this.#drawPaddles(ctx);
+        this.ball.draw();
+        ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.font = "100px Arial";
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.fillText(count_down, ctx.canvas.width / 2, ctx.canvas.height / 2);
+        count_down -= 1;
+      }, 1000);
+  }
+
+  async #update(ctx) {
     var id = requestAnimationFrame(() => this.#update(ctx));
-    console.log(this.game_progress);
     if (this.game_progress === "end") {
       cancelAnimationFrame(id);
       this.declareWinner();
       return;
     }
-    if (this.game_progress === "pause") {
-      // Disable keypress event
-      document.removeEventListener('keypress', yourKeyPressFunction);
+    else if (this.game_progress === "pause") {
 
-      (async () => {
-          await new Promise(resolve => setTimeout(resolve, 3000)); // Delay for 5 seconds
-
-          // Enable keypress event
-          document.addEventListener('keypress', yourKeyPressFunction);
-      })();
-  }
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    this.#drawBoard(ctx);
-    this.#drawPaddles(ctx);
-    this.ball.draw();
-    this.#updatePlayerPositions();
+    }else if (this.game_progress === "playing") {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      this.#drawBoard(ctx);
+      this.#drawPaddles(ctx);
+      this.ball.draw();
+      this.#updatePlayerPositions();
+    }
   }
 
   sendBallState() {
@@ -138,8 +173,7 @@ export default class OnlineGame extends HTMLElement {
   }
 
   #drawBoard(ctx) {
-    ctx.fillStyle = "#222831";
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    this.board.draw();
   }
 
   #handleKeyDown(e) {

@@ -15,6 +15,10 @@ import MatchHistory from "../components/matchHistory.js";
 import UserStats from "../components/user_stats.js";
 import UserAvatar from "../components/user_avatar.js";
 import Notification from "../components/notification.js";
+import FriendRequest from "../components/friend_request.js";
+import FriendPends from "../components/friend_pends.js";
+import Friends from "../components/friends.js";
+import FriendData from "../components/friend_data.js";
 
 export const routes = [
   {
@@ -50,7 +54,18 @@ export const routes = [
       {
         path: "/chat", // Changed from "/chat" to "chat"
         requireAuth: true,
-        component: () => import("../pages/chat.js"),
+        children: [
+          {
+            path: "", // Changed from "/" to "" for the default child route
+            requireAuth: true,
+            component: () => import("../pages/chat.js"),
+          },
+          {
+            path: "/[:user]", // Changed from "/:id" to "[:id]"
+            requireAuth: true,
+            component: () => import("../pages/chat.js"),
+          },
+        ],
       },
       {
         path: "/settings", // Changed from "/settings" to "settings"
@@ -60,7 +75,18 @@ export const routes = [
       {
         path: "/profile", // Changed from "/settings" to "settings"
         requireAuth: true,
-        component: () => import("../pages/profile.js"),
+        children: [
+          {
+            path: "", // Changed from "/" to "" for the default child route
+            requireAuth: true,
+            component: () => import("../pages/profile.js"),
+          },
+          {
+            path: "/[:user]", // Changed from "/:id" to "[:id]"
+            requireAuth: true,
+            component: () => import("../pages/profile.js"),
+          },
+        ],
       },
       {
         path: "/game", // Changed from "/game" to "game"
@@ -90,7 +116,7 @@ export const routes = [
                 path: "/tournament", // Changed from "/tournament" to "tournament"
                 requireAuth: true,
                 component: () => import("../pages/tournament.js"),
-              },
+              }
             ],
           },
         ],
@@ -110,7 +136,7 @@ export const routes = [
         path: "/online",
         requireAuth: true,
         component: () => import("../pages/game/online_game.js"),
-      },
+      }
     ],
   },
 ];

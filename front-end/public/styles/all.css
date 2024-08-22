@@ -3,6 +3,8 @@
  * License - https://fontawesome.com/license (Commercial License)
  * Copyright 2024 Fonticons, Inc.
  */
+
+
 .fa {
   font-family: var(--fa-style-family, "Font Awesome 6 Pro");
   font-weight: var(--fa-style, 900); }

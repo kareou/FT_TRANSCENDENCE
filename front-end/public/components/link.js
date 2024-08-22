@@ -13,10 +13,19 @@ export default class Link extends HTMLAnchorElement {
     return string.startsWith(prefix);
   }
 
+  static extractVariableFromPath(path) {
+    const match = path.match(/\[\:(.*?)\]/);
+    return match ? match[1] : null;
+  }
+
   static matchUrl(url, path) {
     if (path === '/') return url === path;
     if (url.endsWith('/'))
       url = url.slice(0, -1);
+    if (path.includes('[:')) {
+      const regex = new RegExp('^' + path.replace(/\[\:.*?\]/g, '.*') + '$');
+      return regex.test(url);
+    }
     return url === path;
   }
 
@@ -50,6 +59,7 @@ export default class Link extends HTMLAnchorElement {
 
   static async navigateTo(url) {
     if (url !== window.location.pathname) window.history.pushState({}, "", url);
+    if (url.endsWith("/")) url = url.slice(0, -1);
     let pos = url.indexOf("/?");
     if (pos === -1) {
       pos = url.length;
@@ -71,6 +81,11 @@ export default class Link extends HTMLAnchorElement {
     try {
       const component = await route.component();
       const componentToRender = new component.default();
+      const variableName = Link.extractVariableFromPath(route.path);
+      if (variableName) {
+        const variableValue = url.split('/').pop();
+        componentToRender[variableName] = variableValue;
+      }
       root.innerHTML = '';
       root.appendChild(componentToRender);
       const event = new CustomEvent("locationchange", {detail: path});
