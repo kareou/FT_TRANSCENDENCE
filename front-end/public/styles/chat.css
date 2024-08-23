@@ -16,7 +16,7 @@
 :root{
     --purple : #CD10CD;
    }
-   
+
 .slots_messages_container__ {
     height: 100%;
     /* Full height of the parent container */
@@ -810,6 +810,62 @@ body {
 .find_friends:hover {
     background-color: #3c2d52;
     color: white;
+}
+
+.play_invite {
+    width: 6rem;
+    height: 3rem;
+    border-radius: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    background-color: #009F83;
+    box-shadow: 5px 5px 0px #006b57;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.play_invite:hover {
+    background-color: #006b57;
+    box-shadow: none;
+}
+
+.find_conv {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+}
+
+.find_conv h1 {
+    font-size: 2em;
+    font-family: "Actor";
+
+}
+
+.find_conv p {
+    color: gray;
+    font-size: 1.2em;
+}
+
+.find_conv i {
+    font-size: 5rem;
+    line-height: 1;
+    color: #1BA7A0;
+}
+
+.find_friends {
+    width: 12rem;
+    height: 4rem;
+    border-radius: 1rem;
+    background-color: #1BA7A0;
+    color: rgb(21, 21, 21);
+    font-size: 1.5em;
+    font-family: "Actor";
 }
 
 /*

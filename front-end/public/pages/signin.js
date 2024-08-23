@@ -19,7 +19,7 @@ export default class SignIn extends HTMLElement {
       //   window.open(res.url, '_blank');
       // })
       window.location.href = "http://localhost:8000/api/user/oauth2/authorize/42/";
-    })  
+    })
     this.querySelector("form").addEventListener("submit", (e) => {
       e.preventDefault();
       const email = this.querySelector("#email").value;

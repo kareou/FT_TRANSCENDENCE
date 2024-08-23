@@ -219,6 +219,27 @@ export default class Settings extends HTMLElement {
 			</div>
 
 		</div>
+		<div class="links_wrapper_swapper">
+			<div class="link_wrapper_settings one active_btn_settings">
+				<i class="fa fa-user"></i>
+				<span class="txt___sett">
+					General Information
+				</span>
+			</div>
+			<div class="link_wrapper_settings two">
+				<i class="fa-solid fa-game-console-handheld"></i>
+				<span class="txt___sett">
+					Game
+				</span>
+			</div>
+			<div class="link_wrapper_settings three">
+				<i class="fa-solid fa-lock"></i>
+				<span class="txt___sett">
+					Security
+				</span>
+			</div>
+
+		</div>
 	</div>
 	<div class="right_side_settings_wrapper">
 		<div class="marg_wrapper">

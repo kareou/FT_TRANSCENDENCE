@@ -132,7 +132,7 @@ export default class Chat extends HTMLElement {
                     this.querySelector(".find_conv").style.display = "none";
                     this.querySelector(".second_section_wrapper_chat").style.display =
                         "block";
-             
+
                     // this.querySelector('.blocked-user-message').style.display = 'none';
                     // this.querySelector('.input_conv_container__chat').style.display = 'block';
                 });
@@ -502,7 +502,7 @@ export default class Chat extends HTMLElement {
         find_friends.addEventListener('click', () => {
             modal_wrapper_chat.style.display = 'block';
         })
-        
+
         const overlay = document.querySelector('.overlay_chat');
 
         // Assuming modal_wrapper_chat is the modal element
@@ -521,9 +521,9 @@ export default class Chat extends HTMLElement {
         })
         .then(data => {
          for (let i = 0; i < data.length; i++) {
-            users_search_list_wrapper.innerHTML = 
-            ` 
-          
+            users_search_list_wrapper.innerHTML =
+            `
+
 
           <div class="user_wrapper_search">
                 <img src="http://localhost:8000${data[i].user2.profile_pic}" alt="" width="30" height="30" class="user_img_search">
@@ -534,7 +534,7 @@ export default class Chat extends HTMLElement {
          }
          if (data.length === 0) {
           online_friend.style.overflow = "hidden";
-          users_search_list_wrapper.innerHTML = 
+          users_search_list_wrapper.innerHTML =
           `
           <h1>you don't have any friends yet</h1>
           `
@@ -565,7 +565,7 @@ export default class Chat extends HTMLElement {
                         <div class="fullname_search">Full Name</div>
                         <div class="user_name_search">User Name</div>
                     </div>
-    
+
                     <div class="user_wrapper_search">
                         <img src="bg_img.png" alt="" width="30" height="30" class="user_img_search">
                         <div class="fullname_search">Full Name</div>
@@ -596,13 +596,13 @@ export default class Chat extends HTMLElement {
                               <img src="../assets/pdp.png" alt="logo_user" class="logo_chat_user">
                               <div class="infos_con_user_wrapper">
                                   <h3 class="name_user_con" id="username">
-                                  
+
                                   </h3>
-                                  
+
                                   <p class="status_user_con">
                                       Online
                                   </p>
-                                 
+
                               </div>
                           </div>
                           <div class="second_side_wrapper_con_chat__">
@@ -632,6 +632,20 @@ export default class Chat extends HTMLElement {
                                     </button>
                                 </div>
                             </div>
+                            <div class="dropdown_con___">
+                                <img src="assets/drop_icon_arrow.png" alt="grp33" class="drop_down_icon">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="shared_files_wrapper__third_sec_">
+                        <div class="tile_dropdown_wrapper__third">
+                            <div class="title_con___ white">
+                                Shared Files
+                            </div>
+                            <div class="dropdown_con___">
+                                <img src="assets/drop_icon_arrow.png" alt="grp33" class="drop_down_icon">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="third_section_wrapper_chat">
@@ -641,7 +655,7 @@ export default class Chat extends HTMLElement {
                         </div>
                         <div class="details_container_third_wrapper">
                             <h2 class="name_container_third_wrapper_ white">
-                                
+
                             </h2>
                             <div class="status_third_wrapper_ gray">
                                 Online

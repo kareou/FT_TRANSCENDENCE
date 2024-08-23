@@ -7,14 +7,15 @@
     font-family: "Actor";
     src: url("../assets/fonts/Actor-Regular.ttf") format("truetype");
 }
-h1{
+
+h1 {
     color: white;
     font-family: "Coolvetica";
     font-size: larger;
     font-weight: normal;
 }
 
-.dashboard_wrapper{
+.dashboard_wrapper {
     padding: 1rem;
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -31,13 +32,14 @@ h1{
     0% {
         opacity: 0;
     }
+
     100% {
         opacity: 1;
     }
 }
 
 .game_n_friends,
-.profile_n_rank{
+.profile_n_rank {
 
     display: flex;
     gap: 50px;
@@ -48,7 +50,8 @@ h1{
     /* align-items: center; */
 
 }
-.profile{
+
+.profile {
     grid-area: profile;
     display: flex;
     align-items: center;
@@ -81,13 +84,13 @@ h1{
     height: 100%;
     background: url("/public/assets/pong2.webp") no-repeat center center / cover;
     object-fit: cover;
-    filter: blur(5px);  
+    filter: blur(5px);
     z-index: -1;
 }
 
 
 
-.online_friend{
+.online_friend {
     grid-area: friends;
     display: flex;
     align-items: center;
@@ -100,7 +103,7 @@ h1{
 
 }
 
-.rank{
+.rank {
     grid-area: rank;
     display: flex;
     align-items: center;
@@ -115,27 +118,28 @@ h1{
 
 } */
 
-.profile_img img{
+.profile_img img {
     height: 15rem;
     width: 15rem;
     border-radius: 50%;
 }
 
-.game_button#local{
+.game_button#local {
     background-color: #0d7ea8;
 }
-.game_button#local:hover{
+
+.game_button#local:hover {
     background-color: #0ad6ff;
-    filter: drop-shadow(rgba(2,115,94,0.3) 0px 5px 5px);
+    filter: drop-shadow(rgba(2, 115, 94, 0.3) 0px 5px 5px);
     transform: scale(1.1);
     translate: ease-in-out .5s;
 }
 
-.text{
+.text {
     padding: 0 10px;
 }
 
-.game_button{
+.game_button {
     color: white;
     text-decoration: none;
     font-size: 20px;
@@ -145,17 +149,18 @@ h1{
     justify-content: center;
     border: none;
     padding: 1.8rem;
-    border-radius:1ren;
+    border-radius: 1ren;
     cursor: pointer;
     border-radius: 20px;
     filter: drop-shadow(rgba(0, 0, 0, 0.3) 0px 5px 5px);
     transition: ease-in-out .5s;
 }
 
-.game_button#online{
+.game_button#online {
     background-color: #770886;
 }
-.game_button#online:hover{
+
+.game_button#online:hover {
     background-color: #b80fc7;
     filter: drop-shadow(rgba(7, 9, 9, 0.3) 0px 5px 5px);
     transform: scale(1.1);
@@ -163,13 +168,13 @@ h1{
 }
 
 
-#login{
+#login {
     font-family: "Actor";
     color: rgba(149, 149, 149, 0.36);
     font-size: 1em;
 }
 
-#user_name{
+#user_name {
     color: #cd10cd;
     font-family: "Coolvetica";
     font-size: 2em;
@@ -177,23 +182,24 @@ h1{
     margin-left: -1rem;
 }
 
-.profile_info{
+.profile_info {
     width: 80%;
     /* height: 100%; */
 }
 
-#user_coins{
+#user_coins {
     color: white;
     font-family: "Actor";
     font-weight: 100;
 }
 
 
-.achievement h1{
+.achievement h1 {
     font-family: "Actor";
     font-size: 1.5em;
 }
-.achievement{
+
+.achievement {
     /* width: 100%; */
     text-align: center;
     display: grid;
@@ -202,7 +208,7 @@ h1{
 }
 
 
-.level-bar{
+.level-bar {
     display: flex;
     justify-content: start;
     align-items: center;
@@ -213,13 +219,13 @@ h1{
     border-radius: 1rem;
 }
 
-.level-bar span{
+.level-bar span {
     background-color: #04D98B;
     height: 1rem;
     border-radius: 1rem;
 }
 
-.level{
+.level {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -232,35 +238,32 @@ h1{
 
 
 
-@media screen and (min-width: 1250px)
-{
-    .av_img{
-        height: 80px!important;
-        width: 80px!important;
+@media screen and (min-width: 1250px) {
+    .av_img {
+        height: 80px !important;
+        width: 80px !important;
     }
 }
 
-.profile{
+.profile {
     height: 100%;
     padding: 35px;
 }
 
-.profile_info{
+.profile_info {
     height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-}
-
-.name_n_login
-{
     display: flex;
-  flex-direction: column;
-  align-items: baseline;
+    flex-direction: column;
+    justify-content: space-evenly;
 }
 
-.wrapper_info_profile
-{
+.name_n_login {
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+}
+
+.wrapper_info_profile {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -291,23 +294,23 @@ h1{
     display: flex;
 }
 
-.wrapper_modal{
+.wrapper_modal {
     position: relative;
 }
 
-.msg-prompt_sub2{
+.msg-prompt_sub2 {
     position: relative;
 }
 
-.send_btn_modal{
+.send_btn_modal {
     position: absolute;
-    background: none!important;
+    background: none !important;
     left: 87%;
     top: 50%;
     transform: translateY(-50%);
 }
 
-.message-input{
+.message-input {
     width: 100%;
     /* padding: 10px 10px; */
     border-radius: 25px;
@@ -317,103 +320,113 @@ h1{
     padding: 15px 0 0 25px;
     font-size: 15px;
 }
+
 .close-btn {
     position: absolute;
     right: 5px;
     top: 0px;
     transform: translateY(-50%);
     background: none;
-  border: none;
+    border: none;
 }
 
-.center_toggle{
+.center_toggle {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-  }
-    .user_img_rounded {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-    }
-  
-    .friend_online_wrapper {
-      display: flex;
-      align-items: center;
-    }
-  
-    .user_img_rounded {
-      width: 70px;
-      height: 70px;
-      margin: 0px 15px;
-  
-    }
-  
-    .user_name_wrapper {
-      color: white;
-    }
-  
-    .friend_online_wrapper {
-      display: flex;
-      flex-direction: column;
-      padding: 15px 0;
-    }
-  
-    .no_style {
-      background: none;
-      border: none;
-      padding: 0 15px;
-    }
-  
-    .no_style:hover {
-      color: #04BF8A;
-    }
-  
-    .user_data_wrapper {
-      display: flex;
-      align-items: center;
-    }
-  
-    .friend_wrapper__{
-      display: flex;
-      width: 100%;
-      padding: 15px 0;
-    }
-    .online_friend{
-      overflow-y: scroll;
-    }
-  
-      /* For Chrome, Safari and Opera */
-      .online_friend::-webkit-scrollbar {
-        width: 5px; /* Change this to modify scroll size */
-      }
-    
-      .online_friend::-webkit-scrollbar-track {
-        background: #0C1222; /* Change this to modify track color */
-      }
-    
-      .online_friend::-webkit-scrollbar-thumb {
-        background: #16738d; /* Change this to modify scroll color */
-      }
-    
-      .online_friend::-webkit-scrollbar-thumb:hover {
-        background: #16738d; /* Change this to modify scroll color */
-      }
-    
-      /* For IE and Edge */
-      .online_friend {
-        scrollbar-width: thin; /* Change this to modify scroll size */
-        scrollbar-color: #0C1222 #959595; /* Change this to modify scroll and track color */
-      }
+}
 
-      .fq{
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        padding: 15px 0;
-      }
-      .first{
-        display: flex;  
-        flex-direction: column;
-        align-items: center;
-      }
+.user_img_rounded {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+
+.friend_online_wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.user_img_rounded {
+    width: 70px;
+    height: 70px;
+    margin: 0px 15px;
+
+}
+
+.user_name_wrapper {
+    color: white;
+}
+
+.friend_online_wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 15px 0;
+}
+
+.no_style {
+    background: none;
+    border: none;
+    padding: 0 15px;
+}
+
+.no_style:hover {
+    color: #04BF8A;
+}
+
+.user_data_wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.friend_wrapper__ {
+    display: flex;
+    width: 100%;
+    padding: 15px 0;
+}
+
+.online_friend {
+    overflow-y: scroll;
+}
+
+/* For Chrome, Safari and Opera */
+.online_friend::-webkit-scrollbar {
+    width: 5px;
+    /* Change this to modify scroll size */
+}
+
+.online_friend::-webkit-scrollbar-track {
+    background: #0C1222;
+    /* Change this to modify track color */
+}
+
+.online_friend::-webkit-scrollbar-thumb {
+    background: #16738d;
+    /* Change this to modify scroll color */
+}
+
+.online_friend::-webkit-scrollbar-thumb:hover {
+    background: #16738d;
+    /* Change this to modify scroll color */
+}
+
+/* For IE and Edge */
+.online_friend {
+    scrollbar-width: thin;
+    /* Change this to modify scroll size */
+    scrollbar-color: #0C1222 #959595;
+    /* Change this to modify scroll and track color */
+}
+
+.fq {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 15px 0;
+}
+
+.first {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
