@@ -8,38 +8,49 @@ export default class Chat extends HTMLElement {
         this.receiverId = null;
         this.conversationId = null;
         this.chatContainer = null;
-        this.websocket = null;
+        this.conversations = [];
+        // this.activeConversationId = this.getAttribute();
     }
 
     connectedCallback() {
         this.render();
         this.fetchUsers();
         this.setupEventListeners();
-        // this.setupWebSocket();
     }
 
     setupWebSocket() {
-        this.websocket = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${this.user.id}/${this.receiverId}/`);
+        console.log("size = " +this.conversations.length);
+        this.conversations.forEach(conversation => {
+            
+            
+            conversation.websocket.addEventListener("open", function (event) {
+                console.log("WebSocket connection opened with sender " +conversation.senderId+ " and reciever : "  +conversation.receiverId);
+            });
+                
+            conversation.websocket.onmessage = this.handleWebSocketMessage.bind(this);
+    
+            conversation.websocket.addEventListener("close", function (event) {
+                console.log("WebSocket connection closed.");
+            });
 
-        this.websocket.addEventListener("open", function (event) {
-            console.log("WebSocket connection opened.");
-        });
+        })
 
-        this.websocket.onmessage = this.handleWebSocketMessage.bind(this);
-
-        this.websocket.addEventListener("close", function (event) {
-            console.log("WebSocket connection closed.");
-        });
     }
     handleWebSocketMessage(event) {
         const message = JSON.parse(event.data);
-        console.log(message.sender);
-        console.log("ws got " + message.message);
-        // console.log(this.receiverId);
 
-        // if (message.sender == this.user.id)
-        this.displayNewMessage(message);
-        // this.fetchChatData(this.user.id, this.receiverId);
+        if (message.type == "message")
+            this.displayNewMessage(message);
+        else if (message.type == "block_notification")
+        {
+            const userElements = this.querySelectorAll('.chat_bulles_wrapper');
+            userElements.forEach(userElement => {
+                if (userElement.id == message.blocker || userElement.id == message.blocked)
+                {
+                    userElement.click();
+                }
+            });
+        }        
     }
 
     async fetchUsers() {
@@ -68,28 +79,31 @@ export default class Chat extends HTMLElement {
 
     displayUsers(users) {
         const userContainer = this.querySelector('.first_section_wrapper_chat');
-        userContainer.innerHTML = `<div class="first_profile_wrapper_chat">
-        <div class="pdp_warpper">
-        <img src="http://localhost:8000${this.user.profile_pic}" class="pfp_logo" alt="profile picture" loading="lazy">
-
-    </div>
-    <div class="icon_wrapper_">
-        <i class="fa-solid fa-circle-ellipsis fa-2xl" style="color: #ffffff;"></i>
-    </div>
-</div>`;
-
-        users.forEach(user => {
-            const userElementHTML = `
-            <div class="chat_bulles_wrapper user" id="${user.id}" name="${user.username}">
-            <div class="chat_bulle_wrapper">
-                <div class="chat_pdp_wrapper" style="position: relative;">
-                    <user-avatar image="${user.profile_pic}" state="online" width="70" height="70"></user-avatar>
-                </div>
-                <div class="data_chat_bulle_wrapper">
-                    <div class="name_bulle_chat">${user.username}</div>
-                </div>
+        userContainer.innerHTML = `
+        <div class="first_profile_wrapper_chat">
+            <div class="pdp_warpper">
+                <img src="http://localhost:8000${this.user.profile_pic}" class="pfp_logo" alt="profile picture" loading="lazy">
+                <div class="txt_one">Chats</div>
+            </div>
+            <div class="icon_wrapper_">
+                <i class="fa-solid fa-circle-ellipsis fa-2xl" style="color: #ffffff;"></i>
             </div>
         </div>
+        `;
+
+        users.forEach(user => {
+            const userElementHTML = /* HTML */ `
+            <div class="chat_bulles_wrapper user" id="${user.id}" name="${user.username}">
+                <div class="chat_bulle_wrapper">
+                    <div class="chat_pdp_wrapper" style="position: relative;">
+                        <user-avatar image="${user.profile_pic}" state="online" width="70" height="70"></user-avatar>
+                    </div>
+                    <div class="data_chat_bulle_wrapper">
+                        <div class="name_bulle_chat">${user.username}</div>
+                        <div class='last_msg'></div>
+                    </div>
+                    </div>
+            </div>
             `;
 
             userContainer.innerHTML += userElementHTML;
@@ -102,50 +116,52 @@ export default class Chat extends HTMLElement {
         const userElements = this.querySelectorAll('.chat_bulles_wrapper');
 
         userElements.forEach(userElement => {
+            const receiverId = userElement.id;
+            const senderId = this.user.id;
+            this.receiverId = receiverId;
+            const websocket = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${senderId}/${receiverId}/`)
+            const newConversation = {senderId, receiverId, websocket};
+            this.conversations.push(newConversation);
+            
             userElement.addEventListener('click', () => {
                 this.querySelector('.blocked-user-message').style.display = 'none';
                 this.querySelector('.input_conv_container__chat').style.display = 'flex';
-                const receiverId = userElement.id;
-                const senderId = this.user.id;
-                this.receiverId = receiverId;
-                // this.get_blocked();
+
                 this.fetchOrCreateConversation(senderId, receiverId).then(conversation => {
-                    // this.querySelector(".block_or_send_container").innerHTML = '';
-                    // this.querySelector(".logo_chat_user").setAttribute("src", `http://localhost:8000${conversation.json().receiver.profile_pic}`);
-
-                    this.conversationId = conversation.id; // Set the conversation ID attribute
-                    console.log("conversation : " + conversation.conversation);
-                    console.log("conversation id : " + conversation.id);
-                    this.setupWebSocket();
-                    this.fetchMessagesForConversation(conversation.id);
-                    const username = userElement.getAttribute("name");
-                    this.querySelector(".infos_con_user_wrapper").setAttribute("href", `/dashboard/profile/?user=${username}`);
-                    this.querySelector(".name_user_con").innerHTML = userElement.getAttribute("name");
-                    this.querySelector(".logo_chat_user").src =
+                    if (conversation.id != this.conversationId)
+                    {
+                        this.conversationId = conversation.id;
+                        console.log("conversation : " + conversation.conversation);
+                        console.log("conversation id : " + conversation.id);
+                        this.fetchMessagesForConversation(conversation.id);
+                        const username = userElement.getAttribute("name");
+                        this.querySelector(".infos_con_user_wrapper").setAttribute("href", `/dashboard/profile/?user=${username}`);
+                        this.querySelector(".name_user_con").innerHTML = userElement.getAttribute("name");
+                        this.querySelector(".logo_chat_user").src =
                         userElement.querySelector(".avatar_icon").src;
-                    this.querySelector(".name_user_con").innerHTML =
+                      this.querySelector(".name_user_con").innerHTML =
                         userElement.getAttribute("name");
-                    this.querySelector(".pdp_img_a").src =
-                        userElement.querySelector(".avatar_icon").src;
-                    this.querySelector(".name_container_third_wrapper_").innerHTML =
-                        userElement.getAttribute("name");
-                    this.querySelector(".find_conv").style.display = "none";
-                    this.querySelector(".second_section_wrapper_chat").style.display =
+                      this.querySelector(".find_conv").style.display = "none";
+                      this.querySelector(".second_section_wrapper_chat").style.display =
                         "block";
-
-                    // this.querySelector('.blocked-user-message').style.display = 'none';
-                    // this.querySelector('.input_conv_container__chat').style.display = 'block';
+                      this.querySelector(".third_section_wrapper_chat").style.display =
+                        "block";
+                    }
                 });
             });
         });
+        this.setupWebSocket();
     }
-    caseBlock() {
+    caseBlock()
+    {
 
         this.querySelector('.blocked-user-message').style.display = 'block';
         this.querySelector('.input_conv_container__chat').style.display = 'none';
     }
 
     async fetchOrCreateConversation(senderId, receiverId) {
+        console.log("sender : " +senderId);
+        console.log("receiver : " +receiverId);
         try {
             const response = await fetch(`http://localhost:8000/chat/conversations/fetch_or_create/`, {
                 method: 'POST',
@@ -174,12 +190,15 @@ export default class Chat extends HTMLElement {
                     this.querySelector(".block-message").innerHTML = "You have blocked this user and cannot send messages.";
                     console.error('You have blocked this user');
                     this.caseBlock();
+                    // this.querySelector('.block-btn').classList.remove('hidden');
                     this.toggleBlockButton("unblock");
                     break;
                 case 'receiver_blocked_sender':
                     this.querySelector(".block-message").innerHTML = "You are blocked by this user and cannot send messages.";
                     console.error('You are blocked by this user');
                     this.caseBlock();
+                    // this.querySelector('.block-btn').style.display = 'none';
+                    this.querySelector('.block-btn').classList.add('hidden');
                     this.toggleBlockButton("block");
                     break;
                 case 'conversation_created':
@@ -199,33 +218,6 @@ export default class Chat extends HTMLElement {
             console.error('Error:', error);
         }
     }
-    // async fetchOrCreateConversation(senderId, receiverId) {
-    //     try {
-    //         const response = await fetch(`http://localhost:8000/chat/conversations/fetch_or_create/`, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'Authorization': `Bearer ${this.token}`
-    //             },
-    //             credentials: 'include',
-    //             body: JSON.stringify({
-    //                 sender: senderId,
-    //                 receiver: receiverId
-    //             }),
-    //         });
-
-    //         if (response.ok) {
-    //             const conversation = await response.json();
-    //             console.log('Fetched or created conversation:', conversation);
-    //             return conversation;
-    //         } else {
-    //             const errorData = await response.json();
-    //             console.error('Error fetching or creating conversation:', errorData.detail || response.statusText);
-    //         }
-    //     } catch (error) {
-    //         console.error('Error:', error);
-    //     }
-    // }
 
     async fetchMessagesForConversation(conversationId) {
         try {
@@ -251,14 +243,16 @@ export default class Chat extends HTMLElement {
         }
     }
 
-    displayNewMessage(data) {
-        console.log("got a new message");
+    displayNewMessage(data)
+    {
         let messageHTML = '';
-        if (data.sender != this.user.id) {
+        
+        if (data.sender != this.user.id)
+        {
             messageHTML = `
                 <div class="slot_message_container___">
                     <div class="message_container__ second_msg_user">
-                        <div class="message_user_container__">
+                        <div class="message_user_container__ right_side_msg">
                             <div class="message_user_content__">
                                 ${data.message}
                             </div>
@@ -267,7 +261,8 @@ export default class Chat extends HTMLElement {
                 </div>
             `;
         }
-        else {
+        else
+        {
             messageHTML = `
                 <div class="slot_message_container___">
                     <div class="message_container__ first_msg_user">
@@ -280,6 +275,16 @@ export default class Chat extends HTMLElement {
                 </div>
             `;
         }
+        const userElements = this.querySelectorAll('.chat_bulles_wrapper');
+        console.log("log iser : " +this.user.id);
+        userElements.forEach(userElement => {
+            console.log("id : " +userElement.getAttribute("id")+ " rec : " + data.sender);
+            if (userElement.getAttribute("id") == data.sender)
+            {
+                console.log("test " +userElement.getAttribute("id"));
+                userElement.querySelector('.last_msg').innerHTML = data.message;
+            }
+        })
 
         this.chatContainer.innerHTML += messageHTML;
         this.chatContainer.scrollTop = this.chatContainer.scrollHeight; // this for showing the very last messages of the conversation
@@ -290,11 +295,20 @@ export default class Chat extends HTMLElement {
 
         messages.forEach(message => {
             let messageHTML = '';
+            if (message == messages[messages.length -1])
+            {
+                const userElements = this.querySelectorAll('.chat_bulles_wrapper');
+
+                userElements.forEach(userElement => {
+                    if (userElement.getAttribute("id") == this.receiverId || userElement.getAttribute("id") == message.sender)
+                    userElement.querySelector('.last_msg').innerHTML = messages[messages.length -1].message;
+                })
+            }
             if (message.sender != this.user.id) {
                 messageHTML = `
-                    <div class="slot_message_container___">
-                        <div class="message_container__ second_msg_user">
-                            <div class="message_user_container__">
+                    <div class="slot_message_container___ ">
+                        <div class="message_container__ second_msg_user ">
+                            <div class="message_user_container__ right_side_msg">
                                 <div class="message_user_content__">
                                     ${message.message}
                                 </div>
@@ -335,7 +349,8 @@ export default class Chat extends HTMLElement {
         }
 
         const messageContent = document.querySelector('.message-input').value;
-        if (messageContent.trim().length != 0) {
+        if (messageContent.trim().length != 0)
+        {
             const messageData = {
                 sender: this.user.id,
                 message: messageContent,
@@ -343,7 +358,6 @@ export default class Chat extends HTMLElement {
                 conversation: this.conversationId
             };
 
-            // this.websocket.send(JSON.stringify(messageData));
 
             try {
                 const response = await fetch('http://localhost:8000/chat/messages/', {
@@ -358,15 +372,21 @@ export default class Chat extends HTMLElement {
 
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('Message saved via api:', data);
                     const dataWs = {
+                        type: 'message',
                         message: data.message,
-                        sender: data.sender
+                        sender: data.sender,
                     };
-                    this.websocket.send(JSON.stringify(dataWs));
-                    console.log('Message saved:', data);
-                    document.querySelector('.message-input').value = '';
-                    document.querySelector('.message-input').style.height = "auto";
-                    // this.displayMessage(data);
+                    this.conversations.forEach(conversation => {
+                    if ((conversation.senderId == this.user.id && conversation.receiverId == this.receiverId) || (conversation.senderId == this.receiverId && conversation.receiverId == this.user.id))
+                    {
+                        conversation.websocket.send(JSON.stringify(dataWs));
+                        console.log('Message sent via ws:', dataWs);
+                        document.querySelector('.message-input').value = '';
+                    }
+
+                    })
                 } else {
                     const errorData = await response.json();
                     console.error('Error saving message:', errorData.detail || response.statusText);
@@ -377,40 +397,17 @@ export default class Chat extends HTMLElement {
         }
     }
 
-    async get_blocked() {
-        try {
-            const response = await fetch(`http://localhost:8000/chat/users/blocked_users/?user_id=${this.user.id}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.token}`
-                },
-                credentials: 'include',
-            });
 
-            if (response.ok) {
-                const data = await response.json();
-
-                console.log("blocked users : " + data);
-                this.fetchUsers();
-
-
-            } else {
-                console.error('error block');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
     clearChatArea() {
         this.querySelector('.second_section_wrapper_chat').innerHTML = '';
         this.querySelector('.second_section_wrapper_chat').style.display = 'none';
     }
-    async blockOrUnblockUser() {
+    async blockOrUnblockUser()
+    {
         try {
-            let apiUrl = `http://localhost:8000/chat/users/block/`;
+            let apiUrl = `http://localhost:8000/api/friends/block/`;
             if (this.querySelector(".block-btn").innerHTML == "unblock")
-                apiUrl = `http://localhost:8000/chat/users/unblock/`;
+                apiUrl = `http://localhost:8000/api/friends/unblock/`;
 
             const response = await fetch(apiUrl, {
                 method: 'POST',
@@ -419,59 +416,33 @@ export default class Chat extends HTMLElement {
                     'Authorization': `Bearer ${this.token}`
                 },
                 credentials: 'include',
-                body: JSON.stringify({ blocker: this.user.id, blocked: this.receiverId })
+                body: JSON.stringify({ user1: this.user.id, user2: this.receiverId })
             });
 
-            if (response.ok) {
-                const data = await response.json();
-
-                console.log("block response : " + data.user);
-                if (this.querySelector(".block-btn").innerHTML == "unblock") {
-                    this.toggleBlockButton("block");
-                    this.fetchOrCreateConversation(this.user.id, this.receiverId);
-                    this.querySelector('.blocked-user-message').style.display = 'none';
-                    this.querySelector('.input_conv_container__chat').style.display = 'flex';
-                }
-                else if (this.querySelector(".block-btn").innerHTML == "block") {
-                    this.toggleBlockButton("unblock");
-                    this.fetchOrCreateConversation(this.user.id, this.receiverId);
-                    this.querySelector('.blocked-user-message').style.display = 'block';
-                    this.querySelector('.input_conv_container__chat').style.display = 'none';
-                }
-                // this.fetchOrCreateConversation(this.user.id, this.receiverId);
-            } else {
+            if (response.ok)
+            {
+                this.conversations.forEach(conversation => {
+                    if (conversation.senderId == this.user.id && conversation.receiverId == this.receiverId)
+                    {
+                        const dataWs = {
+                            type: 'block_notification',
+                            sender : this.user.id,
+                            blocker: this.user.id,
+                            blocked: this.receiverId,
+                        };
+                        conversation.websocket.send(JSON.stringify(dataWs));
+                    }
+                })
+            }
+            else
+            {
                 console.error('error block');
             }
         } catch (error) {
             console.error('Error:', error);
         }
     }
-    // async unblockUser()
-    // {
-    //     try {
-    //         const response = await fetch(`http://localhost:8000/chat/users/unblock/`, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'Authorization': `Bearer ${this.token}`
-    //             },
-    //             credentials: 'include',
-    //             body: JSON.stringify({ blocker: this.user.id, blocked: this.receiverId })
-    //         });
 
-    //         if (response.ok) {
-    //             const data = await response.json();
-
-    //             console.log("block response : "+data.user);
-    //             this.fetchUsers();
-
-    //         } else {
-    //             console.error('error block');
-    //         }
-    //     } catch (error) {
-    //         console.error('Error:', error);
-    //     }
-    // }
     clearChatArea() {
         this.querySelector('.second_section_wrapper_chat').innerHTML = '';
         this.querySelector('.second_section_wrapper_chat').style.display = 'none';
@@ -487,7 +458,6 @@ export default class Chat extends HTMLElement {
             }
         });
         sendButton.addEventListener('click', () => {
-            // if (sendInput.value.length() > 0)
                 this.sendMessage();
         });
 
@@ -497,180 +467,104 @@ export default class Chat extends HTMLElement {
             this.blockOrUnblockUser();
         });
 
-        const find_friends = document.querySelector('.find_friends');
-        const modal_wrapper_chat = document.querySelector('.modal_wrapper_chat');
-        find_friends.addEventListener('click', () => {
-            modal_wrapper_chat.style.display = 'block';
-        })
 
-        const overlay = document.querySelector('.overlay_chat');
-
-        // Assuming modal_wrapper_chat is the modal element
-        modal_wrapper_chat.addEventListener('click', function (event) {
-            // Check if the click is outside the modal
-            console.log (event.target);
-            console.log(overlay);
-            if (event.target === overlay) {
-                modal_wrapper_chat.style.display = 'none'; // Or any other code to close the modal
-            }
-        });
-        const users_search_list_wrapper = document.querySelector('.users_search_list_wrapper');
-        Http.getData("GET", "api/friends")
-        .then (response =>{
-            return (response)
-        })
-        .then(data => {
-         for (let i = 0; i < data.length; i++) {
-            users_search_list_wrapper.innerHTML =
-            `
-
-
-          <div class="user_wrapper_search">
-                <img src="http://localhost:8000${data[i].user2.profile_pic}" alt="" width="30" height="30" class="user_img_search">
-                <div class="fullname_search">${data[i].user2.full_name}</div>
-                <div class="user_name_search">${data[i].user2.username}</div>
-            </div>
-            `
-         }
-         if (data.length === 0) {
-          online_friend.style.overflow = "hidden";
-          users_search_list_wrapper.innerHTML =
-          `
-          <h1>you don't have any friends yet</h1>
-          `
-         }
-        })
-        ;
     }
-    toggleBlockButton(state) {
+    toggleBlockButton(state)
+    {
         if (state == "block")
-            this.querySelector(".block-btn").innerHTML = `<i class="fa fa-ban" aria-hidden="true"></i>`;
+            this.querySelector(".block-btn").innerHTML = "block";
         else if (state == "unblock")
-            this.querySelector(".block-btn").innerHTML = `<i class="fa-solid fa-user-unlock"></i>`;
+            this.querySelector(".block-btn").innerHTML = "unblock";
 
     }
     render() {
-        this.innerHTML = /*html*/`
+        this.innerHTML = /* HTML */`
 
-            <div class="chat_wrapper_">
-            <div class="modal_wrapper_chat">
-            <div class="overlay_chat"></div>
-            <div class="modal_content_wrapper">
-                <div class="search_input_wrapper_">
-                    <input type="text" name="search" id="search" class="search" placeholder="What are you looking for ?">
+        <div class="chat_wrapper_">
+        <div class="modal_wrapper_chat">
+        <div class="overlay_chat"></div>
+        <div class="modal_content_wrapper">
+            <div class="search_input_wrapper_">
+                <input type="text" name="search" id="search" class="search" placeholder="What are you looking for ?">
+            </div>
+            <div class="users_search_list_wrapper">
+                <div class="user_wrapper_search">
+                    <img src="bg_img.png" alt="" width="30" height="30" class="user_img_search">
+                    <div class="fullname_search">Full Name</div>
+                    <div class="user_name_search">User Name</div>
                 </div>
-                <div class="users_search_list_wrapper">
-                    <div class="user_wrapper_search">
-                        <img src="bg_img.png" alt="" width="30" height="30" class="user_img_search">
-                        <div class="fullname_search">Full Name</div>
-                        <div class="user_name_search">User Name</div>
-                    </div>
 
-                    <div class="user_wrapper_search">
-                        <img src="bg_img.png" alt="" width="30" height="30" class="user_img_search">
-                        <div class="fullname_search">Full Name</div>
-                        <div class="user_name_search">User Name</div>
-                    </div>
-                    <div class="user_wrapper_search">
-                        <img src="bg_img.png" alt="" width="30" height="30" class="user_img_search">
-                        <div class="fullname_search">Full Name</div>
-                        <div class="user_name_search">User Name</div>
-                    </div>
+                <div class="user_wrapper_search">
+                    <img src="bg_img.png" alt="" width="30" height="30" class="user_img_search">
+                    <div class="fullname_search">Full Name</div>
+                    <div class="user_name_search">User Name</div>
+                </div>
+                <div class="user_wrapper_search">
+                    <img src="bg_img.png" alt="" width="30" height="30" class="user_img_search">
+                    <div class="fullname_search">Full Name</div>
+                    <div class="user_name_search">User Name</div>
                 </div>
             </div>
         </div>
-                <div class="first_section_wrapper_chat">
+    </div>
+            <div class="first_section_wrapper_chat">
 
-                </div>
-                <div class="find_conv">
-                         <i class="fa-duotone fa-solid fa-comments"></i>
+            </div>
+            <div class="find_conv">
+                     <i class="fa-duotone fa-solid fa-comments"></i>
 
-                        <h1>select a conversation to start chatting</h1>
-                        <p>or find a friend and chat</p>
-                        <button class="find_friends">Find Friends <i class="fa-light fa-user-group"></i> </button>
-                </div>
-                <div class="second_section_wrapper_chat">
-                      <div class="wrapper_first_con_second_section">
-                      <div class="first_wrapper_info_user_chat_wrapper">
-                          <div class="first_side_wrapper_con_chat__">
-                              <img src="../assets/pdp.png" alt="logo_user" class="logo_chat_user">
-                              <div class="infos_con_user_wrapper">
-                                  <h3 class="name_user_con" id="username">
+                    <h1>select a conversation to start chatting</h1>
+                    <p>or find a friend and chat</p>
+                    <button class="find_friends">Find Friends <i class="fa-light fa-user-group"></i> </button>
+            </div>
+            <div class="second_section_wrapper_chat">
+                  <div class="wrapper_first_con_second_section">
+                  <div class="first_wrapper_info_user_chat_wrapper">
+                      <div class="first_side_wrapper_con_chat__">
+                          <img src="../assets/pdp.png" alt="logo_user" class="logo_chat_user">
+                          <div class="infos_con_user_wrapper">
+                              <h3 class="name_user_con" id="username">
 
-                                  </h3>
+                              </h3>
 
-                                  <p class="status_user_con">
-                                      Online
-                                  </p>
+                              <p class="status_user_con">
+                                  Online
+                              </p>
 
-                              </div>
-                          </div>
-                          <div class="second_side_wrapper_con_chat__">
-                              <button class='play_invite'>
-                              <i class="fa-solid fa-gamepad-modern fa-2xl"></i>
-                              </button>
-                              <button class="block-btn" style="background: none;border: none;">
-                              <span class="block-state">block</span>
-                           </button>
                           </div>
                       </div>
-              </div>
-                    <div class="chat_container_conv__">
-                            <div class="conv_data_container_chat__">
-                                <div class="slots_messages_container__">
+                      <div class="second_side_wrapper_con_chat__">
+                          <button class='play_invite'>
+                          <i class="fa-solid fa-gamepad-modern fa-2xl"></i>
+                          </button>
+                          <button class="block-btn" style="background: none;border: none;">
+                          <span class="block-state">block</span>
+                       </button>
+                      </div>
+                  </div>
+          </div>
+                <div class="chat_container_conv__">
+                        <div class="conv_data_container_chat__">
+                            <div class="slots_messages_container__">
 
-                                </div>
-                            </div>
-                            <div style="display: flex; justify-content: center; width: 100%;">
-                                <div id="blocked-user-message" class="blocked-user-message">
-                                    <p class="block-message">You are blocked and cannot send messages.</p>
-                                </div>
-                                <div class="input_conv_container__chat">
-                                    <textarea name="" id="" class="send_msg_input message-input" rows="1" placeholder="Message"></textarea>
-                                    <button class="send-button">
-                                        <i class="fa-solid fa-paper-plane"></i>
-                                    </button>
-                                </div>
-                            </div>
-                    </div>
-                </div>
-                <div class="third_section_wrapper_chat">
-                    <div class="infos_container_third_sec_chat">
-                        <div class="img_pdp_third_container_wrapper">
-                            <img src="assets/pdp.png" alt="profile picture" class="pdp_img_a">
-                        </div>
-                        <div class="details_container_third_wrapper">
-                            <h2 class="name_container_third_wrapper_ white">
-
-                            </h2>
-                            <div class="status_third_wrapper_ gray">
-                                Online
                             </div>
                         </div>
-                    </div>
-                    <div class="shared_files_wrapper__third_sec_">
-                        <div class="tile_dropdown_wrapper__third">
-                            <div class="title_con___ white">
-                                Shared Files
+                        <div style="display: flex; justify-content: center; width: 100%;">
+                            <div id="blocked-user-message" class="blocked-user-message">
+                                <p class="block-message">You are blocked and cannot send messages.</p>
                             </div>
-                            <div class="dropdown_con___">
-                                <img src="assets/drop_icon_arrow.png" alt="grp33" class="drop_down_icon">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="shared_files_wrapper__third_sec_">
-                        <div class="tile_dropdown_wrapper__third">
-                            <div class="title_con___ white">
-                                Shared Files
-                            </div>
-                            <div class="dropdown_con___">
-                                <img src="assets/drop_icon_arrow.png" alt="grp33" class="drop_down_icon">
+                            <div class="input_conv_container__chat">
+                                <textarea name="" id="" class="send_msg_input message-input" rows="1" placeholder="Message"></textarea>
+                                <button class="send-button">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </button>
                             </div>
                         </div>
-                    </div>
                 </div>
             </div>
-        `;
+            
+        </div>
+    `;
 
         this.chatContainer = this.querySelector('.slots_messages_container__');
         this.userContainer = this.querySelector('.first_section_wrapper_chat');

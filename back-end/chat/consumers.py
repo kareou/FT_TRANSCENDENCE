@@ -34,9 +34,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         try:
             text_data_json = json.loads(text_data)
-            message = text_data_json['message']
+            # message = text_data_json['message']
             sender = text_data_json['sender']
-            print(f"Received message: {message}")
+            type = text_data_json['type']
+            # print(f"Received message: {message}")
 
             if int(sender) not in [self.user_id, self.receiver_id]:
                 print(f"User {sender} is not part of the conversation.")
@@ -44,15 +45,28 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'error': 'User not part of the conversation'
                 }))
                 return
-
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    'type': 'send_message',
-                    'sender': sender,
-                    'message': message
-                }
-            )
+            
+            if type == "message":
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'send_message',
+                        'sender': text_data_json['sender'],
+                        'message': text_data_json['message']
+                    }
+                )
+                
+            elif type == "block_notification":
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'send_block_notification',
+                        'sender': sender,
+                        'blocker': text_data_json['blocker'],
+                        'blocked': text_data_json['blocked']
+                    }
+                )
+                # await self.send_message(text_data_json)
         except json.JSONDecodeError:
             print("Received non-JSON message or empty message:", text_data)
             await self.send(text_data=json.dumps({
@@ -60,8 +74,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }))
 
     async def send_message(self, event):
-        message = event['message']
-        sender = event['sender']
+        message= event['message'],
+        sender= event['sender']
         print(f"Sending message to WebSocket: {message}")
 
         if int(sender) not in [self.user_id, self.receiver_id]:
@@ -72,6 +86,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
 
         await self.send(text_data=json.dumps({
-            'message': message,
-            'sender': sender
+            'type': 'message',
+            'message': event['message'],
+            'sender': event['sender']
+        }))
+
+    async def send_block_notification(self, event):
+        # message= event['message'],
+        sender= event['sender']
+        # print(f"Sending block to WebSocket: {message}")
+
+        if int(sender) not in [self.user_id, self.receiver_id]:
+            print(f"User {sender} is not part of the conversation.")
+            await self.send(text_data=json.dumps({
+                'error': 'User not part of the conversation'
+            }))
+            return
+
+        await self.send(text_data=json.dumps({
+            'type': 'block_notification',
+            'blocker': event['blocker'],
+            'blocked': event['blocked']
         }))

@@ -64,12 +64,15 @@ class friends_viewset(viewsets.ModelViewSet):
             if serializer.is_valid():
                 user1 = serializer.validated_data['user1']
                 user2 = serializer.validated_data['user2']
-                friendShip = friendList.objects.filter(Q(user1=user1, user2=user2) | Q(user1=user2, user2=user1)).first()
-                if friendShip and friendShip.user1_blocked_user2 == False and friendShip.user2_blocked_user1 == False and user1 != user2:
-                    if request.user == user1:
-                        friendShip.user1_blocked_user2 = True
-                    elif request.user == user2:
-                        friendShip.user2_blocked_user1 = True
+                friendShip = friendList.objects.filter(Q(user1=user1, user2=user2)).first()
+                if friendShip:
+                    friendShip.user1_blocked_user2 = True
+                    friendShip.are_friends = False
+                    friendShip.save()
+                    return Response(status=200)
+                friendShip = friendList.objects.filter(Q(user1=user2, user2=user1)).first()
+                if friendShip:
+                    friendShip.user2_blocked_user1 = True
                     friendShip.are_friends = False
                     friendShip.save()
                     return Response(status=200)
