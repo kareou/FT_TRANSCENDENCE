@@ -2,7 +2,6 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Q, Max, Case, When
-# from user.serializers import BlockUserSerializer
 from .serializers import ConversationSerializer, ChatMessageSerializer
 from .models import Conversation, ChatMessage
 from user.models import User
@@ -39,19 +38,17 @@ class UserConversationViewSet(viewsets.ModelViewSet):
         except ObjectDoesNotExist:
             return Response({"detail": "One of the users does not exist", "case": "user_not_found"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if conversation:
+        if conversation:       
             if friendList.objects.filter(
-               (Q(user1=sender) & Q(user2=receiver) & Q(user1_blocked_user2=True))
-            ).exists():
-                return Response({"detail": "You have blocked this user", "case": "sender_blocked_receiver", "conversation": ConversationSerializer(conversation).data}, status=status.HTTP_200_OK)
-            if friendList.objects.filter(
-               (Q(user1=receiver) & Q(user2=sender) & Q(user2_blocked_user1=True))
+                (Q(user1=receiver, user2=sender, user1_blocked_user2=True) |
+                Q(user1=sender, user2=receiver, user2_blocked_user1=True))
             ).exists():
                 return Response({"detail": "You are blocked by this user", "case": "receiver_blocked_sender", "conversation": ConversationSerializer(conversation).data}, status=status.HTTP_200_OK)
-                # return Response({"detail": "You have blocked this user", "case": "sender_blocked_receiver", "conversation": ConversationSerializer(conversation).data}, status=status.HTTP_200_OK)
-            # if receiver in sender.blocked_users.all():
-            #     return Response({"detail": "You have blocked this user", "case": "sender_blocked_receiver", "conversation": ConversationSerializer(conversation).data}, status=status.HTTP_200_OK)
-            # if sender in receiver.blocked_users.all():
+            if friendList.objects.filter(
+                (Q(user1=sender, user2=receiver, user1_blocked_user2=True) |
+                Q(user1=receiver, user2=sender, user2_blocked_user1=True))
+            ).exists():
+                return Response({"detail": "You have blocked this user", "case": "sender_blocked_receiver", "conversation": ConversationSerializer(conversation).data}, status=status.HTTP_200_OK)
 
         if not conversation:
             conversation = Conversation.objects.create(sender_id=sender_id, receiver_id=receiver_id)
@@ -86,12 +83,10 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
-        # Get conversations where the logged-in user is either sender or receiver, ordered by last_message_time
         conversations = Conversation.objects.filter(
             Q(sender=user) | Q(receiver=user)
         ).order_by('-last_message_time')
 
-        # Maintain an ordered list of active user IDs based on the conversation order
         ordered_user_ids = []
         for conversation in conversations:
             if conversation.sender.id != user.id:
@@ -99,112 +94,9 @@ class UserViewSet(viewsets.ModelViewSet):
             if conversation.receiver.id != user.id:
                 ordered_user_ids.append(conversation.receiver.id)
 
-        # Use Django's `Case` and `When` to maintain the order
         preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(ordered_user_ids)])
 
-        # Queryset of users who have had conversations with the logged-in user, ordered by last_message_time
         active_users = User.objects.filter(id__in=ordered_user_ids).order_by(preserved_order)
 
         return active_users
 
-# class UserViewSet(viewsets.ModelViewSet):
-#     serializer_class = UserSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def get_queryset(self):
-#         user = self.request.user
-
-#         conversations = Conversation.objects.filter(
-#             Q(sender=user) | Q(receiver=user)
-#         ).annotate(
-#             last_message_time=Max('chatmessage__timestamp')
-#         ).order_by('-last_message_time')
-
-#         ordered_user_ids = []
-#         for conversation in conversations:
-#             if conversation.sender.id != user.id:
-#                 ordered_user_ids.append(conversation.sender.id)
-#             if conversation.receiver.id != user.id:
-#                 ordered_user_ids.append(conversation.receiver.id)
-
-#         seen = set()
-#         ordered_user_ids = [x for x in ordered_user_ids if not (x in seen or seen.add(x))]
-
-#         active_users = User.objects.filter(id__in=ordered_user_ids).order_by(
-#             models.Case(
-#                 *[models.When(id=pk, then=pos) for pos, pk in enumerate(ordered_user_ids)]
-#             )
-#         )
-
-#         return active_users
-
-#     @action(detail=False, methods=['post'])
-#     def block(self, request, pk=None):
-#         data = request.data
-#         user_to_block_id = data.get('blocked')
-#         blocker_id = data.get('blocker')
-
-#         required_fields = {'blocked', 'blocker'}
-#         if not required_fields.issubset(data.keys()):
-#             return Response({"detail": "User To Block ID and Blocker ID are required."}, status=status.HTTP_400_BAD_REQUEST)
-
-#         user_to_block = get_object_or_404(User, pk=user_to_block_id)
-#         user = get_object_or_404(User, pk=blocker_id)
-#         user.blocked_users.add(user_to_block)
-#         user.save()
-
-#         return Response({'status': 'success', 'message': 'User blocked successfully.', 'user': UserSerializer(user).data}, status=status.HTTP_200_OK)
-
-#     @action(detail=False, methods=['post'])
-#     def unblock(self, request, pk=None):
-#         data = request.data
-#         user_to_unblock_id = data.get('blocked')
-#         blocker_id = data.get('blocker')
-
-#         required_fields = {'blocked', 'blocker'}
-#         if not required_fields.issubset(data.keys()):
-#             return Response({"detail": "User To Block ID and Blocker ID are required."}, status=status.HTTP_400_BAD_REQUEST)
-
-#         user_to_unblock = get_object_or_404(User, pk=user_to_unblock_id)
-#         user = get_object_or_404(User, pk=blocker_id)
-#         user.blocked_users.remove(user_to_unblock)
-
-#         user.save()
-
-#         return Response({'status': 'success', 'message': 'User unblocked successfully.', 'user': UserSerializer(user).data}, status=status.HTTP_200_OK)
-
-
-
-#     @action(detail=False, methods=['get'])
-#     def blocked_users(self, request):
-#         user_id = request.query_params.get('user_id')
-
-#         if not user_id:
-#             return Response({"detail": "User ID is required."}, status=status.HTTP_400_BAD_REQUEST)
-
-#         user = get_object_or_404(User, pk=user_id)
-#         blocked_users = user.blocked_users.all()cf
-#         serializer = UserSerializer(blocked_users, many=True)
-#         return Response(serializer.data)
-
-
-# class BlockUserView(viewsets.ViewSet):
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     @action(detail=True, methods=['POST'])
-#     def block(self, request, pk=None):
-#         blocker = request.user
-#         user_to_block = get_object_or_404(User, pk=pk)
-#         if user_to_block == blocker:
-#             return Response({'error': 'You cannot block yourself.'}, status=status.HTTP_400_BAD_REQUEST)
-#         if user_to_block in blocker.blocked_users.all():
-#             return Response({'error': 'User already blocked.'}, status=status.HTTP_400_BAD_REQUEST)
-#         blocker.blocked_users.add(user_to_block)
-#         return Response({'status': 'success', 'message': 'User blocked successfully.'}, status=status.HTTP_200_OK)
-
-#     @action(detail=False, methods=['GET'])
-#     def blocked_users(self, request):
-#         user = request.user
-#         blocked_users = user.blocked_users.all()
-#         serializer = self.get_serializer(blocked_users, many=True)
-#         return Response(serializer.data, status=status.HTTP_200_OK)

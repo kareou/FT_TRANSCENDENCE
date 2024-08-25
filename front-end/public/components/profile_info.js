@@ -19,6 +19,7 @@ export default class ProfileInfo extends HTMLElement {
       this.render();
       this.markUnearnedAchievements();
       this.setupEventListeners();
+      this.setupEventListeners();
     }
   }
 
@@ -82,13 +83,13 @@ export default class ProfileInfo extends HTMLElement {
         Http.user.id,
         this.user.id
       );
-
+        // console.log("id : "+conversation.conversation.id);
       const messageContent = document.querySelector(".message-input").value;
       const messageData = {
         sender: Http.user.id,
         message: messageContent,
         timestamp: new Date().toISOString(),
-        conversation: conversation.id,
+        conversation: conversation.conversation.id,
       };
 
       this.setupWebSocket();
@@ -105,6 +106,7 @@ export default class ProfileInfo extends HTMLElement {
       if (response.ok) {
         const data = await response.json();
         const dataWs = {
+          type: 'message',
           message: data.message,
           sender: data.sender,
         };
@@ -130,7 +132,9 @@ export default class ProfileInfo extends HTMLElement {
     const buttonSend = document.querySelector(".send-button");
     const add_friend = document.querySelector(".add_friend");
 
-    add_friend.addEventListener("click", async () => {
+    if (add_friend !== null)
+    {
+      add_friend.addEventListener("click", async () => {
       let apiUrl = `http://localhost:8000/api/friends/`;
 
       fetch(apiUrl, {
@@ -163,7 +167,8 @@ export default class ProfileInfo extends HTMLElement {
           console.error("Error:", error);
         });
     });
-
+  }
+  if (buttonNew){
     buttonNew.addEventListener("click", () => {
       console.log("button message pressed");
       if (msgPrompt.classList.contains("hidden")) {
@@ -174,6 +179,7 @@ export default class ProfileInfo extends HTMLElement {
         msgPrompt.classList.add("hidden");
       }
     });
+  }
 
     buttonClose.addEventListener("click", () => {
       console.log("button close pressed");
@@ -213,7 +219,7 @@ export default class ProfileInfo extends HTMLElement {
           <h1 id="user_name">${this.user.full_name}</h1>
           <h6 id="login">${this.user.username}</h6>
         </div>
-        ${this.user !== Http.user.username ? "" : `<div class="wallet_data_wrapper">
+        ${this.username === Http.user.username ? "" : `<div class="wallet_data_wrapper">
         <span>
         <i class="fa-sharp fa-light fa-coins" style="color: #04BF8A;"></i>
         </span>
