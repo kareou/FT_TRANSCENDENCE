@@ -8,21 +8,21 @@ export default class Toast extends HTMLElement {
 	}
 
 	connectedCallback() {
-		const colors = {
-			"success": "#4CAF50",
-			"error": "#F44336",
-			"info": "#2196F3",
-			"warning": "#FFC107",
-		}
-		this.color = colors[this.type];
+		// const colors = {
+		// 	"success": "#4CAF50",
+		// 	"error": "#F44336",
+		// 	"info": "#2196F3",
+		// 	"warning": "#FFC107",
+		// }
+		// this.color = colors[this.type];
 		this.render();
-		const toast = document.querySelector(".toast");
-		setTimeout(() => {
-			// toast.style.transform = "translateX(0)";
-			// setTimeout(() => {
-			toast.remove();
-			// }, 500);
-		}, this.timeout);
+		// 	const toast = document.querySelector(".toast");
+		// 	setTimeout(() => {
+		// 		// toast.style.transform = "translateX(0)";
+		// 		// setTimeout(() => {
+		// 		toast.remove();
+		// 		// }, 500);
+		// 	}, this.timeout);
 	}
 
 	update(message, type, timeout) {
@@ -37,12 +37,15 @@ export default class Toast extends HTMLElement {
 	render() {
 		this.innerHTML = /*HTML*/ `
 		<div class="toast">
-			<div class="toast-body">
-				${this.message}
+			<div class="toast-wrapper">
+			<label for="t-help" class="toast-icon icon-help"></label>
+			<div>
+					<label for="t-help" class="close"></label>
+					<h3>Help!</h3>
+					<p>Do you have a problem? Just use this</p>
+				</div>
 			</div>
-			<div class="timer">
-				<div class="timer-bar" style="background-color: ${this.color}; animation: timer ${this.timeout}ms ease-in-out;"></div>
-			</div>
+
 		</div>
 	`;
 	}
