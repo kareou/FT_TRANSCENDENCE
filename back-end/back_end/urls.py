@@ -30,6 +30,7 @@ urlpatterns = [
     path("api/", include("game.urls")),
     path("api/", include("friends.urls")),
     path("chat/", include("chat.urls")),
+    path("tournament/", include("tournament.urls")),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
