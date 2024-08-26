@@ -97,6 +97,7 @@ INSTALLED_APPS = [
     'game',
     'friends',
     'notification',
+    'tournament'
 ]
 
 MIDDLEWARE = [
