@@ -17,9 +17,36 @@ export default class Chat extends HTMLElement {
         this.fetchUsers();
         this.setupEventListeners();
     }
+    isToday(timestamp) {
+        const date = new Date(timestamp);
+        const today = new Date();
+        return date.getDate() === today.getDate() &&
+               date.getMonth() === today.getMonth() &&
+               date.getFullYear() === today.getFullYear();
+    }
+    
+    formatTime(timestamp) {
+        const date = new Date(timestamp);
+        let hours = date.getHours();
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        return `${hours}:${minutes} ${ampm}`;
+    }
+    
+    formatDate(timestamp) {
+        const date = new Date(timestamp);
+        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const dayName = daysOfWeek[date.getDay()];
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${dayName}, ${month}/${day}/${year}`;
+    }
+
 
     setupWebSocket() {
-        console.log("size = " +this.conversations.length);
+        // console.log("size = " +this.conversations.length);
         this.conversations.forEach(conversation => {
             
             
@@ -52,6 +79,9 @@ export default class Chat extends HTMLElement {
             });
         }        
     }
+
+
+    
 
     async fetchUsers() {
         try {
@@ -160,8 +190,8 @@ export default class Chat extends HTMLElement {
     }
 
     async fetchOrCreateConversation(senderId, receiverId) {
-        console.log("sender : " +senderId);
-        console.log("receiver : " +receiverId);
+        // console.log("sender : " +senderId);
+        // console.log("receiver : " +receiverId);
         try {
             const response = await fetch(`http://localhost:8000/chat/conversations/fetch_or_create/`, {
                 method: 'POST',
@@ -214,6 +244,45 @@ export default class Chat extends HTMLElement {
             }
 
             return responseData.conversation;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    async fetchOrCreateConversationAndVerifyBlock(senderId, receiverId) {
+        // console.log("sender : " +senderId);
+        // console.log("receiver : " +receiverId);
+        try {
+            const response = await fetch(`http://localhost:8000/chat/conversations/fetch_or_create/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    sender: senderId,
+                    receiver: receiverId
+                }),
+            });
+
+            const responseData = await response.json();
+
+            console.error('Case:', responseData.case);
+            switch (responseData.case) {
+                case 'missing_data':
+                    return 0;
+                case 'user_not_found':
+                    return 0;
+                case 'sender_blocked_receiver':
+                    return 0;
+                case 'receiver_blocked_sender':
+                    return 0;
+                case 'conversation_created':
+                   return 1;
+                case 'conversation_fetched':
+                    return 1;
+            }
+            return 1;
         } catch (error) {
             console.error('Error:', error);
         }
@@ -289,11 +358,16 @@ export default class Chat extends HTMLElement {
         this.chatContainer.innerHTML += messageHTML;
         this.chatContainer.scrollTop = this.chatContainer.scrollHeight; // this for showing the very last messages of the conversation
     }
+    
+    
     displayMessages(messages) {
         this.chatContainer = this.querySelector('.slots_messages_container__');
         this.chatContainer.innerHTML = '';
-
+// console.log('pic = '+this.user.profile_pic);
+        // const receiverImg = this.querySelector(".logo_chat_user").src;
         messages.forEach(message => {
+            const message_time =  this.isToday(message.timestamp) ? this.formatTime(message.timestamp) : this.formatDate(message.timestamp);
+        
             let messageHTML = '';
             if (message == messages[messages.length -1])
             {
@@ -304,33 +378,55 @@ export default class Chat extends HTMLElement {
                     userElement.querySelector('.last_msg').innerHTML = messages[messages.length -1].message;
                 })
             }
+            
+            
             if (message.sender != this.user.id) {
                 messageHTML = `
                     <div class="slot_message_container___ ">
                         <div class="message_container__ second_msg_user ">
-                            <div class="message_user_container__ right_side_msg">
-                                <div class="message_user_content__">
-                                    ${message.message}
+                            <div class='content_time_msg'>
+                                <div class="message_user_container__ right_side_msg">
+                                    <div class="message_user_content__">
+                                        ${message.message}
+                                    </div>
                                 </div>
+                                <div class='msg_time'>
+                                    ${message_time}
+                                </div >
                             </div>
+                            <img src="${this.querySelector(".logo_chat_user").src}" class="user_pic_msg_right" alt="profile picture" loading="lazy">
                         </div>
                     </div>
                 `;
+                // 
+                
             } else {
                 messageHTML = `
                     <div class="slot_message_container___">
-                        <div class="message_container__ first_msg_user">
+                    <div class="message_container__ first_msg_user">
+                    <img src="http://localhost:8000${this.user.profile_pic}" class="user_pic_msg_left" alt="profile picture" loading="lazy">
                             <div class="message_user_container__">
-                                <div class="message_user_content__">
-                                    ${message.message}
+                                <div class='content_time_msg'>
+                                    <div class="message_user_content__">
+                                        ${message.message}
+                                    </div>
+                                </div>
+                                <div class='msg_time'>
+                                ${message_time}
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
+                
             }
 
             this.chatContainer.innerHTML += messageHTML;
+            
+            // console.log('1->'+receiverImg);
+            // this.querySelector(".user_pic_msg_right").src = '';
+            // this.querySelector(".user_pic_msg_right").src = receiverImg;
+            // console.log('2->'+this.querySelector(".user_pic_msg_right").src);
         });
         this.chatContainer.scrollTop = this.chatContainer.scrollHeight; // this for showing the very last messages of the conversation
     }
@@ -357,8 +453,15 @@ export default class Chat extends HTMLElement {
                 timestamp: new Date().toISOString(),
                 conversation: this.conversationId
             };
-
-
+            // console.log("result = "+this.fetchOrCreateConversationAndVerifyBlock(this.user.id, this.receiverId));
+            
+            const checkConversation = await this.fetchOrCreateConversationAndVerifyBlock(this.user.id, this.receiverId);
+            console.log("result = " + checkConversation);
+            
+            if (checkConversation === 0) {
+                console.log('Action aborted: User is blocked or conversation could not be created.');
+                return; // Stop further execution
+            }
             try {
                 const response = await fetch('http://localhost:8000/chat/messages/', {
                     method: 'POST',

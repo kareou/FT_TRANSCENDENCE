@@ -647,17 +647,17 @@ body {
     border-radius: 12px;
     position: relative;
     display: block;
-    width: 40%;
+    width: fit-content;
     height: fit-content;
     text-wrap: wrap;
     text-overflow: clip;
     overflow: auto; /* Add this line */
-    word-wrap: break-word; /* Add this line */
+    word-wrap: break-word; Add this line
 }
 
 
 .message_container__ {
-    margin: 8px;
+    margin: 8px;   
 }
 
 .chat_container_conv__ {
@@ -701,8 +701,8 @@ body {
 .right_side_msg{
     width: 50%;
     display: flex;
-    flex-direction: initial;
-    justify-content: flex-end;
+    /* flex-direction: initial; */
+    /* justify-content: flex-end; */
 }
 
 .second_msg_user>.message_user_container__>.message_user_content__ {
@@ -1108,4 +1108,52 @@ sm: '2rem',
 
 .hidden {
     display: none;
+}
+
+.msg_time {
+    font-size: 10px;
+    color: #A5A5A5;
+    /* align-items: flex-end; */
+    
+} 
+
+.user_pic_msg_left {
+    width: 50px;
+    border-radius: 50%;
+    object-fit: contain;
+    /* border: solid 4px #587187; */
+    margin-right: 2%;
+}
+.user_pic_msg_right{
+    width: 50px;
+    border-radius: 50%;
+    object-fit: contain;
+    /* border: solid 4px #587187; */
+    margin-left: 2%;
+}
+
+.slot_message_container___ {
+    /* border: solid red; */
+}
+.message_container__ {
+    
+    /* border: solid white; */
+}
+
+.message_user_container__ {
+    width: fit-content;
+    /* border: solid green; */
+    align-items: center;
+}
+.content_time_msg {
+    display: flex;
+    flex-direction: column;
+}
+.first_msg_user {
+    display: flex;
+    flex-direction: row;
+    
+}
+.message_container__ {
+    padding-top: 5px;
 }
