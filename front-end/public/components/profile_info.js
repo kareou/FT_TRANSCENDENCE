@@ -180,7 +180,7 @@ export default class ProfileInfo extends HTMLElement {
       }
     });
   }
-
+  
     buttonClose.addEventListener("click", () => {
       console.log("button close pressed");
 
@@ -192,6 +192,14 @@ export default class ProfileInfo extends HTMLElement {
       this.sendMessage();
       buttonClose.click();
     });
+
+    const input_message = document.querySelector('.message-input');
+    input_message.addEventListener('keypress', function (event) {
+      if (event.key === 'Enter') {
+          event.preventDefault();
+          buttonSend.click();
+      }
+  });
   }
 
   render() {

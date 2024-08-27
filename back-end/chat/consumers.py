@@ -52,7 +52,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     {
                         'type': 'send_message',
                         'sender': text_data_json['sender'],
-                        'message': text_data_json['message']
+                        'message': text_data_json['message'],
+                        'timestamp': text_data_json['timestamp']
                     }
                 )
                 
@@ -87,8 +88,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await self.send(text_data=json.dumps({
             'type': 'message',
+            'sender': event['sender'],
             'message': event['message'],
-            'sender': event['sender']
+            'timestamp': event['timestamp']
         }))
 
     async def send_block_notification(self, event):
@@ -105,6 +107,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await self.send(text_data=json.dumps({
             'type': 'block_notification',
+            'sender': sender,
             'blocker': event['blocker'],
             'blocked': event['blocked']
         }))

@@ -17,9 +17,41 @@ export default class Chat extends HTMLElement {
         this.fetchUsers();
         this.setupEventListeners();
     }
+    isToday(timestamp) {
+        const date = new Date(timestamp);
+        const today = new Date();
+        return date.getDate() === today.getDate() &&
+               date.getMonth() === today.getMonth() &&
+               date.getFullYear() === today.getFullYear();
+    }
+    
+    formatTime(timestamp) {
+        const date = new Date(timestamp);
+        let hours = date.getHours();
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        return `${hours}:${minutes} ${ampm}`;
+    }
+    
+    formatDate(timestamp) {
+        const date = new Date(timestamp);
+        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const dayName = daysOfWeek[date.getDay()];
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${dayName}, ${month}/${day}/${year}`;
+    }
+
+    escapeHTML(html) {
+        return html.replace(/&/g, '&amp;')
+                   .replace(/</g, '&lt;')
+                   .replace(/>/g, '&gt;');
+    }
 
     setupWebSocket() {
-        console.log("size = " +this.conversations.length);
+        // console.log("size = " +this.conversations.length);
         this.conversations.forEach(conversation => {
             
             
@@ -53,6 +85,9 @@ export default class Chat extends HTMLElement {
         }        
     }
 
+
+    
+
     async fetchUsers() {
         try {
             const response = await fetch(`http://localhost:8000/chat/users/`, {
@@ -83,7 +118,6 @@ export default class Chat extends HTMLElement {
         <div class="first_profile_wrapper_chat">
             <div class="pdp_warpper">
                 <img src="http://localhost:8000${this.user.profile_pic}" class="pfp_logo" alt="profile picture" loading="lazy">
-                <div class="txt_one">Chats</div>
             </div>
             <div class="icon_wrapper_">
                 <i class="fa-solid fa-circle-ellipsis fa-2xl" style="color: #ffffff;"></i>
@@ -96,7 +130,7 @@ export default class Chat extends HTMLElement {
             <div class="chat_bulles_wrapper user" id="${user.id}" name="${user.username}">
                 <div class="chat_bulle_wrapper">
                     <div class="chat_pdp_wrapper" style="position: relative;">
-                        <user-avatar image="${user.profile_pic}" state="online" width="70" height="70"></user-avatar>
+                        <user-avatar image="${user.profile_pic}" state="online" width="50" height="50"></user-avatar>
                     </div>
                     <div class="data_chat_bulle_wrapper">
                         <div class="name_bulle_chat">${user.username}</div>
@@ -118,12 +152,12 @@ export default class Chat extends HTMLElement {
         userElements.forEach(userElement => {
             const receiverId = userElement.id;
             const senderId = this.user.id;
-            this.receiverId = receiverId;
             const websocket = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${senderId}/${receiverId}/`)
             const newConversation = {senderId, receiverId, websocket};
             this.conversations.push(newConversation);
             
             userElement.addEventListener('click', () => {
+                this.receiverId = receiverId;
                 this.querySelector('.blocked-user-message').style.display = 'none';
                 this.querySelector('.input_conv_container__chat').style.display = 'flex';
 
@@ -160,8 +194,8 @@ export default class Chat extends HTMLElement {
     }
 
     async fetchOrCreateConversation(senderId, receiverId) {
-        console.log("sender : " +senderId);
-        console.log("receiver : " +receiverId);
+        // console.log("sender : " +senderId);
+        // console.log("receiver : " +receiverId);
         try {
             const response = await fetch(`http://localhost:8000/chat/conversations/fetch_or_create/`, {
                 method: 'POST',
@@ -218,6 +252,45 @@ export default class Chat extends HTMLElement {
             console.error('Error:', error);
         }
     }
+    async fetchOrCreateConversationAndVerifyBlock(senderId, receiverId) {
+        // console.log("sender : " +senderId);
+        // console.log("receiver : " +receiverId);
+        try {
+            const response = await fetch(`http://localhost:8000/chat/conversations/fetch_or_create/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    sender: senderId,
+                    receiver: receiverId
+                }),
+            });
+
+            const responseData = await response.json();
+
+            console.error('Case:', responseData.case);
+            switch (responseData.case) {
+                case 'missing_data':
+                    return 0;
+                case 'user_not_found':
+                    return 0;
+                case 'sender_blocked_receiver':
+                    return 0;
+                case 'receiver_blocked_sender':
+                    return 0;
+                case 'conversation_created':
+                   return 1;
+                case 'conversation_fetched':
+                    return 1;
+            }
+            return 1;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
 
     async fetchMessagesForConversation(conversationId) {
         try {
@@ -246,42 +319,54 @@ export default class Chat extends HTMLElement {
     displayNewMessage(data)
     {
         let messageHTML = '';
-        
+        const message_time =  this.isToday(data.timestamp) ? this.formatTime(data.timestamp) : this.formatDate(data.timestamp);
         if (data.sender != this.user.id)
         {
             messageHTML = `
-                <div class="slot_message_container___">
-                    <div class="message_container__ second_msg_user">
-                        <div class="message_user_container__ right_side_msg">
-                            <div class="message_user_content__">
-                                ${data.message}
-                            </div>
+            <div class="slot_message_container___ ">
+            <div class="message_container__ second_msg_user ">
+                <div class='content_time_msg'>
+                    <div class="message_user_container__ right_side_msg">
+                        <div class="message_user_content__">
+                            ${data.message}
                         </div>
                     </div>
+                    <div class='msg_time'>
+                        ${message_time}
+                    </div >
                 </div>
-            `;
+                <img src="${this.querySelector(".logo_chat_user").src}" class="user_pic_msg_right" alt="profile picture" loading="lazy">
+            </div>
+        </div>
+    `;
         }
         else
         {
             messageHTML = `
-                <div class="slot_message_container___">
-                    <div class="message_container__ first_msg_user">
-                        <div class="message_user_container__">
+            <div class="slot_message_container___">
+            <div class="message_container__ first_msg_user">
+            <img src="http://localhost:8000${this.user.profile_pic}" class="user_pic_msg_left" alt="profile picture" loading="lazy">
+                    <div class="message_user_container__">
+                        <div class='content_time_msg'>
                             <div class="message_user_content__">
                                 ${data.message}
                             </div>
                         </div>
+                        <div class='msg_time'>
+                        ${message_time}
+                        </div>
                     </div>
                 </div>
-            `;
+            </div>
+        `;
         }
         const userElements = this.querySelectorAll('.chat_bulles_wrapper');
-        console.log("log iser : " +this.user.id);
+        // console.log("log iser : " +this.user.id);
         userElements.forEach(userElement => {
-            console.log("id : " +userElement.getAttribute("id")+ " rec : " + data.sender);
+            // console.log("id : " +userElement.getAttribute("id")+ " rec : " + data.sender);
             if (userElement.getAttribute("id") == data.sender)
             {
-                console.log("test " +userElement.getAttribute("id"));
+                // console.log("test " +userElement.getAttribute("id"));
                 userElement.querySelector('.last_msg').innerHTML = data.message;
             }
         })
@@ -289,11 +374,16 @@ export default class Chat extends HTMLElement {
         this.chatContainer.innerHTML += messageHTML;
         this.chatContainer.scrollTop = this.chatContainer.scrollHeight; // this for showing the very last messages of the conversation
     }
+    
+    
     displayMessages(messages) {
         this.chatContainer = this.querySelector('.slots_messages_container__');
         this.chatContainer.innerHTML = '';
-
+// console.log('pic = '+this.user.profile_pic);
+        // const receiverImg = this.querySelector(".logo_chat_user").src;
         messages.forEach(message => {
+            const message_time =  this.isToday(message.timestamp) ? this.formatTime(message.timestamp) : this.formatDate(message.timestamp);
+        
             let messageHTML = '';
             if (message == messages[messages.length -1])
             {
@@ -304,33 +394,55 @@ export default class Chat extends HTMLElement {
                     userElement.querySelector('.last_msg').innerHTML = messages[messages.length -1].message;
                 })
             }
+            
+            
             if (message.sender != this.user.id) {
                 messageHTML = `
                     <div class="slot_message_container___ ">
                         <div class="message_container__ second_msg_user ">
-                            <div class="message_user_container__ right_side_msg">
-                                <div class="message_user_content__">
-                                    ${message.message}
+                            <div class='content_time_msg'>
+                                <div class="message_user_container__ right_side_msg">
+                                    <div class="message_user_content__">
+                                        ${message.message}
+                                    </div>
                                 </div>
+                                <div class='msg_time'>
+                                    ${message_time}
+                                </div >
                             </div>
+                            <img src="${this.querySelector(".logo_chat_user").src}" class="user_pic_msg_right" alt="profile picture" loading="lazy">
                         </div>
                     </div>
                 `;
+                // 
+                
             } else {
                 messageHTML = `
                     <div class="slot_message_container___">
-                        <div class="message_container__ first_msg_user">
+                    <div class="message_container__ first_msg_user">
+                    <img src="http://localhost:8000${this.user.profile_pic}" class="user_pic_msg_left" alt="profile picture" loading="lazy">
                             <div class="message_user_container__">
-                                <div class="message_user_content__">
-                                    ${message.message}
+                                <div class='content_time_msg'>
+                                    <div class="message_user_content__">
+                                        ${message.message}
+                                    </div>
+                                </div>
+                                <div class='msg_time'>
+                                ${message_time}
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
+                
             }
 
             this.chatContainer.innerHTML += messageHTML;
+            
+            // console.log('1->'+receiverImg);
+            // this.querySelector(".user_pic_msg_right").src = '';
+            // this.querySelector(".user_pic_msg_right").src = receiverImg;
+            // console.log('2->'+this.querySelector(".user_pic_msg_right").src);
         });
         this.chatContainer.scrollTop = this.chatContainer.scrollHeight; // this for showing the very last messages of the conversation
     }
@@ -348,7 +460,7 @@ export default class Chat extends HTMLElement {
             return;
         }
 
-        const messageContent = document.querySelector('.message-input').value;
+        const messageContent = this.escapeHTML(document.querySelector('.message-input').value);
         if (messageContent.trim().length != 0)
         {
             const messageData = {
@@ -357,8 +469,15 @@ export default class Chat extends HTMLElement {
                 timestamp: new Date().toISOString(),
                 conversation: this.conversationId
             };
-
-
+            // console.log("result = "+this.fetchOrCreateConversationAndVerifyBlock(this.user.id, this.receiverId));
+            
+            const checkConversation = await this.fetchOrCreateConversationAndVerifyBlock(this.user.id, this.receiverId);
+            console.log("result = " + checkConversation);
+            
+            if (checkConversation === 0) {
+                console.log('Action aborted: User is blocked or conversation could not be created.');
+                return; // Stop further execution
+            }
             try {
                 const response = await fetch('http://localhost:8000/chat/messages/', {
                     method: 'POST',
@@ -377,11 +496,13 @@ export default class Chat extends HTMLElement {
                         type: 'message',
                         message: data.message,
                         sender: data.sender,
+                        timestamp: data.timestamp
                     };
                     this.conversations.forEach(conversation => {
-                    if ((conversation.senderId == this.user.id && conversation.receiverId == this.receiverId) || (conversation.senderId == this.receiverId && conversation.receiverId == this.user.id))
+                    if ((conversation.senderId == this.user.id && conversation.receiverId == this.receiverId))
                     {
                         conversation.websocket.send(JSON.stringify(dataWs));
+                        console.log('sender : ', this.user.id, ' receiver : ', this.receiverId);
                         console.log('Message sent via ws:', dataWs);
                         document.querySelector('.message-input').value = '';
                     }
@@ -515,7 +636,7 @@ export default class Chat extends HTMLElement {
 
                     <h1>select a conversation to start chatting</h1>
                     <p>or find a friend and chat</p>
-                    <button class="find_friends">Find Friends <i class="fa-light fa-user-group"></i> </button>
+                    <button class="find_friends"><span class="find_friends_span">Find Friends <i class="fa-light fa-user-group"></span></i> </button>
             </div>
             <div class="second_section_wrapper_chat">
                   <div class="wrapper_first_con_second_section">

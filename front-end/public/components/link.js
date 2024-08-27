@@ -75,7 +75,7 @@ export default class Link extends HTMLAnchorElement {
         window.location.href = "/auth/login";
         return;
       }
-      window.location.href = "/404";
+      // window.location.href = "/404";
     }
     if (!route) route = routes[0];
     try {
