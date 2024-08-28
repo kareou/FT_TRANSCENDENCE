@@ -579,9 +579,35 @@ i::before {
 }
 
 .marg_wrapper {
-    padding: 50px;
+    padding: 20px 50px;
 }
 
+/* .form_settings_wrapper_one{
+    height: 500px;
+} */
+.form_settings_wrapper_one
+{
+    height: 500px;
+}
+
+
+.enable_2fa
+,.disable_2fa{
+    background-color: #761cba;
+    padding: 15px 15px;
+    font-size: bold;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+.enable_2fa:hover
+,.disable_2fa:hover{
+    background-color: rgb(86, 15, 117);
+}
 .setting_h {
     font-size: 2rem;
     color: white;
@@ -679,4 +705,8 @@ i::before {
     .first_section_wrapper_chat{
         width: 30%;
     }
+}
+
+.d-none{
+    display: none;
 }
