@@ -56,6 +56,9 @@ export default class OnlineGame extends HTMLElement {
     this.board = new Board(ctx, "mod");
     this.websocket.onmessage = (e) => {
       const data = JSON.parse(e.data);
+      if (data.winner) {
+        this.winner = data.winner;
+      }
       if (data.role) {
         this.role = data.role;
         Http.website_stats.notify("gameusers", { [this.role]: Http.user });

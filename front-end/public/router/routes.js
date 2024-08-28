@@ -20,6 +20,12 @@ import FriendPends from "../components/friend_pends.js";
 import Friends from "../components/friends.js";
 import FriendData from "../components/friend_data.js";
 
+export const errorRoute = [
+  {path: "/404",
+    component: () => import("../pages/404.js"),
+}
+]
+
 export const routes = [
   {
     path: "/",

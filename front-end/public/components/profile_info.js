@@ -279,6 +279,7 @@ export default class ProfileInfo extends HTMLElement {
       </div>
     </div>
     `;
+
   }
 }
 

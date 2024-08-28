@@ -21,7 +21,18 @@ export default class MatchHistory extends HTMLElement {
           ${this.matches.length > 0 ? 
             this.matches.map(
               (match) =>
-                `<match-data user="${this.user}" p1="${match.player1}" p2="${match.player2}" p1score="${match.player1_score}" p2score="${match.player2_score}" winner="${match.winner}"></match-data>`
+                `<div class="matchdata ${match.winner.username === this.user ? "win" : "lose"}">
+                <div class="player">
+                    <img src="http://localhost:8000${match.player1.profile_pic}" alt="avatar" loading="lazy" />
+                    <h1>${match.player1_score}</h1>
+                </div>
+                <h1>VS</h1>
+                <div class="player">
+                    <h1>${match.player2_score}</h1>
+                    <img src="http://localhost:8000${match.player2.profile_pic}" alt="avatar" loading="lazy" />
+                </div>
+            </div>
+            `
             )
             :
             `
