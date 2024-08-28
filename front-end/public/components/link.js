@@ -1,4 +1,4 @@
-import { routes } from "../router/routes.js";
+import { routes, errorRoute } from "../router/routes.js";
 import Http from "../http/http.js";
 
 const root = document.getElementById("app");
@@ -19,6 +19,8 @@ export default class Link extends HTMLAnchorElement {
   }
 
   static matchUrl(url, path) {
+    path = path.toLowerCase();
+    url = url.toLowerCase();
     if (path === '/') return url === path;
     if (url.endsWith('/'))
       url = url.slice(0, -1);
@@ -57,15 +59,26 @@ export default class Link extends HTMLAnchorElement {
     return route;
   }
 
+  static shouldSaveHistory(url) {
+   if (url === window.location.pathname) return false;
+  //  if (Link.startWith(url, "/dashboard/game") || Link.startWith(url, "/game")) return false;
+    return true
+  }
+
   static async navigateTo(url) {
-    if (url !== window.location.pathname) window.history.pushState({}, "", url);
-    if (url.endsWith("/")) url = url.slice(0, -1);
+    if (Link.shouldSaveHistory(url)) window.history.pushState({}, "", url);
+    if (url.endsWith("/") && url != "/") url = url.slice(0, -1);
     let pos = url.indexOf("/?");
     if (pos === -1) {
       pos = url.length;
     }
-    const path = url.slice(0, pos);
+    var path = url.slice(0, pos);
     const isAuth = await Http.verifyToken();
+    if ((path === "/auth/login" || path === "/auth/register") && isAuth) {
+      console.log("redirecting to dashboard");
+      window.location.href = "/dashboard";
+
+    }
     try{
       var route =  Link.findRoute(routes, path, "", isAuth);
       if (!route) throw new Error("Not Found");
@@ -75,9 +88,10 @@ export default class Link extends HTMLAnchorElement {
         window.location.href = "/auth/login";
         return;
       }
-      window.location.href = "/404";
+      route = errorRoute[0];
     }
-    if (!route) route = routes[0];
+    console.log(route);
+    // if (!route) route = routes[0];
     try {
       const component = await route.component();
       const componentToRender = new component.default();

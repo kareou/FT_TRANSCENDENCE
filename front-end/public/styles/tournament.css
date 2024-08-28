@@ -198,13 +198,13 @@ input[type='radio']:checked+label {
 	background-color: gray;
 }
 
-.player {
+/* .player {
 	display: flex;
 	justify-content: start;
 	align-items: center;
 	padding-left: 1rem;
-	border-left: 4px solid rebeccapurple;
-}
+	border-left: 4px solid ;
+} */
 
 .player h1 {
 	color: #000;

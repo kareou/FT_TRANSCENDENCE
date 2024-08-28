@@ -104,39 +104,76 @@
     top: 2%;
     right: 15rem;
     transform: translateX(50%);
-    /* background-color: #778FB8; */
     color: white;
-    /* font-family: "Coolvetica"; */
     width: 25rem;
     height: 5rem;
     font-size: 1rem;
     animation: slideInFromTop .5s ease-in-out;
 }
 
-/* -ch1: #05478a;
-	--ch2: #0070e0;
-	--ch3: #0070e040;
-	--cs1: #005e38;
-	--cs2: #03a65a;
-	--cs3: #03a65a40;
-	--cw1: #c24914;
-	--cw2: #fc8621;
-	--cw3: #fc862140;
-	--ce1: #851d41;
-	--ce2: #db3056;
-	--ce3: #db305640;*/
+#remove-toast{
+    position: absolute;
+    top: .5rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    background: transparent;
+    color: white;
+    border-radius: 100%;
+    width: 1rem;
+    height: 1rem;
+    font: bold;
+    padding: .7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    transition: all .3s ease-in-out;
+}
+
+#remove-toast.error:hover{
+    color: black;
+    background-color: #db3056;
+}
+
+#remove-toast.success:hover{
+    color: black;
+    background-color: #03a65a;
+}
+
+#remove-toast.warning:hover{
+    color: black;
+    background-color: #fc8621;
+}
+
+#remove-toast.info:hover{
+    color: black;
+    background-color: #0070e0;
+}
+
+.toast.remove {
+    animation: fadeout .5s ease-in-out;
+}
+
+@keyframes fadeout {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
 
 .toast-wrapper {
     position: relative;
     display: flex;
-    justify-content: space-around;
     align-items: center;
     padding: 0 1rem;
     width: 100%;
     height: 100%;
 
     background: linear-gradient(90deg, #1f2333, #22232b);
-    /* padding: 1rem 2rem 1rem 6rem; */
+    padding-left: 1rem;
     text-align: center;
     border-radius: 0.25rem;
     font-weight: 300;
@@ -145,24 +182,9 @@
     opacity: 1;
     border: 0.15rem solid #fff2;
     box-shadow: inset 0 0 0.5rem 0 #1d1e26;
+    gap: 2rem;
 }
 
-/* .toast-wrapper:after {
-	content: "";
-    position: absolute;
-    width: 3.5rem;
-    height: 3.5rem;
-    background: radial-gradient(circle at 50% 50%, var(--clr) 1.25rem, var(--brd) calc(1.25rem + 1px) 100%);
-    top: 1.2rem;
-    left: 5rem;
-    border-radius: 3rem;
-    padding-top: 0.2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.75rem;
-    box-sizing: border-box;
-} */
 
 .toast-icon {
 	width: 2.5rem;
@@ -175,6 +197,18 @@
 	cursor: pointer;
 	position: relative;
     background-color: #0070e0;
+}
+
+.toast-icon.error {
+    background-color: #db3056;
+}
+
+.toast-icon.success {
+    background-color: #03a65a;
+}
+
+.toast-icon.warning {
+    background-color: #fc8621;
 }
 
 .toast-icon:before {
@@ -223,8 +257,37 @@
     left: 0rem;
     z-index: 0;
     border-radius: 0.35rem;
-    background: radial-gradient(circle at 0% 50%, #0070e0, #fff0 5rem), radial-gradient(circle at -50% 50%, #05478a, #fff0 5rem);
     opacity: 0.5;
+}
+/* -ch1: #05478a;
+	--ch2: #0070e0;
+	--ch3: #0070e040;
+	--cs1: #005e38;
+	--cs2: #03a65a;
+	--cs3: #03a65a40;
+	--cw1: #c24914;
+	--cw2: #fc8621;
+	--cw3: #fc862140;
+	--ce1: #851d41;
+	--ce2: #db3056;
+	--ce3: #db305640;
+    background: radial-gradient(circle at 0% 50%, var(--clr), #fff0 5rem), radial-gradient(circle at -50% 50%, var(--bg), #fff0 5rem);
+    */
+.toast-wrapper.info:before{
+    background: radial-gradient(circle at 0% 50%, #0070e0, #fff0 5rem), radial-gradient(circle at -50% 50%, #05478a, #fff0 5rem);
+    
+}
+
+.toast-wrapper.success:before{
+    background: radial-gradient(circle at 0% 50%, #03a65a, #fff0 5rem), radial-gradient(circle at -50% 50%, #005e38, #fff0 5rem);
+}
+
+.toast-wrapper.warning:before{
+    background: radial-gradient(circle at 0% 50%, #fc8621, #fff0 5rem), radial-gradient(circle at -50% 50%, #c24914, #fff0 5rem);
+}
+
+.toast-wrapper.error:before{
+    background: radial-gradient(circle at 0% 50%, #db3056, #fff0 5rem), radial-gradient(circle at -50% 50%, #851d41, #fff0 5rem);
 }
 
 .toast-body {

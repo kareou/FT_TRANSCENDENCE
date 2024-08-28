@@ -6,6 +6,7 @@ class Match(models.Model):
     player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player2")
     player1_score = models.IntegerField(default=0)
     player2_score = models.IntegerField(default=0)
+    status = models.CharField(max_length=10, default="pending")
     winner = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateField(auto_now_add=True)
 

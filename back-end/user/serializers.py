@@ -39,11 +39,11 @@ class UserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
 
         # Update fields if they are present in validated_data
-        instance.full_name = validated_data.get('full_name', instance.full_name)
-        instance.username = validated_data.get('username', instance.username)
-        instance.email = validated_data.get('email', instance.email)
-        if 'password' in validated_data:
-            instance.set_password(validated_data['password'])
+        for attr, value in validated_data.items():
+            if attr == 'password':
+                instance.set_password(value)
+            else:
+                setattr(instance, attr, value)
         instance.save()
         return instance
 

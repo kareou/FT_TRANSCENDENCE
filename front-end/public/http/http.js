@@ -9,7 +9,6 @@ class Http {
   }
 
   notifyStats(data) {
-    console.log(data);
   if (data.type === "game_invite")
     this.website_stats.notify("toast", data);
   else if (data.type === "FRQ"){
