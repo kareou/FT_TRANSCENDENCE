@@ -29,11 +29,13 @@ export default class OnlineGame extends HTMLElement {
     this.player1.score = newstate.p1score;
     this.player2.score = newstate.p2score;
     this.game_progress = newstate.game_progress;
-    console.log(this.game_progress);
     if (this.game_progress === "pause") {
       document.removeEventListener("keydown", (e) => this.#handleKeyDown(e));
       this.roundStartCountDown(this.ball.ctx);
       document.addEventListener("keydown", (e) => this.#handleKeyDown(e));
+    }
+    else if (this.game_progress === "end") {
+      this.declareWinner();
     }
     document.getElementById("p1_score").innerText = this.player1.score;
     document.getElementById("p2_score").innerText = this.player2.score;
@@ -122,7 +124,6 @@ export default class OnlineGame extends HTMLElement {
       ctx.fillText(count_down, ctx.canvas.width / 2, ctx.canvas.height / 2);
       count_down -= 1;
       const intervalId = setInterval(() => {
-        console.log(count_down);
         if (count_down === -1) {
           clearInterval(intervalId);
           this.game_progress = "waiting";
@@ -146,7 +147,6 @@ export default class OnlineGame extends HTMLElement {
     var id = requestAnimationFrame(() => this.#update(ctx));
     if (this.game_progress === "end") {
       cancelAnimationFrame(id);
-      this.declareWinner();
       return;
     }
     else if (this.game_progress === "pause") {

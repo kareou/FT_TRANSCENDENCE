@@ -65,8 +65,16 @@ export default class Link extends HTMLAnchorElement {
     return true
   }
 
+
   static async navigateTo(url) {
-    if (Link.shouldSaveHistory(url)) window.history.pushState({}, "", url);
+
+    if (Link.startWith(window.location.pathname, "/game")) {
+      // If the current URL is 'game', replace it with the new URL
+      window.history.replaceState({}, "", url);
+    } else if (Link.shouldSaveHistory(url)) {
+      // If the current URL is not 'game', create a new history entry
+      window.history.pushState({}, "", url);
+    }
     if (url.endsWith("/") && url != "/") url = url.slice(0, -1);
     let pos = url.indexOf("/?");
     if (pos === -1) {
