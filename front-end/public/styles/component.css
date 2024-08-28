@@ -634,11 +634,11 @@ width: 20rem;
 
 .status_indicator {
     position: absolute;
-    width: 1rem;
-    height: 1rem;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    bottom: .4rem;
-    right: .9rem;
+    bottom: 5px;
+    right: 0.9rem;
 }
 
 .avatar_overlay {
