@@ -1,4 +1,5 @@
 import Observer from "../state/observer.js";
+import Link from "../components/link.js";
 
 class Http {
   constructor() {
@@ -9,13 +10,19 @@ class Http {
   }
 
   notifyStats(data) {
+    console.log(data);
   if (data.type === "game_invite")
     this.website_stats.notify("toast", data);
   else if (data.type === "FRQ"){
 
     this.website_stats.notify("friend_request", data);
   }
-    else
+  else if (data.type === "tournament_match"){
+    setTimeout(() => {
+    Link.navigateTo(`/game/online/?game_id=${data.message}`);
+  }, 5000);
+  }
+  else
       this.website_stats.notify("notification", data);
   }
 

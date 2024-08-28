@@ -186,7 +186,6 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.user,self.user_id = await GetUser(self.scope)
         self.game_id = self.scope["url_route"]["kwargs"]["game_id"]
-
         # Increment the connection count
         player_belongs_to_game = await checkPlayerBelongsToGame(self.user, self.game_id)
         if not player_belongs_to_game:
