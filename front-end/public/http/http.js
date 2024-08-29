@@ -14,13 +14,15 @@ class Http {
   if (data.type === "game_invite")
     this.website_stats.notify("toast", data);
   else if (data.type === "FRQ"){
-
     this.website_stats.notify("friend_request", data);
   }
   else if (data.type === "tournament_match"){
     setTimeout(() => {
     Link.navigateTo(`/game/online/?game_id=${data.message}`);
   }, 5000);
+  }
+  else if (data.type === "remove_friend"){
+    this.website_stats.notify("remove_friend", data);
   }
   else
       this.website_stats.notify("notification", data);

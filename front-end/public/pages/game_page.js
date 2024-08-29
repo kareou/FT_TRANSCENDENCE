@@ -60,7 +60,7 @@ export default class GamePage extends HTMLElement {
       start_ev.innerText = `Starting in ${count_down}`;
       setInterval(() => {
         count_down -= 1;
-        if (count_down === -1) {
+        if (count_down === 0) {
           Link.navigateTo("/game/local");
         }
         start_ev.innerText = `Starting in ${count_down}`;

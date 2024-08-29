@@ -10,6 +10,7 @@ export default class OnlineGame extends HTMLElement {
     this.player1 = null;
     this.player2 = null;
     this.ball;
+    this.win = false;
     this.winner = null;
     this.websocket = null;
     this.game_ended = false;
@@ -30,16 +31,22 @@ export default class OnlineGame extends HTMLElement {
     this.player1.score = newstate.p1score;
     this.player2.score = newstate.p2score;
     this.game_progress = newstate.game_progress;
+    document.getElementById("p1_score").innerText = this.player1.score;
+    document.getElementById("p2_score").innerText = this.player2.score;
+
     if (this.game_progress === "pause") {
       document.removeEventListener("keydown", (e) => this.#handleKeyDown(e));
       this.roundStartCountDown(this.ball.ctx);
       document.addEventListener("keydown", (e) => this.#handleKeyDown(e));
     }
     else if (this.game_progress === "end") {
+      if (this.player1.score > this.player2.score) {
+        this.winner = "player1";
+      } else {
+        this.winner = "player2";
+      }
       this.declareWinner();
     }
-    document.getElementById("p1_score").innerText = this.player1.score;
-    document.getElementById("p2_score").innerText = this.player2.score;
   }
 
   connectedCallback() {
@@ -67,6 +74,7 @@ export default class OnlineGame extends HTMLElement {
       this.websocket.onmessage = (e) => {
         const data = JSON.parse(e.data);
         if (data.winner) {
+          console.log(data.winner)
           this.winner = data.winner;
         }
         if (data.role) {
@@ -117,7 +125,8 @@ export default class OnlineGame extends HTMLElement {
 
   declareWinner() {
     const modal = document.createElement("winner-modal");
-    modal.setAttribute("winner", this.winner);
+    let win = this.role === this.winner ? "won" : "lost";
+    modal.setAttribute("type", win);
     this.appendChild(modal);
     this.websocket.close(3000);
     this.websocket = null;

@@ -2,6 +2,7 @@ import { ClassicPaddle, BlossomPaddle, LightSaber } from "./game_objects/player.
 import { Ball } from "./game_objects/ball.js";
 import { Board } from "./game_objects/board.js";
 import Link from "../../components/link.js";
+import Http from "../../http/http.js";
 
 const getPlayerObject = (paddle_name, player_num, ctx, theme) => {
   if (paddle_name === "classic")
@@ -25,6 +26,10 @@ export default class Game extends HTMLElement {
   }
   connectedCallback() {
     let data = localStorage.getItem("state");
+    if (!data) {
+      Link.navigateTo("/dashboard");
+      Http.website_stats.notify("toast", {type: "error", message: "No game data found"});
+    }
     data = JSON.parse(data);
     this.data = data[0]
     this.theme = this.data['table_theme'];
@@ -57,6 +62,7 @@ export default class Game extends HTMLElement {
 
   disconnectedCallback() {
     document.removeEventListener("keydown", this.#movePaddels);
+    localStorage.removeItem("state");
   }
 
   winner(ctx) {
@@ -74,6 +80,7 @@ export default class Game extends HTMLElement {
       else
         ctx.fillText(`${this.data.player2.name} won`, ctx.canvas.width / 2, ctx.canvas.height / 2);
       var time = 5
+      ctx.font = "50px Arial";
       ctx.fillText(`back to dashboard in ${time} ...`, ctx.canvas.width / 2, ctx.canvas.height / 2 + 100);
       time -= 1;
       let intervalId = setInterval(() => {

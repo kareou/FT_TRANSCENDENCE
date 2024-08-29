@@ -624,7 +624,24 @@ width: 20rem;
 
 }
 
+#player_type{
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+#player_type.won{
+    color: #04D98B;
+}
+
+#player_type.lost{
+    color: #D90404;
+}
+
 .avatar_icon {
+    border-radius: 50%;
+}
+
+.icon-wrapper{
     position: relative;
 }
 

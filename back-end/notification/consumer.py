@@ -42,7 +42,8 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 		receiver = notification['receiver'] or None
 		sender = notification['sender'] or None
 		self.group_name = f"notification_{receiver}"
-		if notification_type != "game_invite":
+		print(f"Notification: {notification}", flush=True)
+		if notification_type != "game_invite" and notification_type != "remove_friend":
 			try:
 				receiver_obj = await database_sync_to_async(User.objects.get)(id=receiver)
 				sender_obj = await database_sync_to_async(User.objects.get)(id=sender)

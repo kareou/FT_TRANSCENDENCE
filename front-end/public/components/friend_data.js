@@ -7,6 +7,7 @@ export default class FriendData extends HTMLElement {
     this.profile_pic = this.getAttribute("profile_pic");
     this.full_name = this.getAttribute("full_name");
     this.friendship_id = this.getAttribute("friendship_id");
+    this.state = this.getAttribute("state");
     this.matches = [];
   }
   connectedCallback() {
@@ -15,6 +16,12 @@ export default class FriendData extends HTMLElement {
         Http.getData("DELETE", `api/friends/${this.friendship_id}`).then((response) => {
             console.log(response)
             Http.website_stats.notify("friends");
+            Http.notification_socket.send(JSON.stringify({
+                "type": "remove_friend",
+                "message": this.friendship_id,
+                "receiver": this.id,
+                "sender": Http.user.id
+            }))
         });
         console.log("remove friend")
         console.log(this.friendship_id)
@@ -24,7 +31,7 @@ export default class FriendData extends HTMLElement {
     this.innerHTML = /*HTML*/ `
     <div class="friend_wrapper__">
     <div class="user_data_wrapper" style="width: 100%;">
-    <img src="http://localhost:8000${this.profile_pic}" alt="medal" class="user_img_rounded">
+    <user-avatar image="http://localhost:8000${this.profile_pic}" state=${this.state} width="70" height="70"></user-avatar>
     <p class="user_name_wrapper">${this.full_name}</p>
     </div>
     <div class="icons_wrapper" style="display: flex;align-content: center;">

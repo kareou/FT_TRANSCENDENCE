@@ -6,13 +6,13 @@ export default class WinnerModal extends HTMLElement{
     }
 
     connectedCallback(){
-        this.winner = this.getAttribute("winner");
+        this.type = this.getAttribute("type");
         this.redirectToDashboard();
     }
 
     attributeChangedCallback(name, oldValue, newValue){
-        if(name === "winner"){
-            this.winner = newValue;
+        if(name === "type"){
+            this.type = newValue;
             this.render();
         }
     }
@@ -35,7 +35,7 @@ export default class WinnerModal extends HTMLElement{
         this.innerHTML = /*html*/`
             <div class="modal">
                 <div class="modal_content">
-                    <h1>${this.winner} won</h1>
+                    <h1 id="player_type" class="${this.type}">you ${this.type} </h1>
                     <h1 id="return_timer">back to dashboard in 5 ...</h1>
                 </div>
             </div>
