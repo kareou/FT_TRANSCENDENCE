@@ -5,6 +5,7 @@ export default class Friends extends HTMLElement {
         super();
         Http.website_stats.addObserver({ update: this.update.bind(this), event: "friends" });
         Http.website_stats.addObserver({ update: this.update.bind(this), event: "remove_friend" });
+        Http.website_stats.addObserver({ update: this.update.bind(this), event: "status_update" });
     }
 
     update() {
@@ -25,6 +26,7 @@ export default class Friends extends HTMLElement {
             .then(data => {
                 for (let i = 0; i < data.length; i++) {
                     let fr;
+                    console.log(data[i])
                     if (data[i].user1.id === Http.user.id)
                         fr = `<friend-data id="${data[i].user2.id}" state=${data[i].user2.online} profile_pic="${data[i].user2.profile_pic}"  full_name="${data[i].user2.full_name}" friendship_id="${ data[i].id}" style="width:100%"></friend-data>`
                     else
@@ -43,7 +45,7 @@ export default class Friends extends HTMLElement {
             })
     }
 
- 
+
     connectedCallback() {
         this.render();
         this.getFriends();
@@ -53,7 +55,7 @@ export default class Friends extends HTMLElement {
         this.innerHTML = /*HTML*/ `
             <div class="online_friend" style="display: flex;flex-direction: column;padding: 15px 0;">
             <h1>Friends</h1>
-            <div class="friend_online_wrapper" style="width: 100%;">   
+            <div class="friend_online_wrapper" style="width: 100%;">
             </div>
         </div>
         `;

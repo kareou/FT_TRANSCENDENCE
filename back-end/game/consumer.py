@@ -198,7 +198,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         # Increment the connection count
         player_belongs_to_game = await checkPlayerBelongsToGame(self.user, self.game_id)
         if not player_belongs_to_game:
-            raise Disconnected("User does not belong to the game")
+            return await self.close()
         if self.game_id not in GameConsumer.game_users_data:
             GameConsumer.game_users_data[self.game_id] = []
         if self.game_id in GameConsumer.game_users_count:
@@ -231,7 +231,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     game_state = GameConsumer.game_state_[self.game_id]
                     game_state = update_game_state(game_state)
                     GameConsumer.game_state_[self.game_id] = game_state
-                    
+
                     try:
                         await self.channel_layer.group_send(
                             self.game_id,

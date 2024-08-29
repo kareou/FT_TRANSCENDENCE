@@ -3,14 +3,15 @@ export default class UserAvatar extends HTMLElement{
         super();
         this.state = this.getAttribute('state');
         console.log(this.state)
-        this.state = this.state === true ? "online" : "offline";
+        this.state = this.state == "true" ? "online" : "offline";
+        console.log(this.state)
         this.img = this.getAttribute('image');
         this.width = this.getAttribute('width');
         this.height = this.getAttribute('height');
     }
     connectedCallback(){
         this.render();
-        
+
     }
     render(){
         this.innerHTML = `

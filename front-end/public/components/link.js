@@ -102,7 +102,7 @@ export default class Link extends HTMLAnchorElement {
       const variableName = Link.extractVariableFromPath(route.path);
       if (variableName) {
         const variableValue = url.split('/').pop();
-        componentToRender[variableName] = variableValue;
+        componentToRender[variableName] = decodeURIComponent(variableValue);;
       }
       root.innerHTML = '';
       root.appendChild(componentToRender);
