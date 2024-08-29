@@ -2,6 +2,7 @@ import { ClassicPaddle, BlossomPaddle, LightSaber } from "./game_objects/player.
 import { Ball } from "./game_objects/ball.js";
 import { Board } from "./game_objects/board.js";
 import Http from "../../http/http.js";
+import Link from "../../components/link.js";
 
 export default class OnlineGame extends HTMLElement {
   constructor() {
@@ -44,44 +45,56 @@ export default class OnlineGame extends HTMLElement {
   connectedCallback() {
     const urlParams = new URLSearchParams(window.location.search);
     const gameid = urlParams.get("game_id");
-    this.websocket = new WebSocket(
-      `ws://localhost:8000/ws/gamematch/${gameid}/`
-    );
-    this.render();
-    const canvas = this.querySelector(".board");
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-    const ctx = canvas.getContext("2d");
-    this.player1 = new ClassicPaddle(0, ctx, "mod");
-    this.player2 = new ClassicPaddle(1, ctx, "mod");
-    this.ball = new Ball(ctx, "sky");
-    this.board = new Board(ctx, "mod");
-    this.websocket.onmessage = (e) => {
-      const data = JSON.parse(e.data);
-      if (data.winner) {
-        this.winner = data.winner;
-      }
-      if (data.role) {
-        this.role = data.role;
-        Http.website_stats.notify("gameusers", { [this.role]: Http.user });
-      }
-      if (data.state){
-        this.updateGameStats(data.state);
-      }
-      if (data.message) {
-        if (data.users) Http.website_stats.notify("gameusers", data.users);
-        if (data.message === "Game is starting") {
-          this.game_started = true;
-          this.#timeCountUp();
-          this.#update(ctx);
+    console.log(gameid);
+    if (!gameid) {
+      Link.navigateTo("/dashboard");
+      Http.website_stats.notify("toast", { type: "warning", message: "Game ID not found" });
+      return
+    }
+    else{
+      this.websocket = new WebSocket(
+        `ws://localhost:8000/ws/gamematch/${gameid}/`
+      );
+      this.render();
+      const canvas = this.querySelector(".board");
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+      const ctx = canvas.getContext("2d");
+      this.player1 = new ClassicPaddle(0, ctx, "mod");
+      this.player2 = new ClassicPaddle(1, ctx, "mod");
+      this.ball = new Ball(ctx, "sky");
+      this.board = new Board(ctx, "mod");
+      this.websocket.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        if (data.winner) {
+          this.winner = data.winner;
         }
+        if (data.role) {
+          this.role = data.role;
+          Http.website_stats.notify("gameusers", { [this.role]: Http.user });
+        }
+        if (data.state){
+          this.updateGameStats(data.state);
+        }
+        if (data.message) {
+          if (data.users) Http.website_stats.notify("gameusers", data.users);
+          if (data.message === "Game is starting") {
+            this.game_started = true;
+            this.#timeCountUp();
+            this.#update(ctx);
+          }
+        }
+      };
+      this.#drawBoard(ctx);
+      this.#drawPaddles(ctx);
+      this.ball.draw();
+      document.addEventListener("keydown", (e) => this.#handleKeyDown(e));
+      document.addEventListener("keyup", (e) => this.#handleKeyUp(e));
+      this.websocket.onerror = (e) => {
+        Link.navigateTo("/dashboard");
+        Http.website_stats.notify("toast", { type: "error", message: "This game is already over or does not exist" });
       }
-    };
-    this.#drawBoard(ctx);
-    this.#drawPaddles(ctx);
-    this.ball.draw();
-    document.addEventListener("keydown", (e) => this.#handleKeyDown(e));
-    document.addEventListener("keyup", (e) => this.#handleKeyUp(e));
+    }
   }
 
   disconnectedCallback() {

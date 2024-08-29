@@ -232,8 +232,6 @@
 .toast-icon.error:before {
     content: "+";
     transform: translate(-50%, -50%) rotate(45deg);
-    padding-top: 5px;
-
 }
 
 .toast-icon.success:before {
@@ -244,8 +242,6 @@
 .toast-icon.warning:before {
     content: "!";
     transform: translate(-50%, -50%);
-    padding-top: 5px;
-    background-color: #fc8621;
 }
 
 .toast-wrapper:before {
@@ -339,12 +335,12 @@
 }
 
 .modal_content {
-    background-color: #778FB8;
+    background-color: #1f2333;
     margin: 15% auto;
     padding: 20px;
     border: 0.6px solid #888;
-    width: 80%;
-    height: 80%;
+    width: 30rem;
+    height: 20rem;
     border-radius: 1rem;
     font-family: "Coolvetica";
 }

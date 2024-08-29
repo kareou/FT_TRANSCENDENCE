@@ -38,7 +38,7 @@ export default class Toast extends HTMLElement {
 				<label for="t-help" class="toast-icon ${this.type} icon-help"></label>
 				<div>
 						<label for="t-help" class="close"></label>
-						<h3>Help!</h3>
+						<h3>${this.type}!</h3>
 						<p>${message}</p>
 				</div>
 				<button id="remove-toast" class="${this.type}">x</button>

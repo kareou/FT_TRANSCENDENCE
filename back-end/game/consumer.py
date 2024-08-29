@@ -189,7 +189,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         # Increment the connection count
         player_belongs_to_game = await checkPlayerBelongsToGame(self.user, self.game_id)
         if not player_belongs_to_game:
-            return
+            raise Disconnected("User does not belong to the game")
         if self.game_id not in GameConsumer.game_users_data:
             GameConsumer.game_users_data[self.game_id] = []
         if self.game_id in GameConsumer.game_users_count:
@@ -271,18 +271,20 @@ class GameConsumer(AsyncWebsocketConsumer):
             return False
 
     async def disconnect(self, close_code):
-        GameConsumer.game_users_count[self.game_id] -= 1
-        await self.channel_layer.group_discard(
-            self.game_id,
-            self.channel_name
-        )
-        gameEnd = await self.GameEnded()
-        if gameEnd:
+        try:
+            GameConsumer.game_users_count[self.game_id] -= 1
+            await self.channel_layer.group_discard(
+                self.game_id,
+                self.channel_name
+            )
+            gameEnd = await self.GameEnded()
+            if gameEnd:
+                pass
+            else:
+                GameConsumer.game_state_[self.game_id].game_progress = "end"
+            await self.close()
+        except Exception as e:
             pass
-        else:
-            GameConsumer.game_state_[self.game_id].game_progress = "end"
-        await self.close()
-
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)

@@ -75,6 +75,9 @@ export default class SideBar extends HTMLElement {
       <a is="co-link" href="/dashboard/game">
         <i class="fa-light fa-gamepad-modern fa-2xl icon_side_bar"></i>
       </a>
+      <a is="co-link" href="/dashboard/tournament">
+        <i class="fa-sharp fa-light fa-code-fork fa-2xl icon_side_bar"></i>
+      </a>
       <a is="co-link" href="/dashboard/chat">
         <i class="fa-light fa-message-dots fa-2xl icon_side_bar chat_icon"></i>
       </a>

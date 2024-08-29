@@ -13,7 +13,7 @@ export default class TopBar extends HTMLElement {
 
   checkAndRender() {
     const path = window.location.pathname;
-    if (path === "/" || path.startsWith("/auth"))
+    if (path === "/" || path.startsWith("/auth") || path.startsWith("/game"))
       return;
     if (path === "/dashboard")
       this.welcome = true;
