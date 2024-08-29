@@ -1,4 +1,5 @@
 import Http from "../http/http.js";
+import Link from "./link.js";
 
 export default class ProfileInfo extends HTMLElement {
   constructor() {
@@ -8,9 +9,17 @@ export default class ProfileInfo extends HTMLElement {
     console.log("id : " + this.username);
   }
   connectedCallback() {
-    if (this.username != this.user.user) {
+    if (this.username != this.user.username) {
       Http.getData("Get", `api/user/${this.username}`).then((data) => {
+        if (data.error) {
+          Link.navigateTo("/404");
+          Http.website_stats.notify("toast", {
+            message: data.error.detail,
+            type: "error",
+          });
+        }
         this.user = data;
+        console.log(this.user)
         this.render();
         this.markUnearnedAchievements();
         this.setupEventListeners();

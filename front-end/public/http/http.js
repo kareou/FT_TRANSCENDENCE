@@ -134,7 +134,10 @@ class Http {
       } else if (response.status === 401 && retries < 1) {
         await this.refreshToken();
         return this.getData(method, url, data, retries + 1);
-      } else return response.json();
+      } else{
+        const res = await response.json();
+        return { error: res };
+      };
     } catch (e) {
       return { error: e.message };
     }

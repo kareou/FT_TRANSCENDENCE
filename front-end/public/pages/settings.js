@@ -38,20 +38,20 @@ export default class Settings extends HTMLElement {
 		const btn_confirm = document.querySelector('.btn_confirm');
 		const modal_wrapper_pass = document.querySelector('.modal_wrapper_pass');
 
-		submit_btn.addEventListener('click', () => {
-			modal_wrapper_pass.style.display = "block";
-			const overlay_pass = document.querySelector('.overlay_pass');
-			const modal_content_wrapper = document.querySelector('.modal_content_wrapper');
-			overlay_pass.addEventListener('click', () => {
-				modal_wrapper_pass.style.display = "none";
-			})
-		})
+		// submit_btn.addEventListener('click', () => {
+		// 	modal_wrapper_pass.style.display = "block";
+		// 	const overlay_pass = document.querySelector('.overlay_pass');
+		// 	const modal_content_wrapper = document.querySelector('.modal_content_wrapper');
+		// 	overlay_pass.addEventListener('click', () => {
+		// 		modal_wrapper_pass.style.display = "none";
+		// 	})
+		// })
 
-		btn_confirm.addEventListener('click', () => {
+		submit_btn.addEventListener('click', () => {
 			collectedSettingsData["full_name"] = document.querySelector('.fullname').value ?? null;
 			collectedSettingsData["username"] = document.querySelector('.username').value ?? null;
 			collectedSettingsData["email"] = document.querySelector('.email').value ?? null;
-			collectedSettingsData["password"] = document.querySelector('.pass').value ?? null;
+			// collectedSettingsData["password"] = document.querySelector('.pass').value ?? null;
 			console.log(JSON.stringify(collectedSettingsData))
 
 			const baseUrl = "http://localhost:8000"

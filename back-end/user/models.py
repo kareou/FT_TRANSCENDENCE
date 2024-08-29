@@ -30,6 +30,8 @@ class User(AbstractBaseUser):
     level = models.IntegerField(default=1)
     exp = models.IntegerField(default=0)
     online = models.BooleanField(default=False) 
+    paddle_type = models.CharField(max_length=30, default='classic')
+    table_theme = models.CharField(max_length=30, default='mod')
     is_email_verified = models.BooleanField(default=False)
     _2fa_enabled = models.BooleanField(default=False)
     USERNAME_FIELD = 'email'
