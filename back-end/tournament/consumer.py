@@ -24,7 +24,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_all_matches(self):
         return list(Match.objects.all())
-    
+
     @database_sync_to_async
     def create_match(self, player1, player2):
         match = Match.objects.create(player1=player1, player2=player2, winner=player1)
@@ -41,7 +41,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 return True
         except Match.DoesNotExist:
             return False
-    
+
     async def save_match(self, player1, player2):
         print(f'player=0=id====>[{player1.id}]', flush=True)
         print(f'player=1=id====>[{player2.id}]', flush=True)
@@ -102,7 +102,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_player_by_id(self, player_id):
         return User.objects.get(pk=player_id)
-    
+
     @database_sync_to_async
     def get_user_from_scope(self, scope):
         token = scope.get("cookies", {}).get("access")
@@ -113,7 +113,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             return user
         except Exception:
             return None
-    
+
     @database_sync_to_async
     def get_all_participants(self):
         return list(TournamentParticipant.objects.all())
@@ -146,7 +146,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     self.tournamen_data['first_round'][i]['online'] = False
                     print(f"Player {user_id} removed from tournament.", flush=True)
                 await self.sent_participants_data()
-    
+
     async def sent_participants_data(self):
         print("about to sent users data 222222222222222", flush=True)
         await self.channel_layer.group_send(
@@ -156,7 +156,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'players_data': self.tournamen_data
             }
         )
-    
+
     async def serialize_players_data(self, player):
         self.participants_data[player.id] = "in_waiting"
         player_data = {
@@ -170,7 +170,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             # elif self.participants_data.__len__() >= 4 and player.id in self.participants_data:
             #     self.participants_data[player.id]['round'] = 'second_round'
             #     self.participants_data[player.id]['winner'] = True
-    
+
     async def players_status_changed(self, event):
         await self.send(text_data=json.dumps({
             'type': 'players_status_changed',
@@ -183,7 +183,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         user = await self.get_user_from_scope(self.scope)
         print(f"User id: {user.id}", flush=True)
         await self.accept()
-        
+
 
     async def disconnect(self, code):
         print(code, flush=True)
@@ -194,7 +194,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 await self.change_participant_status(user.id)
             print(f"User id desconnet=--=--=-=-=-=-=-=--=--==-=-=-=->: {user.id}", flush=True)
         await self.close()
-    
+
     async def receive(self, text_data):
         data = json.loads(text_data)
         command = data.get('command')
@@ -300,3 +300,5 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.send_state_task.cancel()
         except Exception as e:
             print("Task already cancelled or Finished", flush=True)
+
+            

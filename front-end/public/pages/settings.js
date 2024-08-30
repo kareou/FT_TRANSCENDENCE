@@ -10,6 +10,32 @@ export default class Settings extends HTMLElement {
     console.log(this.user);
     this.render();
 
+	this.querySelector(".fa-edit").addEventListener("click", () => {
+		const input = document.createElement("input");
+		input.type = "file";
+		input.accept = "image/*";
+		input.click();
+		input.onchange = async () => {
+			const file = input.files[0];
+			const formData = new FormData();
+			formData.append("profile_pic", file);
+			const baseUrl = `${ips.baseUrl}`;
+			const endPoint = "/api/user/update/";
+			const rs = fetch(baseUrl + endPoint, {
+				method: "PUT",
+				credentials: "include",
+				body: formData,
+			})
+				.then((response) => {
+					return response.json();
+				})
+				.then((data) => {
+					console.log(data);
+					this.querySelector(".img_user_settings").src = `${ips.baseUrl}${data.profile_pic}`;
+				});
+		};
+	});
+
     const lws = document.querySelectorAll(".link_wrapper_settings");
     let old_lws = lws[0];
     const content_ = document.querySelector(".content_");
@@ -190,7 +216,7 @@ export default class Settings extends HTMLElement {
 			  z-index: 1000;
 			  backdrop-filter: blur(10px);
 		  }
-  
+
 		  .overlay_2fa,
 		  .overlay_pass {
 	position: absolute;
@@ -218,7 +244,7 @@ export default class Settings extends HTMLElement {
 			  overflow: hidden;
 			  background-image: linear-gradient(190deg, rgb(0, 0, 0) 10%, rgb(0, 0, 0) 34%, rgb(0, 0, 0) 38%, rgb(62, 7, 76) 100%);
 			  border: 0.6px solid white;
-  
+
 		  }
 		  ._2fa__wrapper{
 			height: fit-content;
@@ -310,7 +336,7 @@ height: 35px;
 
 			</div>
 		</div>
-	
+
 		<div class="right_side_settings_wrapper">
 			<div class="marg_wrapper">
 				<div class="content_">
@@ -359,7 +385,7 @@ height: 35px;
 							  </div>
 								</div>
 							</div>
-							
+
 							<div class="buttons_wrapper">
 								<div class="submit_btn">
 									<button type="submit" class="submit_infos">Update Info</button>
@@ -453,7 +479,7 @@ height: 35px;
 						</div>
 					</div>
 					  </div>
-				
+
 					</div>
 				</div>
 			</div>
