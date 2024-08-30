@@ -1,13 +1,17 @@
 import Http from "../http/http.js";
+import { ips } from "../http/ip.js";
 
 export default class GameScore extends HTMLElement {
   constructor() {
     super();
     this.players = {
-        "player1" : null,
-        "player2" : null
+      player1: null,
+      player2: null,
     };
-    Http.website_stats.addObserver({ update: this.update.bind(this), event: "gameusers"});
+    Http.website_stats.addObserver({
+      update: this.update.bind(this),
+      event: "gameusers",
+    });
   }
 
   connectedCallback() {
@@ -18,12 +22,15 @@ export default class GameScore extends HTMLElement {
     this.innerHTML = /*html*/ `
         <div class="players">
             <div class="p_info">
-                ${this.players.player1 ? `<img id="player_img" src="http://localhost:8000${this.players.player1.profile_pic}" alt="avatar" loading="lazy" />
+                ${
+                  this.players.player1
+                    ? `<img id="player_img" src="${ips.baseUrl}${this.players.player1.profile_pic}" alt="avatar" loading="lazy" />
                     <h1>${this.players.player1.username}</h1> 
-                    `:
-                `<h1>waitin for opponent</h1>
+                    `
+                    : `<h1>waitin for opponent</h1>
                 <img id="player_img" src="https://api.dicebear.com/9.x/bottts-neutral/svg" alt="avatar" loading="lazy" />
-                `}
+                `
+                }
                 <h1 id="p1_score">0</h1>
             </div>
             <div class="slash">
@@ -33,11 +40,14 @@ export default class GameScore extends HTMLElement {
             </div>
             <div class="p_info">
                 <h1 id="p2_score">0</h1>
-                ${this.players.player2 ? `<h1>${this.players.player2.username}</h1>
-                <img id="player_img" src="http://localhost:8000${this.players.player2.profile_pic}" alt="avatar" loading="lazy" />` :
-                `<h1>waitin for opponent</h1>
+                ${
+                  this.players.player2
+                    ? `<h1>${this.players.player2.username}</h1>
+                <img id="player_img" src="${ips.baseUrl}${this.players.player2.profile_pic}" alt="avatar" loading="lazy" />`
+                    : `<h1>waitin for opponent</h1>
                 <img id="player_img" src="https://api.dicebear.com/9.x/bottts-neutral/svg" alt="avatar" loading="lazy" />
-                `}
+                `
+                }
             </div>
         </div>
     `;

@@ -277,7 +277,7 @@ class UserAction(ModelViewSet):
         # create a query string with all the OAuth2 parameters
         qs = urlencode({
             'client_id': provider_data['client_id'],
-            'redirect_uri': 'http://localhost:8000/api/user/oauth2/callback/' + provider + '/',
+            'redirect_uri': 'https://localhost:8443/api/user/oauth2/callback/' + provider + '/',
             'response_type': 'code',
             'scope': ' '.join(provider_data['scopes']),
             'state': request.session['oauth2_state'],
@@ -304,7 +304,7 @@ class UserAction(ModelViewSet):
             'client_secret': provider_data['client_secret'],
             'code': code,
             'grant_type': 'authorization_code',
-            'redirect_uri': 'http://localhost:8000/api/user/oauth2/callback/' + provider + '/',
+            'redirect_uri': 'https://localhost:8443/api/user/oauth2/callback/' + provider + '/',
         }
         # send the token request
         resp = requests.post(provider_data['token_url'], data=data, headers={'Accept': 'application/json'})

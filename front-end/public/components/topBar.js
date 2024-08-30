@@ -1,4 +1,5 @@
 import Link from "./link.js";
+import { ips } from "../http/ip.js";
 
 export default class TopBar extends HTMLElement {
   constructor() {
@@ -15,82 +16,77 @@ export default class TopBar extends HTMLElement {
     const path = window.location.pathname;
     if (path === "/" || path.startsWith("/auth") || path.startsWith("/game"))
       return;
-    if (path === "/dashboard")
-      this.welcome = true;
-    else
-      this.welcome = false;
+    if (path === "/dashboard") this.welcome = true;
+    else this.welcome = false;
     this.initURLChangeDetection();
     this.render();
-    const search_chat = document.querySelector('.search_chat');
+    const search_chat = document.querySelector(".search_chat");
     // get users\
-    function count_data_include_search(e, data)
-    {
+    function count_data_include_search(e, data) {
       let count = 0;
-      for (let user in data) 
-      {
+      for (let user in data) {
         if (data[user].username.includes(e)) {
           count++;
         }
       }
-      return (count);
+      return count;
     }
-    search_chat.addEventListener('input', (e) => {
+    search_chat.addEventListener("input", (e) => {
       const card = document.querySelector(".search_wrapper_");
 
-        console.log(this.user);
+      console.log(this.user);
 
-        e.preventDefault();
-        fetch(`http://localhost:8000/api/user/`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: 'include',
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("The data in user listaa =>");
-            console.log(data);
-            card.innerHTML = "";
-            let counter = 0;
-            let count_data = count_data_include_search(e.target.value, data);
-            let border_ = "";
-            
-            for (let user in data) {
-              console.log(counter)
-              console.log(e.target.value)
-              border_ = "border-bottom: none!important"
-              if (e.target.value && data[user].username.includes(e.target.value))
-              {
-                  counter++;
-                  card.classList.add('active')
-                  card.innerHTML += `<a is="co-link" href="/dashboard/profile/${data[user].username}" class="search_warpper_card" style="${border_}">
+      e.preventDefault();
+      fetch(`${ips.baseUrl}/api/user/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("The data in user listaa =>");
+          console.log(data);
+          card.innerHTML = "";
+          let counter = 0;
+          let count_data = count_data_include_search(e.target.value, data);
+          let border_ = "";
+
+          for (let user in data) {
+            console.log(counter);
+            console.log(e.target.value);
+            border_ = "border-bottom: none!important";
+            if (
+              e.target.value &&
+              data[user].username.includes(e.target.value)
+            ) {
+              counter++;
+              card.classList.add("active");
+              card.innerHTML += `<a is="co-link" href="/dashboard/profile/${data[user].username}" class="search_warpper_card" style="${border_}">
                   <img src=${data[user].profile_pic} width="200" class="img_user_search"/> <br>    
                   <div class="infos_user_search_wrapper">
                     <div class="username_search_wrapper" style="padding:4px 0px;">${data[user].username}</div>
                     <div class="email_search_wrapper" style="padding:4px 0px;">${data[user].email}</div>
                   </div>
                 </a>`;
-                // if (count_data > 1 && counter % 2 == 0)
-                //   {
-                //     console.log("The counter => ", counter)
-                //     card.innerHTML += "<hr/>"
-                //   }
-              }
-              else if (e.target.value == "" || count_data == 0)
-                  card.classList.remove('active')
-            }
-          })
-          .catch((error) => {
-            console.error("Error in users list:", error);
-          });
-          if (e.target.value == "")
-          {
-            card.innerHTML = "";
-            card.classList.remove('active')
-            console.log(card.classList)
+              // if (count_data > 1 && counter % 2 == 0)
+              //   {
+              //     console.log("The counter => ", counter)
+              //     card.innerHTML += "<hr/>"
+              //   }
+            } else if (e.target.value == "" || count_data == 0)
+              card.classList.remove("active");
           }
-
+        })
+        .catch((error) => {
+          console.error("Error in users list:", error);
+        });
+      if (e.target.value == "") {
+        card.innerHTML = "";
+        card.classList.remove("active");
+        console.log(card.classList);
+      }
     });
   }
 
@@ -179,7 +175,11 @@ transform: scale(1.1);
 }
 </style>
         <div class="chat_notification_bar_wrapper">
-        ${this.welcome ? "<h1 id='welcoming'>Welcom back,</h1>" : "<h1 id='welcoming'></h1>"}
+        ${
+          this.welcome
+            ? "<h1 id='welcoming'>Welcom back,</h1>"
+            : "<h1 id='welcoming'></h1>"
+        }
         <div>
                 <div class="search_input_wrapper">
                     <input type="text" name="search" id="search_chat" class="search_chat"

@@ -3,6 +3,7 @@ import { Ball } from "./game_objects/ball.js";
 import { Board } from "./game_objects/board.js";
 import Http from "../../http/http.js";
 import Link from "../../components/link.js";
+import {ips} from "../../http/ip.js";
 
 export default class OnlineGame extends HTMLElement {
   constructor() {
@@ -60,7 +61,7 @@ export default class OnlineGame extends HTMLElement {
     }
     else{
       this.websocket = new WebSocket(
-        `ws://localhost:8000/ws/gamematch/${gameid}/`
+        `${ips.ockerUrl}/ws/gamematch/${gameid}/`
       );
       this.render();
       const canvas = this.querySelector(".board");

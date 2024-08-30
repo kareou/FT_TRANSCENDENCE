@@ -14,17 +14,23 @@ export default class SignIn extends HTMLElement {
     const modal_wrapper_otp = this.querySelector(".modal_wrapper_otp");
     signInButton.addEventListener("click", (e) => {
       e.preventDefault();
-      // fetch("http://localhost:8000/api/user/oauth2/authorize/42/")
+      // fetch("${ip.sbaseUrl}/api/user/oauth2/authorize/42/")
       // .then (res => res.json())
       // .then (res => {
       //   console.log(res);
       //   window.open(res.url, '_blank');
       // })
-      window.location.href = "http://localhost:8000/api/user/oauth2/authorize/42/";
+      window.location.href = `${ips.baseUrl}/api/user/oauth2/authorize/42/`;
       Http.openSocket();
-      Http.notification_socket.send(JSON.stringify({ type: "status_update", sender: Http.user.id, message: "offline", receiver: 0 }));
-
-    })
+      Http.notification_socket.send(
+        JSON.stringify({
+          type: "status_update",
+          sender: Http.user.id,
+          message: "offline",
+          receiver: 0,
+        })
+      );
+    });
     this.querySelector("form").addEventListener("submit", (e) => {
       e.preventDefault();
       const email = this.querySelector("#email").value;
@@ -34,23 +40,22 @@ export default class SignIn extends HTMLElement {
         password: pwd,
       };
       Http.login(data, "api/user/login/").then((res) => {
-        if (res.message == "'otp'")
-        {
+        if (res.message == "'otp'") {
           otp_container.style.display = "block";
           modal_wrapper_otp.style.display = "block";
           otp_container.querySelector("#otp_input").required = true;
-          otp_container.querySelector("#otp_input").addEventListener("input", (e) => {
-            if (e.target.value.length == 6)
-            {
-
-              data["otp"] = e.target.value;
-              Http.login(data, "api/user/login/").then((res) => {
-                if (res.user) {
-                  Link.navigateTo("/dashboard");
-                }
-              });
-            }
-          });
+          otp_container
+            .querySelector("#otp_input")
+            .addEventListener("input", (e) => {
+              if (e.target.value.length == 6) {
+                data["otp"] = e.target.value;
+                Http.login(data, "api/user/login/").then((res) => {
+                  if (res.user) {
+                    Link.navigateTo("/dashboard");
+                  }
+                });
+              }
+            });
         }
         if (res.user) {
           Link.navigateTo("/dashboard");

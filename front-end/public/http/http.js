@@ -1,9 +1,10 @@
 import Observer from "../state/observer.js";
 import Link from "../components/link.js";
+import {ips} from "./ip.js";
 
 class Http {
   constructor() {
-    this.baseUrl = "http://localhost:8000";
+    this.baseUrl = ips.baseUrl;
     this.user = null;
     this.website_stats = new Observer();
     this.notification_socket = null;
@@ -56,7 +57,7 @@ class Http {
   openSocket() {
     console.log("Opening socket");
     this.notification_socket = new WebSocket(
-      `ws://localhost:8000/ws/notification/${this.user.id}/`
+      `${ips.socketUrl}/ws/notification/${this.user.id}/`
     );
     this.notification_socket.onmessage = (e) => {
       const data = JSON.parse(e.data);

@@ -1,6 +1,7 @@
 import Http from "../http/http.js";
 import Observer from "../state/observer.js";
 import Link from "../components/link.js";
+import { ips } from "../http/ip.js";
 
 export default class MatchMaking extends HTMLElement {
   constructor() {
@@ -28,11 +29,11 @@ export default class MatchMaking extends HTMLElement {
   }
 
   connectedCallback() {
-    this.websocket = new WebSocket("ws://localhost:8000/ws/matchmaking/");
+    this.websocket = new WebSocket(`${ips.socketUrl}/ws/matchmaking/`);
     this.websocket.onmessage = (e) => {
       const data = JSON.parse(e.data);
       if (data.player2) {
-        if (this.matchmakingstate.players.length === 2){
+        if (this.matchmakingstate.players.length === 2) {
           if (this.intervalId) {
             clearInterval(this.intervalId);
             this.intervalId = null;
@@ -73,7 +74,7 @@ export default class MatchMaking extends HTMLElement {
     });
   }
 
-  reset(){
+  reset() {
     const cancel = this.querySelector("#cancel");
     cancel.removeAttribute("disabled");
     const state = this.querySelector("#lobby_state");
@@ -81,8 +82,7 @@ export default class MatchMaking extends HTMLElement {
   }
 
   disconnectedCallback() {
-    if (this.websocket)
-      this.websocket.close(3001);
+    if (this.websocket) this.websocket.close(3001);
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
@@ -90,7 +90,6 @@ export default class MatchMaking extends HTMLElement {
   }
 
   render() {
-
     this.innerHTML = /*html*/ `
 		<div class="matchmaking-wrapper">
       <div class="matchmaking">

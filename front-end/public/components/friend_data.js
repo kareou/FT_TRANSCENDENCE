@@ -1,4 +1,5 @@
 import Http from "../http/http.js";
+import { ips } from "../http/ip.js";
 
 export default class FriendData extends HTMLElement {
   constructor() {
@@ -13,25 +14,29 @@ export default class FriendData extends HTMLElement {
   connectedCallback() {
     this.render();
     this.querySelector(".remove_friend").addEventListener("click", () => {
-        Http.getData("DELETE", `api/friends/${this.friendship_id}`).then((response) => {
-            console.log(response)
-            Http.website_stats.notify("friends");
-            Http.notification_socket.send(JSON.stringify({
-                "type": "remove_friend",
-                "message": this.friendship_id,
-                "receiver": this.id,
-                "sender": Http.user.id
-            }))
-        });
-        console.log("remove friend")
-        console.log(this.friendship_id)
+      Http.getData("DELETE", `api/friends/${this.friendship_id}`).then(
+        (response) => {
+          console.log(response);
+          Http.website_stats.notify("friends");
+          Http.notification_socket.send(
+            JSON.stringify({
+              type: "remove_friend",
+              message: this.friendship_id,
+              receiver: this.id,
+              sender: Http.user.id,
+            })
+          );
+        }
+      );
+      console.log("remove friend");
+      console.log(this.friendship_id);
     });
   }
   render() {
     this.innerHTML = /*HTML*/ `
     <div class="friend_wrapper__">
     <div class="user_data_wrapper" style="width: 100%;">
-    <user-avatar image="http://localhost:8000${this.profile_pic}" state=${this.state} width="70" height="70"></user-avatar>
+    <user-avatar image="${ips.baseUrl}${this.profile_pic}" state=${this.state} width="70" height="70"></user-avatar>
     <p class="user_name_wrapper">${this.full_name}</p>
     </div>
     <div class="icons_wrapper" style="display: flex;align-content: center;">
@@ -44,6 +49,6 @@ export default class FriendData extends HTMLElement {
     </div>
   </div>
     `;
-    }
+  }
 }
 customElements.define("friend-data", FriendData);
