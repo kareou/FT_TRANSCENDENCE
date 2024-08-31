@@ -79,6 +79,11 @@ export const routes = [
         component: () => import("../pages/settings.js"),
       },
       {
+        path: "/tournament", // Changed from "/tournament" to "tournament"
+        requireAuth: true,
+        component: () => import("../pages/tournament.js"),
+      },
+      {
         path: "/profile", // Changed from "/settings" to "settings"
         requireAuth: true,
         children: [
@@ -101,29 +106,12 @@ export const routes = [
           {
             path: "/online", // Changed from "/online" to "online"
             requireAuth: true,
-            children: [
-              {
-                path: "/1v1", // Changed from "/1v1" to "1v1"
-                requireAuth: true,
-                component: () => import("../pages/matchmaking.js"),
-              },
-            ],
+            component: () => import("../pages/matchmaking.js"),
           },
           {
             path: "/local", // Changed from "/local" to "local"
             requireAuth: true,
-            children: [
-              {
-                path: "/1v1", // Changed from "/1v1" to "1v1"
-                requireAuth: true,
-                component: () => import("../pages/game_page.js"),
-              },
-              {
-                path: "/tournament", // Changed from "/tournament" to "tournament"
-                requireAuth: true,
-                component: () => import("../pages/tournament.js"),
-              }
-            ],
+            component: () => import("../pages/game_page.js"),
           },
         ],
       },

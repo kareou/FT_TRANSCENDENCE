@@ -1,174 +1,204 @@
 import Http from "../http/http.js";
+import {ips} from "../http/ip.js";
 
 export default class Settings extends HTMLElement {
-	constructor() {
-		super();
-		this.user = Http.user;
-	}
-	connectedCallback() {
-		console.log(this.user)
-		this.render();
+  constructor() {
+    super();
+    this.user = Http.user;
+  }
+  connectedCallback() {
+    console.log(this.user);
+    this.render();
 
-		const lws = document.querySelectorAll('.link_wrapper_settings')
-		let old_lws = lws[0];
-		const content_ = document.querySelector(".content_")
-		let key_obj = null;
-		const set = document.querySelectorAll('.set')
-
-
-		lws.forEach((e, idx_btn) => {
-			e.addEventListener('click', () => {
-				if (old_lws)
-					old_lws.classList.remove('active_btn_settings')
-				e.classList.add('active_btn_settings')
-
-				set.forEach((e, idx) => {
-					if (idx != idx_btn)
-						e.classList.add('d-none')
-					else
-						e.classList.remove('d-none')
+	this.querySelector(".fa-edit").addEventListener("click", () => {
+		const input = document.createElement("input");
+		input.type = "file";
+		input.accept = "image/*";
+		input.click();
+		input.onchange = async () => {
+			const file = input.files[0];
+			const formData = new FormData();
+			formData.append("profile_pic", file);
+			const baseUrl = `${ips.baseUrl}`;
+			const endPoint = "/api/user/update/";
+			const rs = fetch(baseUrl + endPoint, {
+				method: "PUT",
+				credentials: "include",
+				body: formData,
+			})
+				.then((response) => {
+					return response.json();
 				})
-				console.log(key_obj)
+				.then((data) => {
+					console.log(data);
+					this.querySelector(".img_user_settings").src = `${ips.baseUrl}${data.profile_pic}`;
+				});
+		};
+	});
 
-				old_lws = e;
-			})
-		})
-		const submit_btn = document.querySelector('.submit_infos');
-		const collectedSettingsData = {};
-		const btn_confirm = document.querySelector('.btn_confirm');
-		const modal_wrapper_pass = document.querySelector('.modal_wrapper_pass');
+    const lws = document.querySelectorAll(".link_wrapper_settings");
+    let old_lws = lws[0];
+    const content_ = document.querySelector(".content_");
+    let key_obj = null;
+    const set = document.querySelectorAll(".set");
 
-		submit_btn.addEventListener('click', () => {
-			modal_wrapper_pass.style.display = "block";
-			const overlay_pass = document.querySelector('.overlay_pass');
-			const modal_content_wrapper = document.querySelector('.modal_content_wrapper');
-			overlay_pass.addEventListener('click', () => {
-				modal_wrapper_pass.style.display = "none";
-			})
-		})
+    lws.forEach((e, idx_btn) => {
+      e.addEventListener("click", () => {
+        if (old_lws) old_lws.classList.remove("active_btn_settings");
+        e.classList.add("active_btn_settings");
 
-		btn_confirm.addEventListener('click', () => {
-			collectedSettingsData["full_name"] = document.querySelector('.fullname').value ?? null;
-			collectedSettingsData["username"] = document.querySelector('.username').value ?? null;
-			collectedSettingsData["email"] = document.querySelector('.email').value ?? null;
-			collectedSettingsData["password"] = document.querySelector('.pass').value ?? null;
-			console.log(JSON.stringify(collectedSettingsData))
+        set.forEach((e, idx) => {
+          if (idx != idx_btn) e.classList.add("d-none");
+          else e.classList.remove("d-none");
+        });
+        console.log(key_obj);
 
-			const baseUrl = "http://localhost:8000"
-			const endPoint = "/api/user/update/"
-			const rs = fetch(baseUrl + endPoint, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				credentials: 'include',
-				body: JSON.stringify(collectedSettingsData),
-			}).then(response => {
-				return response.json();
-			}).then(data => {
-				console.log(data)
-				console.log(collectedSettingsData)
-			})
-		})
+        old_lws = e;
+      });
+    });
+    const submit_btn = document.querySelector(".submit_infos");
+    const collectedSettingsData = {};
+    const btn_confirm = document.querySelector(".btn_confirm");
+    const modal_wrapper_pass = document.querySelector(".modal_wrapper_pass");
 
-		const update_pass = document.querySelector('.update_pass');
-		const collectedPassData = {};
-		collectedPassData["old_password"] = document.querySelector('.oldpass').value ?? null;
-		collectedPassData["new_password"] = document.querySelector('.newpass').value ?? null;
-		collectedPassData["confirm_password"] = document.querySelector('.confirmpass').value ?? null;
+    // submit_btn.addEventListener('click', () => {
+    // 	modal_wrapper_pass.style.display = "block";
+    // 	const overlay_pass = document.querySelector('.overlay_pass');
+    // 	const modal_content_wrapper = document.querySelector('.modal_content_wrapper');
+    // 	overlay_pass.addEventListener('click', () => {
+    // 		modal_wrapper_pass.style.display = "none";
+    // 	})
+    // })
 
-		update_pass.addEventListener('click', () => {
+    submit_btn.addEventListener("click", () => {
+      collectedSettingsData["full_name"] =
+        document.querySelector(".fullname").value ?? null;
+      collectedSettingsData["username"] =
+        document.querySelector(".username").value ?? null;
+      collectedSettingsData["email"] =
+        document.querySelector(".email").value ?? null;
+      // collectedSettingsData["password"] = document.querySelector('.pass').value ?? null;
+      console.log(JSON.stringify(collectedSettingsData));
 
-			const dataPs = {}
-			dataPs["old_password"] = document.querySelector('.oldpass').value
-			dataPs["password"] = document.querySelector('.newpass').value
-			if (document.querySelector('.newpass').value != document.querySelector('.confirmpass').value)
-				return alert("Passwords do not match");
-			const baseUrl = "http://localhost:8000"
-			const endPoint = "/api/user/change_password/"
-			const rs = fetch(baseUrl + endPoint, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				credentials: 'include',
-				body: JSON.stringify(dataPs),
-			}).then(response => {
-				return response.json();
-			}).then(data => {
-				console.log(data)
-				console.log(dataPs)
-			})
-		});
+      const baseUrl = `${ips.baseUrl}`;
+      const endPoint = "/api/user/update/";
+      const rs = fetch(baseUrl + endPoint, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(collectedSettingsData),
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data);
+          console.log(collectedSettingsData);
+        });
+    });
 
-		const enable_2fa = document.querySelector('.enable_2fa');
-		const disable_2fa = document.querySelector('.disable_2fa');
-		const qr = document.querySelector('._2fa_qrcode');
+    const update_pass = document.querySelector(".update_pass");
+    const collectedPassData = {};
+    collectedPassData["old_password"] =
+      document.querySelector(".oldpass").value ?? null;
+    collectedPassData["new_password"] =
+      document.querySelector(".newpass").value ?? null;
+    collectedPassData["confirm_password"] =
+      document.querySelector(".confirmpass").value ?? null;
 
-		Http.getData("/api/user/" + this.user.username).then(data => {
-			console.log(data)
-		})
-		const _2fa_container = document.querySelector('._2fa_container');
-		const modal_wrapper_2fa = document.querySelector('.modal_wrapper_2fa');
-		enable_2fa.addEventListener('click', () => {
-			const baseUrl = "http://localhost:8000"
-			const endPoint = "/api/user/enable_2fa/"
-			const rs = fetch(baseUrl + endPoint, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				credentials: 'include',
-			}).then(response => {
-				return response.json();
-			}).then(data => {
-				_2fa_container.style.display = "block";
-				modal_wrapper_2fa.style.display = "block";
-				qr.src = data["2fa_url"]
+    update_pass.addEventListener("click", () => {
+      const dataPs = {};
+      dataPs["old_password"] = document.querySelector(".oldpass").value;
+      dataPs["password"] = document.querySelector(".newpass").value;
+      if (
+        document.querySelector(".newpass").value !=
+        document.querySelector(".confirmpass").value
+      )
+        return alert("Passwords do not match");
+      const baseUrl = `${ips.baseUrl}`;
+      const endPoint = "/api/user/change_password/";
+      const rs = fetch(baseUrl + endPoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(dataPs),
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data);
+          console.log(dataPs);
+        });
+    });
 
-				console.log(data["2fa_url"])
-				enable_2fa.style.display = "none";
-				disable_2fa.style.display = "block";
-			})
-		})
+    const enable_2fa = document.querySelector(".enable_2fa");
+    const disable_2fa = document.querySelector(".disable_2fa");
+    const qr = document.querySelector("._2fa_qrcode");
 
-		disable_2fa.addEventListener('click', () => {
-			const baseUrl = "http://localhost:8000"
-			const endPoint = "/api/user/disable_2fa/"
-			const rs = fetch(baseUrl + endPoint, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				credentials: 'include',
-			}).then(response => {
-				return response.json();
-			}).then(data => {
-				console.log(data)
-				enable_2fa.style.display = "block";
-				disable_2fa.style.display = "none";
-			})
-		})
+    Http.getData("/api/user/" + this.user.username).then((data) => {
+      console.log(data);
+    });
+    const _2fa_container = document.querySelector("._2fa_container");
+    const modal_wrapper_2fa = document.querySelector(".modal_wrapper_2fa");
+    enable_2fa.addEventListener("click", () => {
+      const baseUrl = `${ips.baseUrl}`;
+      const endPoint = "/api/user/enable_2fa/";
+      const rs = fetch(baseUrl + endPoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          _2fa_container.style.display = "block";
+          modal_wrapper_2fa.style.display = "block";
+          qr.src = data["2fa_url"];
 
+          console.log(data["2fa_url"]);
+          enable_2fa.style.display = "none";
+          disable_2fa.style.display = "block";
+        });
+    });
 
-		if (this.user._2fa_enabled) {
-			enable_2fa.style.display = "none";
-			disable_2fa.style.display = "block";
+    disable_2fa.addEventListener("click", () => {
+      const baseUrl = `${ips.baseUrl}`;
+      const endPoint = "/api/user/disable_2fa/";
+      const rs = fetch(baseUrl + endPoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data);
+          enable_2fa.style.display = "block";
+          disable_2fa.style.display = "none";
+        });
+    });
 
-
-		}
-		else {
-			enable_2fa.style.display = "block";
-			disable_2fa.style.display = "none";
-		}
-
-
-
-
-	}
-	render() {
-
-		this.innerHTML = /*html*/ `
+    if (this.user._2fa_enabled) {
+      enable_2fa.style.display = "none";
+      disable_2fa.style.display = "block";
+    } else {
+      enable_2fa.style.display = "block";
+      disable_2fa.style.display = "none";
+    }
+  }
+  render() {
+    this.innerHTML = /*html*/ `
 		<style>
 			._2fa_qrcode{
 				width: 100%;
@@ -186,7 +216,7 @@ export default class Settings extends HTMLElement {
 			  z-index: 1000;
 			  backdrop-filter: blur(10px);
 		  }
-  
+
 		  .overlay_2fa,
 		  .overlay_pass {
 	position: absolute;
@@ -214,7 +244,7 @@ export default class Settings extends HTMLElement {
 			  overflow: hidden;
 			  background-image: linear-gradient(190deg, rgb(0, 0, 0) 10%, rgb(0, 0, 0) 34%, rgb(0, 0, 0) 38%, rgb(62, 7, 76) 100%);
 			  border: 0.6px solid white;
-  
+
 		  }
 		  ._2fa__wrapper{
 			height: fit-content;
@@ -269,7 +299,9 @@ height: 35px;
 		<div class="left_side_settings_wrapper">
 			<div class="infos_wrapper">
 				<div class="img_wrapper">
-					<img src='http://localhost:8000${this.user.profile_pic}' alt="img user" class="img_user_settings"
+					<img src='${ips.baseUrl}${
+      this.user.profile_pic
+    }' alt="img user" class="img_user_settings"
 						loading="lazy">
 					<i class="fa fa-edit"></i>
 				</div>
@@ -304,7 +336,7 @@ height: 35px;
 
 			</div>
 		</div>
-	
+
 		<div class="right_side_settings_wrapper">
 			<div class="marg_wrapper">
 				<div class="content_">
@@ -330,7 +362,9 @@ height: 35px;
 								<lable class="label_txt" for="email">
 									Email:
 								</lable>
-								<input type="email" name="email" id="email" class="email" value="${this.user.email}">
+								<input type="email" name="email" id="email" class="email" value="${
+                  this.user.email
+                }">
 							</div>
 							<!-- <div class="input_settings_wrapper">
 								<div class="label_txt">
@@ -351,7 +385,7 @@ height: 35px;
 							  </div>
 								</div>
 							</div>
-							
+
 							<div class="buttons_wrapper">
 								<div class="submit_btn">
 									<button type="submit" class="submit_infos">Update Info</button>
@@ -436,19 +470,22 @@ height: 35px;
 						<div class="modal_content_wrapper _2fa__wrapper">
 						<div class="_2fa_container">
 						<label for="otp">2FA QR CODE</label>
-							${this.user._2fa_enabled ? `<img src="http://localhost:8000/media/2fa/${Http.user.username}_2fa.png" alt="2fa qr code" class="_2fa_qrcode">` : "<img src='' alt='2fa qr code' class='_2fa_qrcode'>"}
+							${
+                this.user._2fa_enabled
+                  ? `<img src="${ips.baseUrl}/media/2fa/${Http.user.username}_2fa.png" alt="2fa qr code" class="_2fa_qrcode">`
+                  : "<img src='' alt='2fa qr code' class='_2fa_qrcode'>"
+              }
 					  </div>
 						</div>
 					</div>
 					  </div>
-				
+
 					</div>
 				</div>
 			</div>
 		</div>
 		`;
-	}
-
+  }
 }
 
 customElements.define("settings-page", Settings);

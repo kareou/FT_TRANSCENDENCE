@@ -1,26 +1,21 @@
 version: "3"
 services:
-  # front-end:
-  #   container_name: front-end
-  #   image: nginx:latest
-  #   volumes:
-  #     - ./conf/nginx_spa.conf:/etc/nginx/nginx.conf
-  #     - ./front-end:/usr/share/nginx/html
-  #   ports:
-  #     - "80:80"
-  #   networks:
-  #     - local
-  #   restart: always
-  #   depends_on:
-  #     - back-end
+  front-end:
+    container_name: front-end
+    build: "./front-end"
+    ports:
+      - "443:443"
+    networks:
+      - local
+    restart: on-failure
+    depends_on:
+      - back-end
   back-end:
     container_name: back-end
     build: "./back-end"
-    volumes:
-      - ./back-end:/back-end
     restart: on-failure
     ports:
-      - "8000:8000"
+      - "8443:8443"
     depends_on:
       - db
     networks:
@@ -34,7 +29,7 @@ services:
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: test_db
+      POSTGRES_DB: libftPong
     ports:
       - "5432:5432"
     networks:

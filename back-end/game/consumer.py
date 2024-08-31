@@ -148,13 +148,22 @@ def update_game_state(state: GameState):
 def checkPlayerBelongsToGame(user, game_id):
     try:
         game = get_object_or_404(Match, id=game_id)
-        if game.status == "end":
+        if game.status == "end" or game.status == "ongoing":
             return False
         if game.player1 == user or game.player2 == user:
             return True
         return False
     except Exception as e:
         return False
+
+@database_sync_to_async
+def startGame(game_id):
+    try:
+        game = get_object_or_404(Match, id=game_id)
+        game.status = "ongoing"
+        game.save()
+    except Exception as e:
+        pass
 
 class GameConsumer(AsyncWebsocketConsumer):
 
@@ -189,7 +198,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         # Increment the connection count
         player_belongs_to_game = await checkPlayerBelongsToGame(self.user, self.game_id)
         if not player_belongs_to_game:
-            return
+            return await self.close()
         if self.game_id not in GameConsumer.game_users_data:
             GameConsumer.game_users_data[self.game_id] = []
         if self.game_id in GameConsumer.game_users_count:
@@ -208,7 +217,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             asyncio.create_task(self.check_second_player_join())
         if GameConsumer.game_users_count[self.game_id] == 2:
             GameConsumer.game_state_[self.game_id] = GameState()
-
+            await startGame(self.game_id)
             await self.channel_layer.group_send(
                 self.game_id,
                 {
@@ -222,6 +231,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     game_state = GameConsumer.game_state_[self.game_id]
                     game_state = update_game_state(game_state)
                     GameConsumer.game_state_[self.game_id] = game_state
+
                     try:
                         await self.channel_layer.group_send(
                             self.game_id,
@@ -232,29 +242,17 @@ class GameConsumer(AsyncWebsocketConsumer):
                         )
                     except Disconnected as e:
                         print("User Disconnected", flush=True)
-                    if GameConsumer.game_state_[self.game_id].game_progress == "end":
-                        winner = await updateGameScore(self.game_id, GameConsumer.game_state_[self.game_id])
-                        await updateUserStats(GameConsumer.game_users_data[self.game_id][0]["player1"], winner, GameConsumer.game_state_[self.game_id].p1score, GameConsumer.game_state_[self.game_id].p2score)
-                        await updateUserStats(GameConsumer.game_users_data[self.game_id][1]["player2"], winner, GameConsumer.game_state_[self.game_id].p2score, GameConsumer.game_state_[self.game_id].p1score)
-                        try:
-                            await self.channel_layer.group_send(
-                                self.game_id,
-                                {
-                                    "type": "game_end",
-                                    "winner": winner,
-                                }
-                            )
-                        except Disconnected as e:
-                            print("User Disconnected", flush=True)
                     if GameConsumer.game_state_[self.game_id].game_progress == "pause":
                         await asyncio.sleep(3)  # Sleep for 3 seconds
                         GameConsumer.game_state_[self.game_id].game_progress = "playing"
+                    elif GameConsumer.game_state_[self.game_id].game_progress == "end":
+                        await self.handleGmaeEnd()
                     else:
                         await asyncio.sleep(0.0016)
 
                 if GameConsumer.game_state_[self.game_id].game_progress == "end":
                     try:
-                        self.send_state_task.cancel()
+                        await self.send_state_task.cancel()
                     except Exception as e:
                         print("Task already cancelled or Finished", flush=True)
             await asyncio.sleep(1)
@@ -271,18 +269,15 @@ class GameConsumer(AsyncWebsocketConsumer):
             return False
 
     async def disconnect(self, close_code):
-        GameConsumer.game_users_count[self.game_id] -= 1
-        await self.channel_layer.group_discard(
-            self.game_id,
-            self.channel_name
-        )
-        gameEnd = await self.GameEnded()
-        if gameEnd:
+        try:
+            GameConsumer.game_users_count[self.game_id] -= 1
+            await self.channel_layer.group_discard(
+                self.game_id,
+                self.channel_name
+            )
+            await self.close()
+        except Exception as e:
             pass
-        else:
-            GameConsumer.game_state_[self.game_id].game_progress = "end"
-        await self.close()
-
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -311,6 +306,10 @@ class GameConsumer(AsyncWebsocketConsumer):
         state["ball"]["y"] = state["ball"]["y"] / state["screen_height"]
         await self.send(text_data=json.dumps({"state": state}))
 
+    async def handleGmaeEnd(self):
+        winner = await updateGameScore(self.game_id, GameConsumer.game_state_[self.game_id])
+        await updateUserStats(GameConsumer.game_users_data[self.game_id][0]["player1"], winner, GameConsumer.game_state_[self.game_id].p1score, GameConsumer.game_state_[self.game_id].p2score)
+        await updateUserStats(GameConsumer.game_users_data[self.game_id][1]["player2"], winner, GameConsumer.game_state_[self.game_id].p2score, GameConsumer.game_state_[self.game_id].p1score)
 
     async def game_end(self, event):
         winner = event["winner"]

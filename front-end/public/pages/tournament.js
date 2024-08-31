@@ -1,120 +1,123 @@
+import { ips } from "../http/ip.js";
+
 export default class Tournament extends HTMLElement {
-    constructor() {
-        super();
-        this.socket = null;  // Store the WebSocket connection here
-        this.userId = 1;  // Set the predefined user ID here
-    }
+  constructor() {
+    super();
+    this.socket = null; // Store the WebSocket connection here
+    this.userId = 1; // Set the predefined user ID here
+  }
 
-    connectedCallback(data) {
-        this.setupWebSocket();
-        this.render();
-    }
+  connectedCallback(data) {
+    this.setupWebSocket();
+    this.render();
+  }
 
-    disconnectedCallback() {
-        if (this.socket) {
-            this.socket.close();     
+  disconnectedCallback() {
+    if (this.socket) {
+      this.socket.close();
+    }
+  }
+
+  PlayerAlrExist(data, keys) {
+    const brackets = this.querySelectorAll(".bracket_wrapper");
+    let checker = false;
+    brackets.forEach((bracket) => {
+      keys.forEach((key) => {
+        if (bracket.id == key) {
+          checker = true;
         }
-    }
+      });
+    });
+    return checker;
+  }
 
-    PlayerAlrExist(data, keys) {
-        const brackets = this.querySelectorAll('.bracket_wrapper');
-        let checker = false;
-        brackets.forEach(bracket => {
-            keys.forEach(key => {
-                if (bracket.id == key){
-                    checker = true;
-                }
-            })
+  updateBracket(data) {
+    // let keys = null;
+    // if(data)
+    //     keys= Object.keys(data.players_data);
+    // // console.log("The keys of players_data are => ", keys);
+    // let checker = true;
+    // if (data.type == "tournament_created")
+    // {
+    //     const brackets = this.querySelectorAll('.bracket_wrapper');
+    //     if (this.PlayerAlrExist(data, keys)) {
+    //         console.log('Player already exist');
+    //         return;
+    //     }
+    // console.log("The data of player is => ", data.id);
+    // brackets.forEach(bracket => {
+    //     if (bracket.id === "" && checker){
+    //         console.log("The data of player is => ", data.players_data[keys[keys.length - 1]]);
+    //         bracket.querySelector('.name_wrapper').innerHTML = data.players_data[keys[keys.length - 1]].username;
+    //         bracket.querySelector('.img_user > img').src = data.players_data[keys[keys.length - 1]].image;
+    //         bracket.id = keys[[keys.length - 1]];
+    //         keys.shift();
+    //         console.log("The keys SHIFTED are => ", keys);
+    //         checker = false;
+    //         console.log("The bracket id is => ", bracket);
+    //         console.log("The keys are => ", keys);
+    //         console.log("The checker ")
+    //     }
+    //     console.log("The bracket id is => ", bracket);
+    // })
+    // let keys = Object.keys(data.players_data);
+    // console.log(keys);
+    // console.log("the brackets data => ", brackets);
+    // let i = 0;
+    // keys.forEach(key => {
+    //     // console.log("The key is => ", key);
+    //     brackets[i].querySelector('.name_wrapper').innerHTML = data.players_data[key].username;
+    //     brackets[i++].querySelector('.img_user > img').src = data.players_data[key].image;
+    // })
+    // }
+  }
 
-        })
-        return checker;
-    }
+  setupWebSocket() {
+    this.socket = new WebSocket(`${ips.socketUrl}/ws/tournament/`);
 
-    updateBracket(data) {
+    this.socket.onopen = (e) => {
+      console.log("Connected to the WebSocket.");
+      document.getElementById("status").innerHTML =
+        'Connected. Click "Join Tournament" to join.';
+      document.getElementById("joinButton").disabled = false;
+    };
 
-        // let keys = null;
-        // if(data)
-        //     keys= Object.keys(data.players_data);
-        // // console.log("The keys of players_data are => ", keys);
-        // let checker = true;
-        // if (data.type == "tournament_created")
-        // {
-        //     const brackets = this.querySelectorAll('.bracket_wrapper');
-        //     if (this.PlayerAlrExist(data, keys)) {
-        //         console.log('Player already exist');
-        //         return;
-        //     }
-            // console.log("The data of player is => ", data.id);
-            // brackets.forEach(bracket => {
-            //     if (bracket.id === "" && checker){
-            //         console.log("The data of player is => ", data.players_data[keys[keys.length - 1]]);
-            //         bracket.querySelector('.name_wrapper').innerHTML = data.players_data[keys[keys.length - 1]].username;
-            //         bracket.querySelector('.img_user > img').src = data.players_data[keys[keys.length - 1]].image;
-            //         bracket.id = keys[[keys.length - 1]];
-            //         keys.shift();
-            //         console.log("The keys SHIFTED are => ", keys);
-            //         checker = false;
-            //         console.log("The bracket id is => ", bracket);
-            //         console.log("The keys are => ", keys);
-            //         console.log("The checker ")
-            //     }
-            //     console.log("The bracket id is => ", bracket);
-            // })
-            // let keys = Object.keys(data.players_data);
+    this.socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log("Message from server: ", data);
+      document.getElementById(
+        "status"
+      ).innerHTML = `Match ${data.match_id} created between Player ${data.player1_id} and Player ${data.player2_id} player1_username: ${data.player1_username} player2_username: ${data.player2_username} player1_image: ${data.player1_image} player2_image: ${data.player2_image}`;
+      this.updateBracket(data);
+      // if (data.type === 'match_created') {
+      //     console.log("The data is => ", data);
+      //     window.location.href = `/game/online/?game_id=${data.match_id}`;
+      // }
+    };
 
-            // console.log(keys);
-    
-    
-            // console.log("the brackets data => ", brackets);
-            // let i = 0;
-            // keys.forEach(key => {
-            //     // console.log("The key is => ", key);
-            //     brackets[i].querySelector('.name_wrapper').innerHTML = data.players_data[key].username;
-            //     brackets[i++].querySelector('.img_user > img').src = data.players_data[key].image;
-            // })
-            // }
+    this.socket.onclose = (event) => {
+      if (event.wasClean) {
+        console.log(
+          `Closed cleanly, code=${event.code} reason=${event.reason}`
+        );
+      } else {
+        console.error("Connection died");
+      }
+      document.getElementById("status").innerHTML =
+        "WebSocket connection closed.";
+      document.getElementById("joinButton").disabled = true;
+    };
 
-    }
+    this.socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      document.getElementById("status").innerHTML =
+        "Error connecting to WebSocket.";
+      document.getElementById("joinButton").disabled = true;
+    };
+  }
 
-    setupWebSocket() {
-        this.socket = new WebSocket('ws://localhost:8000/ws/tournament/');
-
-        this.socket.onopen = (e) => {
-            console.log("Connected to the WebSocket.");
-            document.getElementById('status').innerHTML = 'Connected. Click "Join Tournament" to join.';
-            document.getElementById('joinButton').disabled = false;
-        };
-
-        this.socket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            console.log("Message from server: ", data);
-            document.getElementById('status').innerHTML = `Match ${data.match_id} created between Player ${data.player1_id} and Player ${data.player2_id} player1_username: ${data.player1_username} player2_username: ${data.player2_username} player1_image: ${data.player1_image} player2_image: ${data.player2_image}`;
-            this.updateBracket(data);
-            // if (data.type === 'match_created') {
-            //     console.log("The data is => ", data);
-            //     window.location.href = `/game/online/?game_id=${data.match_id}`;
-            // }
-        };
-
-        this.socket.onclose = (event) => {
-            if (event.wasClean) {
-                console.log(`Closed cleanly, code=${event.code} reason=${event.reason}`);
-            } else {
-                console.error('Connection died');
-            }
-            document.getElementById('status').innerHTML = 'WebSocket connection closed.';
-            document.getElementById('joinButton').disabled = true;
-        };
-
-        this.socket.onerror = (error) => {
-            console.error('WebSocket error:', error);
-            document.getElementById('status').innerHTML = 'Error connecting to WebSocket.';
-            document.getElementById('joinButton').disabled = true;
-        };
-    }
-
-    render() {
-        this.innerHTML = /*html*/`
+  render() {
+    this.innerHTML = /*html*/ `
         <style>
         .bracket_wrapper{
             display: flex;
@@ -246,19 +249,21 @@ export default class Tournament extends HTMLElement {
             </div>
         `;
 
-        document.getElementById('joinButton').addEventListener('click', () => {
-            if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-                this.socket.send(JSON.stringify({
-                    'command': 'join',
-                    'player_id': this.userId  // Use the predefined user ID
-                }));
-                document.getElementById('status').innerHTML = 'Joining tournament...';
-                document.getElementById('joinButton').disabled = true;
-            } else {
-                alert("WebSocket connection is not open. Please try again.");
-            }
-        });
-    }
+    document.getElementById("joinButton").addEventListener("click", () => {
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        this.socket.send(
+          JSON.stringify({
+            command: "join",
+            player_id: this.userId, // Use the predefined user ID
+          })
+        );
+        document.getElementById("status").innerHTML = "Joining tournament...";
+        document.getElementById("joinButton").disabled = true;
+      } else {
+        alert("WebSocket connection is not open. Please try again.");
+      }
+    });
+  }
 }
 
-customElements.define('tournament-page', Tournament);
+customElements.define("tournament-page", Tournament);

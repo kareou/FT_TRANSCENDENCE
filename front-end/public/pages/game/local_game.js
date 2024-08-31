@@ -1,6 +1,8 @@
 import { ClassicPaddle, BlossomPaddle, LightSaber } from "./game_objects/player.js";
 import { Ball } from "./game_objects/ball.js";
 import { Board } from "./game_objects/board.js";
+import Link from "../../components/link.js";
+import Http from "../../http/http.js";
 
 const getPlayerObject = (paddle_name, player_num, ctx, theme) => {
   if (paddle_name === "classic")
@@ -24,6 +26,10 @@ export default class Game extends HTMLElement {
   }
   connectedCallback() {
     let data = localStorage.getItem("state");
+    if (!data) {
+      Link.navigateTo("/dashboard");
+      Http.website_stats.notify("toast", {type: "error", message: "No game data found"});
+    }
     data = JSON.parse(data);
     this.data = data[0]
     this.theme = this.data['table_theme'];
@@ -56,6 +62,47 @@ export default class Game extends HTMLElement {
 
   disconnectedCallback() {
     document.removeEventListener("keydown", this.#movePaddels);
+    localStorage.removeItem("state");
+  }
+
+  winner(ctx) {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      this.board.draw();
+      this.#drawPaddles(ctx);
+      this.ball.draw();
+      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.font = "100px Arial";
+      ctx.fillStyle = "white";
+      ctx.textAlign = "center";
+      if (this.player1.score > this.player2.score)
+        ctx.fillText(`${this.data.player1.name} won`, ctx.canvas.width / 2, ctx.canvas.height / 2);
+      else
+        ctx.fillText(`${this.data.player2.name} won`, ctx.canvas.width / 2, ctx.canvas.height / 2);
+      var time = 5
+      ctx.font = "50px Arial";
+      ctx.fillText(`back to dashboard in ${time} ...`, ctx.canvas.width / 2, ctx.canvas.height / 2 + 100);
+      time -= 1;
+      let intervalId = setInterval(() => {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        this.board.draw();
+        this.#drawPaddles(ctx);
+        this.ball.draw();
+        ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.font = "100px Arial";
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.fillText(`${this.player1.score > this.player2.score ? this.data.player1.name : this.data.player2.name} won`, ctx.canvas.width / 2, ctx.canvas
+          .height / 2);
+        ctx.font = "50px Arial";
+        ctx.fillText(`back to dashboard in ${time} ...`, ctx.canvas.width / 2, ctx.canvas.height / 2 + 100);
+        if (time === 0) {
+          clearInterval(intervalId);
+          Link.navigateTo("/dashboard");
+        }
+        time -= 1;
+      }, 1000);
   }
 
   render() {
@@ -136,7 +183,11 @@ export default class Game extends HTMLElement {
         this.game_started = false;
       }
     }
-    else {
+    else if (this.game_started === false && (this.player1.score === 3 || this.player2.score === 3)) {
+      this.winner(ctx);
+
+    }
+    else if (this.game_started === false) {
       await this.roundStartCountDown(ctx);
       this.game_started = true;
       this.#update(ctx);

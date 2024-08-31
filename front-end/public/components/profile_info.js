@@ -1,4 +1,6 @@
 import Http from "../http/http.js";
+import Link from "./link.js";
+import { ips } from "../http/ip.js";
 
 export default class ProfileInfo extends HTMLElement {
   constructor() {
@@ -8,9 +10,17 @@ export default class ProfileInfo extends HTMLElement {
     console.log("id : " + this.username);
   }
   connectedCallback() {
-    if (this.username != this.user.user) {
+    if (this.username != this.user.username) {
       Http.getData("Get", `api/user/${this.username}`).then((data) => {
+        if (data.error) {
+          Link.navigateTo("/404");
+          Http.website_stats.notify("toast", {
+            message: data.error.detail,
+            type: "error",
+          });
+        }
         this.user = data;
+        console.log(this.user);
         this.render();
         this.markUnearnedAchievements();
         this.setupEventListeners();
@@ -32,7 +42,7 @@ export default class ProfileInfo extends HTMLElement {
   async fetchOrCreateConversation(senderId, receiverId) {
     try {
       const response = await fetch(
-        `http://localhost:8000/chat/conversations/fetch_or_create/`,
+        `${ips.baseUrl}/chat/conversations/fetch_or_create/`,
         {
           method: "POST",
           headers: {
@@ -64,7 +74,7 @@ export default class ProfileInfo extends HTMLElement {
   }
   setupWebSocket() {
     this.websocket = new WebSocket(
-      `ws://127.0.0.1:8000/ws/chat/${Http.user.id}/${this.user.id}/`
+      `${ips.socketUrl}/ws/chat/${Http.user.id}/${this.user.id}/`
     );
 
     this.websocket.addEventListener("open", function (event) {
@@ -83,7 +93,7 @@ export default class ProfileInfo extends HTMLElement {
         Http.user.id,
         this.user.id
       );
-        // console.log("id : "+conversation.conversation.id);
+      // console.log("id : "+conversation.conversation.id);
       const messageContent = document.querySelector(".message-input").value;
       const messageData = {
         sender: Http.user.id,
@@ -93,7 +103,7 @@ export default class ProfileInfo extends HTMLElement {
       };
 
       this.setupWebSocket();
-      const response = await fetch("http://localhost:8000/chat/messages/", {
+      const response = await fetch(`${ips.baseUrl}/chat/messages/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -106,7 +116,7 @@ export default class ProfileInfo extends HTMLElement {
       if (response.ok) {
         const data = await response.json();
         const dataWs = {
-          type: 'message',
+          type: "message",
           message: data.message,
           sender: data.sender,
         };
@@ -132,55 +142,54 @@ export default class ProfileInfo extends HTMLElement {
     const buttonSend = document.querySelector(".send-button");
     const add_friend = document.querySelector(".add_friend");
 
-    if (add_friend !== null)
-    {
+    if (add_friend !== null) {
       add_friend.addEventListener("click", async () => {
-      let apiUrl = `http://localhost:8000/api/friends/`;
+        let apiUrl = `${ips.baseUrl}/api/friends/`;
 
-      fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          user1: Http.user.id,
-          user2: this.user.id,
-        }),
-      })
-        .then((response) => {
-          console.log(response);
-          if (response.ok) {
-            Http.notification_socket.send(
-              JSON.stringify({
-                type: "FRQ",
-                sender: Http.user.id,
-                receiver: this.user.id,
-                message: "Friend Request from " + Http.user.username,
-              })
-            );
-          } else {
-            console.error("Error:", response.statusText);
-          }
+        fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            user1: Http.user.id,
+            user2: this.user.id,
+          }),
         })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    });
-  }
-  if (buttonNew){
-    buttonNew.addEventListener("click", () => {
-      console.log("button message pressed");
-      if (msgPrompt.classList.contains("hidden")) {
-        msgPrompt.classList.remove("hidden");
-        msgPrompt.classList.add("visible");
-      } else {
-        msgPrompt.classList.remove("visible");
-        msgPrompt.classList.add("hidden");
-      }
-    });
-  }
-  
+          .then((response) => {
+            console.log(response);
+            if (response.ok) {
+              Http.notification_socket.send(
+                JSON.stringify({
+                  type: "FRQ",
+                  sender: Http.user.id,
+                  receiver: this.user.id,
+                  message: "Friend Request from " + Http.user.username,
+                })
+              );
+            } else {
+              console.error("Error:", response.statusText);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      });
+    }
+    if (buttonNew) {
+      buttonNew.addEventListener("click", () => {
+        console.log("button message pressed");
+        if (msgPrompt.classList.contains("hidden")) {
+          msgPrompt.classList.remove("hidden");
+          msgPrompt.classList.add("visible");
+        } else {
+          msgPrompt.classList.remove("visible");
+          msgPrompt.classList.add("hidden");
+        }
+      });
+    }
+
     buttonClose.addEventListener("click", () => {
       console.log("button close pressed");
 
@@ -193,13 +202,13 @@ export default class ProfileInfo extends HTMLElement {
       buttonClose.click();
     });
 
-    const input_message = document.querySelector('.message-input');
-    input_message.addEventListener('keypress', function (event) {
-      if (event.key === 'Enter') {
-          event.preventDefault();
-          buttonSend.click();
+    const input_message = document.querySelector(".message-input");
+    input_message.addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        buttonSend.click();
       }
-  });
+    });
   }
 
   render() {
@@ -219,7 +228,9 @@ export default class ProfileInfo extends HTMLElement {
     </style>
         <div class="profile" >
       <div class="profile_img">
-        <img src='http://localhost:8000${this.user.profile_pic}' class="profile_img" alt="profile" loading="lazy">
+        <img src='${ips.baseUrl}${
+      this.user.profile_pic
+    }' class="profile_img" alt="profile" loading="lazy">
       </div>
       <div class="profile_info">
       <div class="wrapper_info_profile">
@@ -227,7 +238,10 @@ export default class ProfileInfo extends HTMLElement {
           <h1 id="user_name">${this.user.full_name}</h1>
           <h6 id="login">${this.user.username}</h6>
         </div>
-        ${this.username === Http.user.username ? "" : `<div class="wallet_data_wrapper">
+        ${
+          this.username === Http.user.username
+            ? ""
+            : `<div class="wallet_data_wrapper">
         <span>
         <i class="fa-sharp fa-light fa-coins" style="color: #04BF8A;"></i>
         </span>
@@ -239,7 +253,8 @@ export default class ProfileInfo extends HTMLElement {
           <button class="add_friend no_style">
           <i class="fa fa-user-plus" aria-hidden="true"></i>
           </button>
-        </div>`}
+        </div>`
+        }
       </div>
         <div class="achievement">
           <div class="achievement_list">
@@ -279,7 +294,6 @@ export default class ProfileInfo extends HTMLElement {
       </div>
     </div>
     `;
-
   }
 }
 

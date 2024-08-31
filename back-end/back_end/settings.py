@@ -73,7 +73,8 @@ SIMPLE_JWT = {
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "*",
+    'localhost',
+    '127.0.0.1',
 ]
 
 
@@ -112,7 +113,14 @@ MIDDLEWARE = [
 ]
 
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://localhost:8443",
+    "https://127.0.0.1:8443",
+    "https://localhost",
+    "https://127.0.0.1",
+]
 
 ROOT_URLCONF = 'back_end.urls'
 
@@ -143,7 +151,7 @@ WSGI_APPLICATION = 'back_end.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test_db',
+        'NAME': 'libftPong',
         'USER' : 'root',
         'PASSWORD' : 'root',
         'HOST' : 'db',
@@ -231,8 +239,8 @@ CORS_ALLOW_HEADERS = (
 CORS_ALLOW_CREDENTIALS = True
 
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.nour4.tech'
+EMAIL_HOST = env('EMAIL_HOST')
 EMAIL_HOST_USER = env('EMAIL_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_PASSWORD')
 EMAIL_PORT = '587'
-DEFAULT_FROM_EMAIL = 'libftpong@nour4.tech'
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')

@@ -68,10 +68,7 @@ export default class Link extends HTMLAnchorElement {
 
   static async navigateTo(url) {
 
-    if (Link.startWith(window.location.pathname, "/game")) {
-      // If the current URL is 'game', replace it with the new URL
-      window.history.replaceState({}, "", url);
-    } else if (Link.shouldSaveHistory(url)) {
+    if (Link.shouldSaveHistory(url)) {
       // If the current URL is not 'game', create a new history entry
       window.history.pushState({}, "", url);
     }
@@ -83,7 +80,6 @@ export default class Link extends HTMLAnchorElement {
     var path = url.slice(0, pos);
     const isAuth = await Http.verifyToken();
     if ((path === "/auth/login" || path === "/auth/register") && isAuth) {
-      console.log("redirecting to dashboard");
       window.location.href = "/dashboard";
 
     }
@@ -93,7 +89,7 @@ export default class Link extends HTMLAnchorElement {
     }
     catch (e) {
       if (e.message === "Unauthorized") {
-        window.location.href = "/auth/login";
+        Link.navigateTo("/auth/login");
         return;
       }
       route = errorRoute[0];
@@ -106,7 +102,7 @@ export default class Link extends HTMLAnchorElement {
       const variableName = Link.extractVariableFromPath(route.path);
       if (variableName) {
         const variableValue = url.split('/').pop();
-        componentToRender[variableName] = variableValue;
+        componentToRender[variableName] = decodeURIComponent(variableValue);;
       }
       root.innerHTML = '';
       root.appendChild(componentToRender);

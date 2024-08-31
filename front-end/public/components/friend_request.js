@@ -1,5 +1,6 @@
 import MatchData from "./match_data.js";
 import Http from "../http/http.js";
+import { ips } from "../http/ip.js";
 
 export default class FriendRequest extends HTMLElement {
   constructor() {
@@ -24,7 +25,7 @@ export default class FriendRequest extends HTMLElement {
     this.innerHTML = /*HTML*/ `
             <div class="friend_wrapper__">
             <div class="user_data_wrapper" style="width: 100%;">
-            <img src="http://localhost:8000${this.profile_pic}" alt="medal" class="user_img_rounded">
+            <img src="${ips.baseUrl}${this.profile_pic}" alt="medal" class="user_img_rounded">
             <p class="user_name_wrapper">${this.full_name}</p>
             </div>
             <div class="icons_wrapper" style="display: flex;align-content: center;">
@@ -37,6 +38,6 @@ export default class FriendRequest extends HTMLElement {
             </div>
         </div>
     `;
-    }
+  }
 }
 customElements.define("friend-request", FriendRequest);

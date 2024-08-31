@@ -1,0 +1,9 @@
+FROM nginx:1.27
+
+COPY . /var/www/html/libftPong
+COPY /conf/nginx.conf /etc/nginx/
+COPY /conf/certs /etc/nginx/certs
+
+EXPOSE 443
+
+CMD ["nginx", "-g", "daemon off;"]

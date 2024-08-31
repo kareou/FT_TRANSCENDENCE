@@ -1,9 +1,10 @@
 import Observer from "../state/observer.js";
 import Link from "../components/link.js";
+import {ips} from "./ip.js";
 
 class Http {
   constructor() {
-    this.baseUrl = "http://localhost:8000";
+    this.baseUrl = ips.baseUrl;
     this.user = null;
     this.website_stats = new Observer();
     this.notification_socket = null;
@@ -11,18 +12,25 @@ class Http {
 
   notifyStats(data) {
     console.log(data);
-  if (data.type === "game_invite")
-    this.website_stats.notify("toast", data);
-  else if (data.type === "FRQ"){
-
-    this.website_stats.notify("friend_request", data);
-  }
-  else if (data.type === "tournament_match"){
-    setTimeout(() => {
-    Link.navigateTo(`/game/online/?game_id=${data.message}`);
-  }, 5000);
-  }
-  else
+    if (data.type === "game_invite")
+      this.website_stats.notify("toast", data);
+    else if (data.type === "FRQ") {
+      this.website_stats.notify("friend_request", data);
+    }
+    else if (data.type === "tournament_match") {
+      setTimeout(() => {
+        Link.navigateTo(`/game/online/?game_id=${data.message}`);
+      }, 5000);
+    }
+    else if (data.type === "status_update") {
+      if (data.user_id !== this.user.id) {
+        this.website_stats.notify("status_update", data);
+      }
+    }
+    else if (data.type === "remove_friend") {
+      this.website_stats.notify("remove_friend", data);
+    }
+    else
       this.website_stats.notify("notification", data);
   }
 
@@ -47,12 +55,16 @@ class Http {
   }
 
   openSocket() {
+    console.log("Opening socket");
     this.notification_socket = new WebSocket(
-      `ws://localhost:8000/ws/notification/${this.user.id}/`
+      `${ips.socketUrl}/ws/notification/${this.user.id}/`
     );
     this.notification_socket.onmessage = (e) => {
       const data = JSON.parse(e.data);
       this.notifyStats(data);
+    }
+    this.notification_socket.onopen = () => {
+      this.notification_socket.send(JSON.stringify({ type: "status_update", sender: this.user.id, message: "online", receiver: 0 }));
     }
   }
 
@@ -89,7 +101,12 @@ class Http {
         },
         credentials: "include",
       });
+      console.log(response.status);
       if (response.status === 200) {
+        console.log("response.status");
+        this.notification_socket.close(3001);
+        console.log("response.status");
+        this.notification_socket = null;
         const res = await response.json();
         this.user = null;
         return res;
@@ -118,7 +135,10 @@ class Http {
       } else if (response.status === 401 && retries < 1) {
         await this.refreshToken();
         return this.getData(method, url, data, retries + 1);
-      } else return response.json();
+      } else{
+        const res = await response.json();
+        return { error: res };
+      };
     } catch (e) {
       return { error: e.message };
     }
@@ -159,7 +179,7 @@ class Http {
         this.user = res.user;
         if (!this.notification_socket) {
           this.openSocket();
-        }else if(this.notification_socket.readyState === 3){
+        } else if (this.notification_socket.readyState === 3) {
           this.openSocket();
         }
         return true;

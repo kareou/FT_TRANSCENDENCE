@@ -4,6 +4,8 @@ export default class Friends extends HTMLElement {
     constructor() {
         super();
         Http.website_stats.addObserver({ update: this.update.bind(this), event: "friends" });
+        Http.website_stats.addObserver({ update: this.update.bind(this), event: "remove_friend" });
+        Http.website_stats.addObserver({ update: this.update.bind(this), event: "status_update" });
     }
 
     update() {
@@ -23,8 +25,13 @@ export default class Friends extends HTMLElement {
             })
             .then(data => {
                 for (let i = 0; i < data.length; i++) {
-                    const test = `<friend-data profile_pic="${data[i].user1.profile_pic}"  full_name="${data[i].user1.full_name}" friendship_id="${ data[i].id}" style="width:100%"></friend-data>`
-                    friends_wrapper.innerHTML += test
+                    let fr;
+                    console.log(data[i])
+                    if (data[i].user1.id === Http.user.id)
+                        fr = `<friend-data id="${data[i].user2.id}" state=${data[i].user2.online} profile_pic="${data[i].user2.profile_pic}"  full_name="${data[i].user2.full_name}" friendship_id="${ data[i].id}" style="width:100%"></friend-data>`
+                    else
+                        fr = `<friend-data id="${data[i].user1.id}" state=${data[i].user1.online} profile_pic="${data[i].user1.profile_pic}"  full_name="${data[i].user1.full_name}" friendship_id="${ data[i].id}" style="width:100%"></friend-data>`
+                        friends_wrapper.innerHTML += fr
                 }
                 if (data.length === 0) {
                     online_friend.style.overflow = "hidden";
@@ -38,7 +45,7 @@ export default class Friends extends HTMLElement {
             })
     }
 
- 
+
     connectedCallback() {
         this.render();
         this.getFriends();
@@ -48,7 +55,7 @@ export default class Friends extends HTMLElement {
         this.innerHTML = /*HTML*/ `
             <div class="online_friend" style="display: flex;flex-direction: column;padding: 15px 0;">
             <h1>Friends</h1>
-            <div class="friend_online_wrapper" style="width: 100%;">   
+            <div class="friend_online_wrapper" style="width: 100%;">
             </div>
         </div>
         `;
