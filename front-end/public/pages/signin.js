@@ -17,7 +17,7 @@ export default class SignIn extends HTMLElement {
     signInButton.addEventListener("click", async (e) => {
       e.preventDefault();
       try {
-        window.location.replace(`${ips.baseUrl}/api/user/oauth2/authorize/412/`);
+        window.location.replace(`${ips.baseUrl}/api/user/oauth2/authorize/42/`);
       } catch (error) {
         console.log(error);
       }

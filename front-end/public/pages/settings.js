@@ -203,7 +203,7 @@ export default class Settings extends HTMLElement {
 				.then((data) => {
 					_2fa_container.style.display = "block";
 					modal_wrapper_2fa.style.display = "block";
-					qr.src = data["2fa_url"];
+					// qr.src = data["2fa_url"];
 
 					console.log(data["2fa_url"]);
 					enable_2fa.style.display = "none";

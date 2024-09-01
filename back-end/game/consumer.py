@@ -214,9 +214,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.accept()
         await self.send(text_data=json.dumps({"role": role}))
         if role == "player1":
+            GameConsumer.game_state_[self.game_id] = GameState()
             asyncio.create_task(self.check_second_player_join())
         if GameConsumer.game_users_count[self.game_id] == 2:
-            GameConsumer.game_state_[self.game_id] = GameState()
             await startGame(self.game_id)
             await self.channel_layer.group_send(
                 self.game_id,

@@ -98,6 +98,7 @@ class Http {
         return res;
       }
       const res = await response.json();
+      this.website_stats.notify("toast", { type: "info", message: res.message });
       return res;
     } catch (e) {
       return { error: e.message };
@@ -128,7 +129,7 @@ class Http {
         body: JSON.stringify(data),
         credentials: "include",
       });
-      if (response.status === 200) {
+      if (response.ok) {
         const res = await response.json();
         this.user = res.user;
         await this.getFriends();
@@ -136,6 +137,7 @@ class Http {
         return res;
       } else {
         res = await response.json();
+        this.website_stats.notify("toast", { type: "error", message: res.message });
         return res;
       }
     } catch (e) {
@@ -153,7 +155,7 @@ class Http {
         credentials: "include",
       });
       console.log(response.status);
-      if (response.status === 200) {
+      if (response.ok) {
         this.notification_socket.close(3001);
         this.notification_socket = null;
         const res = await response.json();
@@ -178,17 +180,23 @@ class Http {
         credentials: "include",
         body: (method === "POST" || method === "PUT") ? JSON.stringify(data) : null,
       });
-      if (response.status === 200) {
+      if (response.ok) {
         const res = await response.json();
+        if (method === "POST" || method === "PUT")
+          this.website_stats.notify("toast", { type: "success", message: res.message });
         return res;
       } else if (response.status === 401 && retries < 1) {
         await this.refreshToken();
         return this.getData(method, url, data, retries + 1);
       } else{
         const res = await response.json();
+        if (method === "POST" || method === "PUT")
+          this.website_stats.notify("toast", { type: "error", message: res.message });
         return { error: res };
       };
     } catch (e) {
+      if (method === "POST" || method === "PUT")
+        this.website_stats.notify("toast", { type: "error", message: e.message });
       return { error: e.message };
     }
   }
@@ -202,7 +210,7 @@ class Http {
         },
         credentials: "include",
       });
-      if (response.status === 200) {
+      if (response.ok) {
         const res = await response.json();
         return res;
       } else {
@@ -223,7 +231,7 @@ class Http {
         },
         credentials: "include",
       });
-      if (response.status === 200) {
+      if (response.ok) {
         const res = await response.json();
         this.user = res.user;
         console.log(this.user);
