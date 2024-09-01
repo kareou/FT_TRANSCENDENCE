@@ -23,7 +23,7 @@ def join_tournament(request):
 #         )
 #         players[0].delete()
 #         players[1].delete()
-    
+
 #     if Match.objects.count() == 4:
 #         tournament = tournament.objects.create
 

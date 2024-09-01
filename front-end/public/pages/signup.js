@@ -11,19 +11,16 @@ export default class SignUp extends HTMLElement {
     this.querySelector("form").addEventListener("submit", (e) => {
       e.preventDefault();
       const username = this.querySelector("#username").value;
-      const full_name = this.querySelector("#username").value;
+      const full_name = this.querySelector("#full_name").value;
       const email = this.querySelector("#email").value;
       const pwd = this.querySelector("#pwd").value;
       const data = {
         username: username,
-        full_name: username,
+        full_name: full_name,
         email: email,
         password: pwd,
       };
       Http.register(data,"api/user/register/").then((res) => {
-        // if (res.token) {
-        //   Link.navigateTo("/");
-        // }
         console.log(res);
       });
     });

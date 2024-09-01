@@ -16,7 +16,10 @@ export default class FriendData extends HTMLElement {
     this.querySelector(".remove_friend").addEventListener("click", () => {
       Http.getData("DELETE", `api/friends/${this.friendship_id}`).then(
         (response) => {
-          console.log(response);
+          Http.getData("GET", "api/friends/").then((data) => {
+            console.log("Froends are => ", data);
+          })
+          delete Http.friends[this.id];
           Http.website_stats.notify("friends");
           Http.notification_socket.send(
             JSON.stringify({

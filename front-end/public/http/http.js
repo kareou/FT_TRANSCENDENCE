@@ -6,12 +6,31 @@ class Http {
   constructor() {
     this.baseUrl = ips.baseUrl;
     this.user = null;
+    this.friends = {};
     this.website_stats = new Observer();
+    this.tournament_data = null;
     this.notification_socket = null;
   }
 
+  serializeFriends(friends) {
+    friends.forEach((friend) => {
+      if (friend.user1.id != this.user.id) {
+          this.friends[friend.user1.id] = {...friend.user1, friendship_id: friend.id};
+
+      }
+      else{
+          this.friends[friend.user2.id] = {...friend.user2, friendship_id: friend.id};
+      }
+    })
+    console.log(this.friends.length);
+  }
+
+  async getFriends() {
+    const data =  await this.getData("GET", "api/friends/")
+    this.serializeFriends(data);
+  }
+
   notifyStats(data) {
-    console.log(data);
     if (data.type === "game_invite")
       this.website_stats.notify("toast", data);
     else if (data.type === "FRQ") {
@@ -24,11 +43,41 @@ class Http {
     }
     else if (data.type === "status_update") {
       if (data.user_id !== this.user.id) {
+        this.friends[data.user_id].online = !this.friends[data.user_id].online;
         this.website_stats.notify("status_update", data);
       }
     }
+    else if (data.type === "add_friend") {
+      if (data.message.user1.id != this.user.id) {
+          this.friends[data.message.user1.id] = {...data.message.user1, friendship_id: data.message.id};
+      }
+      else{
+          this.friends[data.message.user2.id] = {...data.message.user2, friendship_id: data.message.id};
+      }
+      this.website_stats.notify("friends", data);
+    }
     else if (data.type === "remove_friend") {
+      delete this.friends[data.sender];
       this.website_stats.notify("remove_friend", data);
+    }
+    else if (data.type === "players_status_changed") {
+      let current_location = window.location.pathname
+       this.tournament_data = data.message;
+      if ( current_location !== "/dashboard/tournament") {
+        if(current_location !== "/game/online"){
+          Link.navigateTo("/dashboard/tournament");
+        }else {
+          const interval = setInterval(() => {
+            current_location = window.location.pathname;
+            if (window.location.pathname === "/dashboard") {
+              clearInterval(interval);
+              Link.navigateTo("/dashboard/tournament");
+            }
+          }, 500);
+        }
+      }else{
+        this.website_stats.notify("players_status_changed", this.tournament_data);
+      }
     }
     else
       this.website_stats.notify("notification", data);
@@ -45,6 +94,7 @@ class Http {
       });
       if (response.status !== 201) {
         const res = await response.json();
+        this.website_stats.notify("toast", { type: "error", message: "something wrong happened" });
         return res;
       }
       const res = await response.json();
@@ -81,6 +131,7 @@ class Http {
       if (response.status === 200) {
         const res = await response.json();
         this.user = res.user;
+        await this.getFriends();
         this.openSocket();
         return res;
       } else {
@@ -103,9 +154,7 @@ class Http {
       });
       console.log(response.status);
       if (response.status === 200) {
-        console.log("response.status");
         this.notification_socket.close(3001);
-        console.log("response.status");
         this.notification_socket = null;
         const res = await response.json();
         this.user = null;
@@ -127,7 +176,7 @@ class Http {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: method === "POST" ? JSON.stringify(data) : null,
+        body: (method === "POST" || method === "PUT") ? JSON.stringify(data) : null,
       });
       if (response.status === 200) {
         const res = await response.json();
@@ -177,6 +226,8 @@ class Http {
       if (response.status === 200) {
         const res = await response.json();
         this.user = res.user;
+        console.log(this.user);
+        await this.getFriends();
         if (!this.notification_socket) {
           this.openSocket();
         } else if (this.notification_socket.readyState === 3) {

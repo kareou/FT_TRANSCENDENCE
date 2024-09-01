@@ -37,14 +37,15 @@ export default class SideBar extends HTMLElement {
   // Check the current URL and render if it matches certain criteria
   checkAndRender() {
     const path = window.location.pathname;
+    this.initURLChangeDetection();
     if (path === "/" || Link.startWith(path, "/game") || Link.startWith(path, "/auth")) {
-      return;
+      this.innerHTML = "";
     }
-    this.render();
+    else
+      this.render();
     this.findSelected();
     const logoutBtn = this.querySelector(".logout_logo_wrapper");
     logoutBtn.addEventListener("click", this.handellogout);
-    this.initURLChangeDetection();
   }
 
   // Initialize URL change detection
@@ -72,9 +73,7 @@ export default class SideBar extends HTMLElement {
       <a is="co-link" href="/dashboard" class="active">
         <i class="fa-thin fa-objects-column fa-2xl icon_side_bar"></i>
       </a>
-      <a is="co-link" href="/dashboard/game">
-        <i class="fa-light fa-gamepad-modern fa-2xl icon_side_bar"></i>
-      </a>
+  
       <a is="co-link" href="/dashboard/tournament">
         <i class="fa-sharp fa-light fa-code-fork fa-2xl icon_side_bar"></i>
       </a>

@@ -141,8 +141,10 @@ export default class ProfileInfo extends HTMLElement {
     const msgPrompt = document.querySelector(".msg-prompt");
     const buttonSend = document.querySelector(".send-button");
     const add_friend = document.querySelector(".add_friend");
+    const remove_friend = document.querySelector(".remove_friend");
 
     if (add_friend !== null) {
+      console.log("add friend is not null");
       add_friend.addEventListener("click", async () => {
         let apiUrl = `${ips.baseUrl}/api/friends/`;
 
@@ -189,6 +191,29 @@ export default class ProfileInfo extends HTMLElement {
         }
       });
     }
+    if (remove_friend != null) {
+      console.log("add friend is not ---- null");
+      remove_friend.addEventListener("click", async () => {
+        console.log("remove friend in -");
+        console.log(Http.friends[this.user.id].friendship_id);
+        Http.getData("DELETE", `api/friends/${Http.friends[this.user.id].friendship_id }`).then(
+          (response) => {
+            delete Http.friends[this.user.id];
+            Http.website_stats.notify("friends");
+            Http.notification_socket.send(
+              JSON.stringify({
+                type: "remove_friend",
+                message: this.friendship_id,
+                receiver: this.user.id,
+                sender: Http.user.id,
+              })
+            );
+          }
+        );
+        console.log("remove friend in -");
+        console.log(this.friendship_id);
+      })
+    }
 
     buttonClose.addEventListener("click", () => {
       console.log("button close pressed");
@@ -218,6 +243,7 @@ export default class ProfileInfo extends HTMLElement {
         width:150px;
         height:150px;
         margin: 0 25px ;
+        object-fit: cover;
       }
       .av_img{
         width: 40px;
@@ -242,18 +268,19 @@ export default class ProfileInfo extends HTMLElement {
           this.username === Http.user.username
             ? ""
             : `<div class="wallet_data_wrapper">
-        <span>
-        <i class="fa-sharp fa-light fa-coins" style="color: #04BF8A;"></i>
-        </span>
-        <span id="user_coins">2300$
-        </span>
-        <button class="new-msg send_msg no_style">
-                <i class="fa-regular fa-message"></i>
-              </button>
-          <button class="add_friend no_style">
-          <i class="fa fa-user-plus" aria-hidden="true"></i>
-          </button>
-        </div>`
+                <button class="new-msg send_msg no_style">
+                  <i class="fa-regular fa-message"></i>
+                </button>
+                ${
+                  Http.friends.hasOwnProperty(this.user.id)
+                    ? `<button class="remove_friend no_style">
+                         <i class="fa fa-user-minus" aria-hidden="true"></i>
+                       </button>`
+                    : `<button class="add_friend no_style">
+                         <i class="fa fa-user-plus" aria-hidden="true"></i>
+                       </button>`
+                }
+              </div>`
         }
       </div>
         <div class="achievement">

@@ -1,5 +1,7 @@
 import Link from "../components/link.js";
 import Http from "../http/http.js";
+import { ips } from "../http/ip.js";
+
 export default class SignIn extends HTMLElement {
   constructor() {
     super();
@@ -12,15 +14,17 @@ export default class SignIn extends HTMLElement {
     const signInButton = this.querySelector(".intra_login");
     const otp_container = this.querySelector(".otp_container");
     const modal_wrapper_otp = this.querySelector(".modal_wrapper_otp");
-    signInButton.addEventListener("click", (e) => {
+    signInButton.addEventListener("click", async (e) => {
       e.preventDefault();
-      // fetch("${ip.sbaseUrl}/api/user/oauth2/authorize/42/")
-      // .then (res => res.json())
-      // .then (res => {
-      //   console.log(res);
-      //   window.open(res.url, '_blank');
-      // })
-      window.location.href = `${ips.baseUrl}/api/user/oauth2/authorize/42/`;
+      try {
+        window.location.replace(`${ips.baseUrl}/api/user/oauth2/authorize/412/`);
+      } catch (error) {
+        console.log(error);
+      }
+      Http.getData("GET", "api/user/oauth2/authorize/42/").then((res) => {
+        Http.user = res.user;
+        console.log(res);
+      });
       Http.openSocket();
       Http.notification_socket.send(
         JSON.stringify({

@@ -140,7 +140,7 @@ def update_game_state(state: GameState):
             state.game_progress = "pause"
     if state.ballx <= 40 + 10 and state.p1y <= state.bally <= state.p1y + 100:
         state.ballvx *= -1
-    if state.ballx >= state.screen_width - 40 and state.p2y <= state.bally <= state.p2y + 100:
+    if state.ballx >= state.screen_width - 40 - 10 and state.p2y <= state.bally <= state.p2y + 100:
         state.ballvx *= -1
     return state
 

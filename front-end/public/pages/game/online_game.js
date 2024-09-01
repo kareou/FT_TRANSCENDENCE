@@ -5,6 +5,16 @@ import Http from "../../http/http.js";
 import Link from "../../components/link.js";
 import {ips} from "../../http/ip.js";
 
+const getPlayerObject = (paddle_name, player_num, ctx, theme) => {
+  if (paddle_name === "classic")
+    return new ClassicPaddle(player_num, ctx, theme);
+  else if (paddle_name === "blossom")
+    return new BlossomPaddle(player_num, ctx, theme);
+  else if (paddle_name === "lightsaber")
+    return new LightSaber(player_num, ctx, theme);
+}
+
+
 export default class OnlineGame extends HTMLElement {
   constructor() {
     super();
@@ -61,17 +71,17 @@ export default class OnlineGame extends HTMLElement {
     }
     else{
       this.websocket = new WebSocket(
-        `${ips.ockerUrl}/ws/gamematch/${gameid}/`
+        `${ips.socketUrl}/ws/gamematch/${gameid}/`
       );
       this.render();
       const canvas = this.querySelector(".board");
       canvas.width = canvas.clientWidth;
       canvas.height = canvas.clientHeight;
       const ctx = canvas.getContext("2d");
-      this.player1 = new ClassicPaddle(0, ctx, "mod");
-      this.player2 = new ClassicPaddle(1, ctx, "mod");
-      this.ball = new Ball(ctx, "sky");
-      this.board = new Board(ctx, "mod");
+      this.player1 = getPlayerObject(Http.user.paddle_type, 0, ctx, this.theme);
+      this.player2 = getPlayerObject(Http.user.paddle_type, 1, ctx, this.theme);
+      this.ball = new Ball(ctx, Http.user.table_theme);
+      this.board = new Board(ctx, Http.user.table_theme);
       this.websocket.onmessage = (e) => {
         const data = JSON.parse(e.data);
         if (data.winner) {

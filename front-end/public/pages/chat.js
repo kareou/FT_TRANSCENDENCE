@@ -10,7 +10,6 @@ export default class Chat extends HTMLElement {
     this.conversationId = null;
     this.chatContainer = null;
     this.conversations = [];
-    // this.activeConversationId = this.getAttribute();
   }
 
   connectedCallback() {
@@ -63,14 +62,13 @@ export default class Chat extends HTMLElement {
   }
 
   setupWebSocket() {
-    // console.log("size = " +this.conversations.length);
     this.conversations.forEach((conversation) => {
       conversation.websocket.addEventListener("open", function (event) {
         console.log(
           "WebSocket connection opened with sender " +
-            conversation.senderId +
-            " and reciever : " +
-            conversation.receiverId
+          conversation.senderId +
+          " and reciever : " +
+          conversation.receiverId
         );
       });
 
@@ -111,7 +109,6 @@ export default class Chat extends HTMLElement {
 
       if (response.ok) {
         const users = await response.json();
-        console.log("All users:", users);
         this.displayUsers(users);
       } else {
         console.error("Error fetching users:", response.statusText);
@@ -218,8 +215,6 @@ export default class Chat extends HTMLElement {
   }
 
   async fetchOrCreateConversation(senderId, receiverId) {
-    // console.log("sender : " +senderId);
-    // console.log("receiver : " +receiverId);
     try {
       const response = await fetch(
         `${ips.baseUrl}/chat/conversations/fetch_or_create/`,
@@ -238,8 +233,7 @@ export default class Chat extends HTMLElement {
       );
 
       const responseData = await response.json();
-
-      console.error("Case:", responseData.case);
+      this.querySelector(".block-btn").classList.remove("hidden");
       switch (responseData.case) {
         case "missing_data":
           console.error("Missing sender or receiver");
@@ -252,7 +246,6 @@ export default class Chat extends HTMLElement {
             "You have blocked this user and cannot send messages.";
           console.error("You have blocked this user");
           this.caseBlock();
-          // this.querySelector('.block-btn').classList.remove('hidden');
           this.toggleBlockButton("unblock");
           break;
         case "receiver_blocked_sender":
@@ -260,7 +253,6 @@ export default class Chat extends HTMLElement {
             "You are blocked by this user and cannot send messages.";
           console.error("You are blocked by this user");
           this.caseBlock();
-          // this.querySelector('.block-btn').style.display = 'none';
           this.querySelector(".block-btn").classList.add("hidden");
           this.toggleBlockButton("block");
           break;
@@ -282,8 +274,6 @@ export default class Chat extends HTMLElement {
     }
   }
   async fetchOrCreateConversationAndVerifyBlock(senderId, receiverId) {
-    // console.log("sender : " +senderId);
-    // console.log("receiver : " +receiverId);
     try {
       const response = await fetch(
         `${ips.baseUrl}/chat/conversations/fetch_or_create/`,
@@ -303,7 +293,6 @@ export default class Chat extends HTMLElement {
 
       const responseData = await response.json();
 
-      console.error("Case:", responseData.case);
       switch (responseData.case) {
         case "missing_data":
           return 0;
@@ -340,7 +329,6 @@ export default class Chat extends HTMLElement {
 
       if (response.ok) {
         const messages = await response.json();
-        console.log("Fetched messages for conversation:", messages);
         this.displayMessages(messages);
       } else {
         const errorData = await response.json();
@@ -373,9 +361,8 @@ export default class Chat extends HTMLElement {
                         ${message_time}
                     </div >
                 </div>
-                <img src="${
-                  this.querySelector(".logo_chat_user").src
-                }" class="user_pic_msg_right" alt="profile picture" loading="lazy">
+                <img src="${this.querySelector(".logo_chat_user").src
+        }" class="user_pic_msg_right" alt="profile picture" loading="lazy">
             </div>
         </div>
     `;
@@ -399,24 +386,19 @@ export default class Chat extends HTMLElement {
         `;
     }
     const userElements = this.querySelectorAll(".chat_bulles_wrapper");
-    // console.log("log iser : " +this.user.id);
     userElements.forEach((userElement) => {
-      // console.log("id : " +userElement.getAttribute("id")+ " rec : " + data.sender);
       if (userElement.getAttribute("id") == data.sender) {
-        // console.log("test " +userElement.getAttribute("id"));
         userElement.querySelector(".last_msg").innerHTML = data.message;
       }
     });
 
     this.chatContainer.innerHTML += messageHTML;
-    this.chatContainer.scrollTop = this.chatContainer.scrollHeight; // this for showing the very last messages of the conversation
+    this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
   }
 
   displayMessages(messages) {
     this.chatContainer = this.querySelector(".slots_messages_container__");
     this.chatContainer.innerHTML = "";
-    // console.log('pic = '+this.user.profile_pic);
-    // const receiverImg = this.querySelector(".logo_chat_user").src;
     messages.forEach((message) => {
       const message_time = this.isToday(message.timestamp)
         ? this.formatTime(message.timestamp)
@@ -450,9 +432,8 @@ export default class Chat extends HTMLElement {
                                     ${message_time}
                                 </div >
                             </div>
-                            <img src="${
-                              this.querySelector(".logo_chat_user").src
-                            }" class="user_pic_msg_right" alt="profile picture" loading="lazy">
+                            <img src="${this.querySelector(".logo_chat_user").src
+          }" class="user_pic_msg_right" alt="profile picture" loading="lazy">
                         </div>
                     </div>
                 `;
@@ -479,12 +460,8 @@ export default class Chat extends HTMLElement {
 
       this.chatContainer.innerHTML += messageHTML;
 
-      // console.log('1->'+receiverImg);
-      // this.querySelector(".user_pic_msg_right").src = '';
-      // this.querySelector(".user_pic_msg_right").src = receiverImg;
-      // console.log('2->'+this.querySelector(".user_pic_msg_right").src);
     });
-    this.chatContainer.scrollTop = this.chatContainer.scrollHeight; // this for showing the very last messages of the conversation
+    this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
   }
 
   displayMessage(message) {
@@ -513,20 +490,18 @@ export default class Chat extends HTMLElement {
         timestamp: new Date().toISOString(),
         conversation: this.conversationId,
       };
-      // console.log("result = "+this.fetchOrCreateConversationAndVerifyBlock(this.user.id, this.receiverId));
 
       const checkConversation =
         await this.fetchOrCreateConversationAndVerifyBlock(
           this.user.id,
           this.receiverId
         );
-      console.log("result = " + checkConversation);
 
       if (checkConversation === 0) {
         console.log(
           "Action aborted: User is blocked or conversation could not be created."
         );
-        return; // Stop further execution
+        return;
       }
       try {
         const response = await fetch(`${ips.baseUrl}/chat/messages/`, {
@@ -560,7 +535,6 @@ export default class Chat extends HTMLElement {
                 " receiver : ",
                 this.receiverId
               );
-              console.log("Message sent via ws:", dataWs);
               document.querySelector(".message-input").value = "";
             }
           });
@@ -645,6 +619,69 @@ export default class Chat extends HTMLElement {
     blockButton.addEventListener("click", () => {
       this.blockOrUnblockUser();
     });
+
+    const find_friends = document.querySelector(".find_friends");
+    const modal_wrapper_chat = document.querySelector(".modal_wrapper_chat");
+    find_friends.addEventListener("click", () => {
+      modal_wrapper_chat.style.display = "block";
+    });
+
+    const overlay = document.querySelector(".overlay_chat");
+
+    modal_wrapper_chat.addEventListener("click", function (event) {
+      console.log(event.target);
+      console.log(overlay);
+      if (event.target === overlay) {
+        modal_wrapper_chat.style.display = "none";
+      }
+    });
+
+    const user_list_wrapper = document.querySelector(
+      ".users_search_list_wrapper"
+    );
+
+    document.querySelector(".search").addEventListener("input", (e) => {
+      Http.getData("GET", "api/friends").then((data) => {
+
+        console.log(data)
+        if (e.target.value === "") {
+          user_list_wrapper.innerHTML = "";
+        } else {
+          for (let i = 0; i < data.length; i++) {
+            if (data[i].user1.id === Http.user.id) {
+              console.log(e.target.value);
+              console.log(data[i].user2.username);
+              if (data[i].user2.username.includes(e.target.value)) {
+                user_list_wrapper.innerHTML += `
+                <div class="user_wrapper_search">
+                <a is="co-link" href="/dashboard/profile/${data[i].user2.username}" style="
+    display: flex;
+">
+
+                <img src="${ips.baseUrl}${data[i].user2.profile_pic}" alt="" width="30" height="30" class="user_img_search">
+                <div class="fullname_search">${data[i].user2.full_name}</div>
+                </a>
+              </div>`;
+              }
+            } else {
+              console.log(e.target.value);
+              console.log(data[i].user2.username);
+              if (data[i].user1.username.includes(e.target.value)) {
+                user_list_wrapper.innerHTML += `
+                <div class="user_wrapper_search">
+                <a is="co-link" href="/dashboard/profile/${data[i].user1.username}" style="
+    display: flex;
+">
+                <img src="${ips.baseUrl}${data[i].user1.profile_pic}" alt="" width="30" height="30" class="user_img_search">
+                <div class="fullname_search">${data[i].user1.full_name}</div>
+                </a>
+              </div>`;
+              }
+            }
+          }
+        }
+      });
+    });
   }
   toggleBlockButton(state) {
     if (state == "block") this.querySelector(".block-btn").innerHTML = "block";
@@ -662,22 +699,7 @@ export default class Chat extends HTMLElement {
                 <input type="text" name="search" id="search" class="search" placeholder="What are you looking for ?">
             </div>
             <div class="users_search_list_wrapper">
-                <div class="user_wrapper_search">
-                    <img src="bg_img.png" alt="" width="30" height="30" class="user_img_search">
-                    <div class="fullname_search">Full Name</div>
-                    <div class="user_name_search">User Name</div>
-                </div>
 
-                <div class="user_wrapper_search">
-                    <img src="bg_img.png" alt="" width="30" height="30" class="user_img_search">
-                    <div class="fullname_search">Full Name</div>
-                    <div class="user_name_search">User Name</div>
-                </div>
-                <div class="user_wrapper_search">
-                    <img src="bg_img.png" alt="" width="30" height="30" class="user_img_search">
-                    <div class="fullname_search">Full Name</div>
-                    <div class="user_name_search">User Name</div>
-                </div>
             </div>
         </div>
     </div>
@@ -700,10 +722,6 @@ export default class Chat extends HTMLElement {
                               <h3 class="name_user_con" id="username">
 
                               </h3>
-
-                              <p class="status_user_con">
-                                  Online
-                              </p>
 
                           </div>
                       </div>
@@ -736,7 +754,7 @@ export default class Chat extends HTMLElement {
                         </div>
                 </div>
             </div>
-            
+
         </div>
     `;
 

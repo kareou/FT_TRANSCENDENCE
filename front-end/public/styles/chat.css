@@ -152,6 +152,7 @@ body {
     justify-content: space-between;
     flex-direction: column;
     width: fit-content;
+    transition: all 1s ease-in-out;
     /* height: 90vh !important; */
 }
 
@@ -247,11 +248,11 @@ body {
 }
 
 .dash_logos_wrapper a.active {
-    border-left: 2px solid #1BA7A0;
+    border-left: 2px solid var(--purple);
 }
 
 .dash_logos_wrapper a.active .icon_side_bar {
-    color: #1BA7A0;
+    color: var(--purple);
     filter: drop-shadow(0px 0px 5px #1BA7A0);
 }
 
@@ -286,6 +287,7 @@ body {
     max-width: 2000px;
     margin: auto;
     padding: 10rem 15rem;
+    transition: all 1s ease-in-out;
 }
 
 .item {

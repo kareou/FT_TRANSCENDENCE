@@ -1,19 +1,32 @@
 FROM python:3.9.5
 
+# WORKDIR /back-end
+
+# COPY requirements.txt requirements.txt
+
+# COPY . .
+
+# RUN chmod +x start.sh
+
+# RUN pip install -r requirements.txt
+
+# ENV DJANGO_SETTINGS_MODULE=back_end.settings
+
+# EXPOSE 8000
+
 WORKDIR /back-end
 
 COPY requirements.txt requirements.txt
 
 COPY . .
 
-RUN chmod +x start.sh
-
 RUN pip install -r requirements.txt
 
 ENV DJANGO_SETTINGS_MODULE=back_end.settings
 
-EXPOSE 8443
+RUN chmod +x start.sh
 
-ENTRYPOINT ["./start.sh"]
+EXPOSE 8000
 
-CMD ["daphne", "-e", "ssl:8443:privateKey=/back-end/certs/lebftPong.key:certKey=/back-end/certs/lebftPong.crt", "back_end.asgi:application"]
+CMD ["sh", "start.sh"]
+

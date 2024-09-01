@@ -40,7 +40,7 @@ export default class UserStats extends HTMLElement {
     <div class="win_rate">
         <div>
             <span class="stat_label">Win Rate</span>
-            <span class="stat_value">${this.calcWinrate().toFixed(2)}%</span>
+            <span class="stat_value">${isNaN(this.calcWinrate().toFixed(2)) ? "0" : this.calcWinrate().toFixed(2)} %</span>
             <span class="stat_subtext">${this.stats.matche_won}W - ${this.stats.matche_lost}L</span>
         </div>
     </div>
@@ -61,22 +61,22 @@ export default class UserStats extends HTMLElement {
     <figure class="graph">
         <ol>
             <li><span id="stat">
-                    matches winned
+                    Matches Won
                 </span>
                 <span id="progress" for="matche_won"></span>
             </li>
             <li><span id="stat">
-                    matches lost
+                    Matches Lost
                 </span>
                 <span id="progress" for="matche_lost"></span>
             </li>
             <li><span id="stat">
-                    goals scored
+                    Goals Scored
                 </span>
                 <span id="progress" for="goals_scored"></span>
             </li>
             <li><span id="stat">
-                    goals conceded
+                    Goals Conceded
                 </span>
                 <span id="progress" for="goals_conceded"></span>
             </li>
