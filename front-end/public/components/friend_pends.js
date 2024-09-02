@@ -17,7 +17,6 @@ export default class FriendPends extends HTMLElement {
         const fq_wrapper = document.querySelector(".friend_online_wrapper_requests")
         Http.getData("GET", "api/friends/accept/")
         .then (response =>{
-        console.log(response)
             return (response)
         })
         .then(data => {

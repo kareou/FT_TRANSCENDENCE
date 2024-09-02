@@ -124,9 +124,8 @@ export default class Chat extends HTMLElement {
         <div class="first_profile_wrapper_chat">
             <div class="pdp_warpper">
                 <img src="${ips.baseUrl}${this.user.profile_pic}" class="pfp_logo" alt="profile picture" loading="lazy">
-            </div>
+                </div>
             <div class="icon_wrapper_">
-                <i class="fa-solid fa-circle-ellipsis fa-2xl" style="color: #ffffff;"></i>
             </div>
         </div>
         `;
@@ -437,7 +436,6 @@ export default class Chat extends HTMLElement {
                         </div>
                     </div>
                 `;
-        //
       } else {
         messageHTML = `
                     <div class="slot_message_container___">
@@ -625,6 +623,12 @@ export default class Chat extends HTMLElement {
     find_friends.addEventListener("click", () => {
       modal_wrapper_chat.style.display = "block";
     });
+    
+
+    const colseButton = document.querySelector("#close-btn");
+    colseButton.addEventListener("click", () => {
+      modal_wrapper_chat.style.display = "none";
+    });
 
     const overlay = document.querySelector(".overlay_chat");
 
@@ -693,16 +697,19 @@ export default class Chat extends HTMLElement {
 
         <div class="chat_wrapper_">
         <div class="modal_wrapper_chat">
-        <div class="overlay_chat"></div>
-        <div class="modal_content_wrapper">
-            <div class="search_input_wrapper_">
-                <input type="text" name="search" id="search" class="search" placeholder="What are you looking for ?">
-            </div>
-            <div class="users_search_list_wrapper">
+          <div class="overlay_chat"></div>
+            <div class="modal_content_wrapper">
+                <div class="search_input_wrapper_" style="display:flex;">
+                  <input type="text" name="search" id="search" class="search" placeholder="What are you looking for ?">
 
+                  <i class="fa-regular fa-circle-xmark fa-2x" id="close-btn" style="margin-left:10px; padding:5px; color: red;" ></i>
+
+                </div>
+                <div class="users_search_list_wrapper">
+
+                </div>
             </div>
-        </div>
-    </div>
+          </div>
             <div class="first_section_wrapper_chat">
 
             </div>
@@ -743,7 +750,7 @@ export default class Chat extends HTMLElement {
                         </div>
                         <div style="display: flex; justify-content: center; width: 100%;">
                             <div id="blocked-user-message" class="blocked-user-message">
-                                <p class="block-message">You are blocked and cannot send messages.</p>
+                                <p class="block-message"></p>
                             </div>
                             <div class="input_conv_container__chat">
                                 <textarea name="" id="" class="send_msg_input message-input" rows="1" placeholder="Message"></textarea>

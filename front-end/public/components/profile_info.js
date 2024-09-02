@@ -7,7 +7,6 @@ export default class ProfileInfo extends HTMLElement {
     super();
     this.user = Http.user;
     this.username = this.getAttribute("user");
-    console.log("id : " + this.username);
   }
   connectedCallback() {
     if (this.username != this.user.username) {
@@ -28,7 +27,6 @@ export default class ProfileInfo extends HTMLElement {
     } else {
       this.render();
       this.markUnearnedAchievements();
-      this.setupEventListeners();
       this.setupEventListeners();
     }
   }
@@ -93,7 +91,6 @@ export default class ProfileInfo extends HTMLElement {
         Http.user.id,
         this.user.id
       );
-      // console.log("id : "+conversation.conversation.id);
       const messageContent = document.querySelector(".message-input").value;
       const messageData = {
         sender: Http.user.id,
@@ -181,10 +178,11 @@ export default class ProfileInfo extends HTMLElement {
     }
     if (buttonNew) {
       buttonNew.addEventListener("click", () => {
-        console.log("button message pressed");
+        
         if (msgPrompt.classList.contains("hidden")) {
           msgPrompt.classList.remove("hidden");
           msgPrompt.classList.add("visible");
+          document.querySelector(".message-input").focus();
         } else {
           msgPrompt.classList.remove("visible");
           msgPrompt.classList.add("hidden");
