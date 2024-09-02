@@ -40,8 +40,8 @@ class friends_viewset(viewsets.ModelViewSet):
                     serializer.save(user1_invited_user2=True)
                 elif request.user == user2:
                     serializer.save(user2_invited_user1=True)
-                return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=401)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
         try:
@@ -50,10 +50,10 @@ class friends_viewset(viewsets.ModelViewSet):
             queryset = friendList.objects.get(pk=pk)
             if queryset is not None and queryset.are_friends == True:
                 queryset.delete()
-                return Response(status=200)
+                return Response(status=status.HTTP_200_OK)
         except friendList.DoesNotExist:
-            return Response(status=400)
-        return Response(status=400)
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=False, methods=['GET', 'POST'])
     def block(self, request, pk=None):
@@ -64,18 +64,29 @@ class friends_viewset(viewsets.ModelViewSet):
             if serializer.is_valid():
                 user1 = serializer.validated_data['user1']
                 user2 = serializer.validated_data['user2']
+                # if the user is friend with the other user
                 friendShip = friendList.objects.filter(Q(user1=user1, user2=user2)).first()
                 if friendShip:
                     friendShip.user1_blocked_user2 = True
                     friendShip.are_friends = False
                     friendShip.save()
-                    return Response(status=200)
+                    return Response(status=status.HTTP_200_OK)
                 friendShip = friendList.objects.filter(Q(user1=user2, user2=user1)).first()
                 if friendShip:
                     friendShip.user2_blocked_user1 = True
                     friendShip.are_friends = False
                     friendShip.save()
-                    return Response(status=200)
+                    return Response(status=status.HTTP_200_OK)
+                # if the user is not friend with the other user
+                if request.user == user1:
+                    serializer.save(user1_blocked_user2=True)
+                    return Response(status=status.HTTP_200_OK)
+
+                if request.user == user2:
+                    serializer.save(user2_blocked_user1=True)
+                    return Response(status=status.HTTP_200_OK)
+
+                return Response(status=status.HTTP_404_NOT_FOUND)
         if request.method == 'GET':
             if request.user.is_authenticated:
                 queryset = friendList.objects.filter(
@@ -86,7 +97,7 @@ class friends_viewset(viewsets.ModelViewSet):
                 return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
             blockList = friendListSerializer(queryset, many=True)
             return Response(blockList.data)
-        return Response(status=400)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=False, methods=['GET', 'POST'])
     def unblock(self, request, pk=None):
@@ -100,27 +111,28 @@ class friends_viewset(viewsets.ModelViewSet):
                 return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
             if queryset:
                 queryset.delete()
-                return Response(status=200)
-        return Response(status=400)
+                return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=False, methods=['GET', 'POST'])
     def accept(self, request, pk=None):
         if request.method == 'POST':
             if request.user.is_authenticated:
                 queryset = friendList.objects.filter(
-                    (Q(user1=request.user) & Q(user2_invited_user1=True)) |
-                    (Q(user2=request.user) & Q(user1_invited_user2=True))
+                    ((Q(user1=request.user) & Q(user2_invited_user1=True)) |
+                    (Q(user2=request.user) & Q(user1_invited_user2=True))) &
+                    (Q(user1_blocked_user2=False) & Q(user2_blocked_user1=False))
                 ).first()
             else:
                 return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
             if not queryset:
-                return Response({"detail": "No pending invitation found."}, status=400)
+                return Response({"detail": "No pending invitation found."}, status=status.HTTP_404_NOT_FOUND)
             queryset.are_friends = True
             queryset.user1_invited_user2 = False
             queryset.user2_invited_user1 = False
             queryset.save()
             serializer = friendListSerializer(queryset)
-            return Response(serializer.data, status=200)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         if request.method == 'GET':
             if request.user.is_authenticated:
                 queryset = friendList.objects.filter(
@@ -133,5 +145,5 @@ class friends_viewset(viewsets.ModelViewSet):
                 serializer = friendListSerializer(queryset, many=True)
                 return (Response(serializer.data))
             else:
-                return Response({"message": "No friends found"}, status=200)
+                return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

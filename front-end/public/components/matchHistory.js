@@ -43,9 +43,11 @@ export default class MatchHistory extends HTMLElement {
             `
                 )
               : `
+              <div class="no_matches">
             <i class="fa-sharp fa-thin fa-empty-set fa-2xl" style="color: #ffffff;"></i>
             <h1>WE DIDNT FIND ANY MATCHES FOR THIS PLAYER</h1>
-            <a is="co-link" href=""/dashboard/game/online/1v1" class="game_button" id="online">Play a game</a>
+            <a is="co-link" href="/dashboard/game/online" class="game_button" id="online">Play a game</a>
+            </div>
             `
           }
         </div>

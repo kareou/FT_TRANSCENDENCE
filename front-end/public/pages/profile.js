@@ -13,22 +13,14 @@ export default class Profile extends HTMLElement {
 
   render() {
     this.innerHTML = /*HTML*/ `
-  <div class="dashboard_wrapper">
+  <div class="dashboard_wrapper __flex_dash">
+  <div class="first_wrapper_dashboard">
     <profile-info user="${this.user}"></profile-info>
-    <div class="rank">
-      <div class="first">
-        <img src="/public/assets/medal.png" alt="medal">
-        <h1>iness joumaa</h1>
-      </div>
-      <div class="second">
-        <h1>Friends</h1>
-      </div>
-      <div class="third">
-        <h1>Friends</h1>
-      </div>
     </div>
-    <user-stats user="${this.user}"></user-stats>
-    <match-history user="${this.user}"></match-history>
+    <div class="second_wrapper_dashboard">
+      <user-stats class="user_stats" user="${this.user}"></user-stats>
+      <match-history class="match_history" user="${this.user}"></match-history>
+    </div>
   </div>
 `;
   }
