@@ -295,7 +295,11 @@ class UserAction(ModelViewSet):
             return Response({'message': 'Provider not implemented'}, status=status.HTTP_400_BAD_REQUEST)
         provider_data = self.OAuth2_providers[provider]
         # check the state parameter
-        if 'oauth2_state' not in request.session or 'state' not in request.GET or request.session['oauth2_state'] != request.GET['state']:
+        if 'oauth2_state' not in request.session :
+            return Response({'message': 'oauth2_state not in request session'}, status=status.HTTP_400_BAD)
+        if 'state' not in request.GET:
+            return Response({'message': 'State not in request.Get'}, status=status.HTTP_400_BAD_REQUEST)
+        if request.session['oauth2_state'] != request.GET['state']:
             return Response({'message': 'Invalid state parameter'}, status=status.HTTP_400_BAD_REQUEST)
         # get the authorization code from the query string
         code = request.GET.get('code')
