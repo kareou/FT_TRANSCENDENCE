@@ -133,5 +133,5 @@ class friends_viewset(viewsets.ModelViewSet):
                 serializer = friendListSerializer(queryset, many=True)
                 return (Response(serializer.data))
             else:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+                return Response({"message": "No friends found"}, status=200)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -142,9 +142,13 @@ export default class Tournament extends HTMLElement {
       } else {
         console.error("Connection died");
       }
-      document.getElementById("status").innerHTML =
+      const statusElement = document.getElementById("status");
+      if (statusElement)
+      statusElement.innerHTML =
         "WebSocket connection closed.";
-      document.getElementById("joinButton").disabled = true;
+      const joinButtonElement = document.getElementById("joinButton");
+      if (joinButtonElement)
+      joinButtonElement.disabled = true;
     };
 
     this.socket.onerror = (error) => {

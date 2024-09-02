@@ -35,64 +35,67 @@ export default class TopBar extends HTMLElement {
       }
       return (count);
     }
-    search_chat.addEventListener('input', (e) => {
-      const card = document.querySelector(".search_wrapper_");
+    if (search_chat)
+    {
+      search_chat.addEventListener('input', (e) => {
+        const card = document.querySelector(".search_wrapper_");
 
-        console.log(this.user);
+          console.log(this.user);
 
-        e.preventDefault();
-        fetch(`http://localhost:8000/api/user/`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: 'include',
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("The data in user listaa =>");
-            console.log(data);
-            card.innerHTML = "";
-            let counter = 0;
-            let count_data = count_data_include_search(e.target.value, data);
-            let border_ = "";
-            
-            for (let user in data) {
-              console.log(counter)
-              console.log(e.target.value)
-              border_ = "border-bottom: none!important"
-              if (e.target.value && data[user].username.includes(e.target.value))
-              {
-                  counter++;
-                  card.classList.add('active')
-                  card.innerHTML += `<a is="co-link" href="/dashboard/profile/${data[user].username}" class="search_warpper_card" style="${border_}">
-                  <img src=${data[user].profile_pic} width="200" class="img_user_search"/> <br>    
-                  <div class="infos_user_search_wrapper">
-                    <div class="username_search_wrapper" style="padding:4px 0px;">${data[user].username}</div>
-                    <div class="email_search_wrapper" style="padding:4px 0px;">${data[user].email}</div>
-                  </div>
-                </a>`;
-                // if (count_data > 1 && counter % 2 == 0)
-                //   {
-                //     console.log("The counter => ", counter)
-                //     card.innerHTML += "<hr/>"
-                //   }
-              }
-              else if (e.target.value == "" || count_data == 0)
-                  card.classList.remove('active')
-            }
+          e.preventDefault();
+          fetch(`http://localhost:8000/api/user/`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: 'include',
           })
-          .catch((error) => {
-            console.error("Error in users list:", error);
-          });
-          if (e.target.value == "")
-          {
-            card.innerHTML = "";
-            card.classList.remove('active')
-            console.log(card.classList)
-          }
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("The data in user listaa =>");
+              console.log(data);
+              card.innerHTML = "";
+              let counter = 0;
+              let count_data = count_data_include_search(e.target.value, data);
+              let border_ = "";
+              
+              for (let user in data) {
+                console.log(counter)
+                console.log(e.target.value)
+                border_ = "border-bottom: none!important"
+                if (e.target.value && data[user].username.includes(e.target.value))
+                {
+                    counter++;
+                    card.classList.add('active')
+                    card.innerHTML += `<a is="co-link" href="/dashboard/profile/${data[user].username}" class="search_warpper_card" style="${border_}">
+                    <img src=${data[user].profile_pic} width="200" class="img_user_search"/> <br>    
+                    <div class="infos_user_search_wrapper">
+                      <div class="username_search_wrapper" style="padding:4px 0px;">${data[user].username}</div>
+                      <div class="email_search_wrapper" style="padding:4px 0px;">${data[user].email}</div>
+                    </div>
+                  </a>`;
+                  // if (count_data > 1 && counter % 2 == 0)
+                  //   {
+                  //     console.log("The counter => ", counter)
+                  //     card.innerHTML += "<hr/>"
+                  //   }
+                }
+                else if (e.target.value == "" || count_data == 0)
+                    card.classList.remove('active')
+              }
+            })
+            .catch((error) => {
+              console.error("Error in users list:", error);
+            });
+            if (e.target.value == "")
+            {
+              card.innerHTML = "";
+              card.classList.remove('active')
+              console.log(card.classList)
+            }
 
-    });
+      });
+    }
   }
 
   initURLChangeDetection() {

@@ -189,26 +189,14 @@ export default class Settings extends HTMLElement {
 		const modal_wrapper_2fa = document.querySelector(".modal_wrapper_2fa");
 		enable_2fa.addEventListener("click", () => {
 			const baseUrl = `${ips.baseUrl}`;
-			const endPoint = "/api/user/enable_2fa/";
-			const rs = fetch(baseUrl + endPoint, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				credentials: "include",
+			const endPoint = "api/user/enable_2fa/";
+			Http.getData("POST", endPoint).then(data =>{
+				_2fa_container.style.display = "block";
+				modal_wrapper_2fa.style.display = "block";
+				enable_2fa.style.display = "none";
+				disable_2fa.style.display = "block";
 			})
-				.then((response) => {
-					return response.json();
-				})
-				.then((data) => {
-					_2fa_container.style.display = "block";
-					modal_wrapper_2fa.style.display = "block";
-					// qr.src = data["2fa_url"];
 
-					console.log(data["2fa_url"]);
-					enable_2fa.style.display = "none";
-					disable_2fa.style.display = "block";
-				});
 		});
 
 		const overlay = document.querySelector(".overlay_2fa");
@@ -225,22 +213,12 @@ export default class Settings extends HTMLElement {
 
 		disable_2fa.addEventListener("click", () => {
 			const baseUrl = `${ips.baseUrl}`;
-			const endPoint = "/api/user/disable_2fa/";
-			const rs = fetch(baseUrl + endPoint, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				credentials: "include",
+			const endPoint = "api/user/disable_2fa/";
+			Http.getData("POST", endPoint).then(data =>{
+				enable_2fa.style.display = "block";
+				disable_2fa.style.display = "none";
 			})
-				.then((response) => {
-					return response.json();
-				})
-				.then((data) => {
-					console.log(data);
-					enable_2fa.style.display = "block";
-					disable_2fa.style.display = "none";
-				});
+
 		});
 
 		if (this.user._2fa_enabled) {
