@@ -24,7 +24,7 @@ export default class FriendPends extends HTMLElement {
         const test = `<friend-request profile_pic="${data[i].user1.profile_pic}"  full_name="${data[i].user1.full_name}" user_id="${ data[i].user1.id}"></friend-request>`
         fq_wrapper.innerHTML += test
         }
-        if (data["detail"] === "No friendList matches the given query.") {
+        if (data["detail"] === "No FriendList matches the given query.") {
         console.log("no friend requests")
         fq_wrapper.style.overflow = "hidden";
         fq_wrapper.innerHTML =

@@ -1,10 +1,10 @@
 from rest_framework import serializers
 from  user.serializers import UserSerializer   
-from .models import friendList
+from .models import FriendList
 
 class friendListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = friendList
+        model = FriendList
         fields = '__all__'
     def to_representation(self, instance):
         representation = super().to_representation(instance)
