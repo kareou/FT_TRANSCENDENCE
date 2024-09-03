@@ -29,7 +29,7 @@ export default class OnlineGame extends HTMLElement {
     this.role = null;
     this.game_started = false;
     this.keyStates = {};
-    this.game_progress = "playing";
+    this.game_progress = "Joining";
   }
 
   updateGameStats(newstate) {
@@ -91,6 +91,7 @@ export default class OnlineGame extends HTMLElement {
         if (data.role) {
           this.role = data.role;
           Http.website_stats.notify("gameusers", { [this.role]: Http.user });
+          this.waitingPlayers(ctx);
         }
         if (data.state){
           this.updateGameStats(data.state);
@@ -176,6 +177,19 @@ export default class OnlineGame extends HTMLElement {
       }, 1000);
   }
 
+  waitingPlayers(ctx) {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    this.board.draw();
+    this.#drawPaddles(ctx);
+    this.ball.draw();
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.font = "50px Arial";
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.fillText("Waiting for players", ctx.canvas.width / 2, ctx.canvas.height / 2);
+  }
+
   async #update(ctx) {
     var id = requestAnimationFrame(() => this.#update(ctx));
     if (this.game_progress === "end") {
@@ -190,6 +204,8 @@ export default class OnlineGame extends HTMLElement {
       this.#drawPaddles(ctx);
       this.ball.draw();
       this.#updatePlayerPositions();
+    }else if (this.game_progress === "Joining") {
+      
     }
   }
 

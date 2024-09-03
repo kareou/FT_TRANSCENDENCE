@@ -34,17 +34,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         match.save()
         return match
 
-    async def delete_all_matches(self):
-        try:
-            matches = await self.get_all_matches()
-            if matches is not None:
-                for match in matches:
-                    print(f"Match {match.id} removed.", flush=True)
-                    await database_sync_to_async(match.delete)()
-                return True
-        except Match.DoesNotExist:
-            return False
-
     async def save_match(self, player1, player2):
         print(f'player=0=id====>[{player1.id}]', flush=True)
         print(f'player=1=id====>[{player2.id}]', flush=True)
@@ -189,13 +178,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'win': False
             }
             self.tournament_data['first_round'].append(player_data_first_round)
-
-    async def players_status_changed(self, event):
-        await self.send(text_data=json.dumps({
-            'type': 'players_status_changed',
-            'first_round': event['first_round'],
-            'second_round': event['second_round']
-        }))
     ################################################################## WEBSOCKET METHODS ############################################################
     async def connect(self):
         self.room_group_name = "tournament"
@@ -216,7 +198,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         user = await self.get_user_from_scope(self.scope)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         if code != 1800:
-            if user.id in self.participants_data.keys() and code != 1800:
+            if user and user.id in self.participants_data.keys() and code != 1800:
                 await self.change_participant_status(user.id)
             print(f"User id desconnect=--=--=-=-=-=-=-=--=--==-=-=-=->: {user.id}", flush=True)
         await self.close()
