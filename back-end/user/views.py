@@ -69,6 +69,20 @@ class UserAction(ModelViewSet):
     # def list(self, request):
     #     return Response({'detail': 'forbidden.'}, status=status.HTTP_403_FORBIDDEN)
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            user = User.objects.get(pk=kwargs['pk'])
+            user.delete()
+            refresh_token = RefreshToken(request.data.get('refresh'))
+            refresh_token.blacklist()
+            response = Response({'message': 'User deleted successfully'}, status=status.HTTP_200_OK)
+            response.delete_cookie('refresh')
+            response.delete_cookie('access')
+            return response
+        except User.DoesNotExist:
+            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+
     def retrieve(self, request, *args, **kwargs):
         # this is the case when the retrieve method is called with the pk as 'update'
         if kwargs['pk'] == 'update':
@@ -153,11 +167,11 @@ class UserAction(ModelViewSet):
         if user is not None and account_activation_token.check_token(user, token):
             user.is_email_verified = True
             user.save()
-            return redirect('https://{settings.Front_HOST}/login')
+            return redirect(f'https://{settings.FRONT_HOST}/auth/login')
             # return Response({'message': 'Account activated successfullyly'}, status=status.HTTP_200_OK)
         else:
             return Response({'message': 'Activation link is invalid!'}, status=status.HTTP_400_BAD_REQUEST)
-            # return redirect('https://{settings.Front_HOST}/activation-failed')
+            # return redirect('https://{settings.FRONT_HOST}/activation-failed')
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def reset_password(self, request):
@@ -245,7 +259,7 @@ class UserAction(ModelViewSet):
         generate_qr(user.username, 'ft_transcendence')
         user._2fa_enabled = True
         user.save()
-        return Response({'message': '2FA enabled', 'detail': 'scan the qrcode in the path below', '2fa_url': 'https://localhost:8000/media/2fa/'+user.username+'_2fa.png'}, status=status.HTTP_200_OK)
+        return Response({'message': '2FA enabled', 'detail': 'scan the qrcode in the path below', '2fa_url': 'https://localhost:8443/media/2fa/'+user.username+'_2fa.png'}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def disable_2fa(self, request):
@@ -275,7 +289,7 @@ class UserAction(ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def oauth2_authorize(self, request, provider):
         if provider not in self.OAuth2_providers:
-            response = HttpResponseRedirect('https://{settings.Front_HOST}/auth/login')
+            response = HttpResponseRedirect(f'https://{settings.FRONT_HOST}/auth/login')
             response.set_cookie('error', '')  # Set the cookie
             return response
         provider_data = self.OAuth2_providers[provider]
@@ -286,7 +300,7 @@ class UserAction(ModelViewSet):
         # create a query string with all the OAuth2 parameters
         qs = urlencode({
             'client_id': provider_data['client_id'],
-            'redirect_uri': 'https://localhost:8000/api/user/oauth2/callback/' + provider + '/',
+            'redirect_uri': 'https://localhost:8443/api/user/oauth2/callback/' + provider + '/',
             'response_type': 'code',
             'scope': ' '.join(provider_data['scopes']),
             'state': request.session['oauth2_state'],
@@ -298,19 +312,19 @@ class UserAction(ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def oauth2_callback(self, request, provider):
         if provider not in self.OAuth2_providers:
-            response = HttpResponseRedirect('https://{settings.Front_HOST}/auth/login')
+            response = HttpResponseRedirect(f'https://{settings.FRONT_HOST}/auth/login')
             response.set_cookie('error', '')  # Set the cookie
             return response
         provider_data = self.OAuth2_providers[provider]
         # check the state parameter
         if 'oauth2_state' not in request.session or 'state' not in request.GET or 'oauth2_state' not in request.session:
-            response = HttpResponseRedirect('https://{settings.Front_HOST}/auth/login')
+            response = HttpResponseRedirect(f'https://{settings.FRONT_HOST}/auth/login')
             response.set_cookie('error', '')  # Set the cookie
             return response
         # get the authorization code from the query string
         code = request.GET.get('code')
         if not code:
-            response = HttpResponseRedirect('https://{settings.Front_HOST}/auth/login')
+            response = HttpResponseRedirect(f'https://{settings.FRONT_HOST}/auth/login')
             response.set_cookie('error', '')  # Set the cookie
             return response
         # prepare the data for the token request
@@ -319,7 +333,7 @@ class UserAction(ModelViewSet):
             'client_secret': provider_data['client_secret'],
             'code': code,
             'grant_type': 'authorization_code',
-            'redirect_uri': 'https://localhost:8000/api/user/oauth2/callback/' + provider + '/',
+            'redirect_uri': 'https://localhost:8443/api/user/oauth2/callback/' + provider + '/',
         }
         # send the token request
         resp = requests.post(provider_data['token_url'], data=data, headers={'Accept': 'application/json'})
@@ -327,14 +341,14 @@ class UserAction(ModelViewSet):
             return Response({'message': 'Failed to obtain access token'}, status=status.HTTP_400_BAD_REQUEST)
         token_data = resp.json()
         if 'access_token' not in token_data:
-            response = HttpResponseRedirect('https://{settings.Front_HOST}/auth/login')
+            response = HttpResponseRedirect(f'https://{settings.FRONT_HOST}/auth/login')
             response.set_cookie('error', '')  # Set the cookie
             return response
         # send a request to the user endpoint
         headers = {'Authorization': 'Bearer ' + token_data['access_token']}
         resp = requests.get(provider_data['user_url'], headers=headers)
         if resp.status_code != 200:
-            response = HttpResponseRedirect('https://{settings.Front_HOST}/auth/login')
+            response = HttpResponseRedirect(f'https://{settings.FRONT_HOST}/auth/login')
             response.set_cookie('error', '')  # Set the cookie
             return response
         user_data = resp.json()
@@ -350,7 +364,7 @@ class UserAction(ModelViewSet):
         response.data = {"user": UserSerializer(user).data}
         response.set_cookie(key='refresh', value=str(refresh_token), httponly=True)
         response.set_cookie(key='access', value=access_token, httponly=True)
-        origin = "https://{settings.Front_HOST}/"
+        origin = f"https://{settings.FRONT_HOST}/"
         redirect_response = redirect(f'{origin}dashboard')
         redirect_response.cookies = response.cookies
         return redirect_response

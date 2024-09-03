@@ -1,10 +1,17 @@
 import Http from "../http/http.js";
 import { ips } from "../http/ip.js";
+import Link from "../components/link.js";
 
 export default class Settings extends HTMLElement {
   constructor() {
     super();
     this.user = Http.user;
+  }
+  escapeHTML(html) {
+    return html
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
   }
   connectedCallback() {
     console.log(this.user);
@@ -68,7 +75,11 @@ export default class Settings extends HTMLElement {
           body: formData,
         })
           .then((response) => {
-            return response.json();
+			if (response.ok)
+			{
+				// this.website_stats.notify("toast", { type: "success", message: "updated successfully" });
+				return response.json();
+			}
           })
           .then((data) => {
             this.querySelector(
@@ -103,23 +114,14 @@ export default class Settings extends HTMLElement {
     const btn_confirm = document.querySelector(".btn_confirm");
     const modal_wrapper_pass = document.querySelector(".modal_wrapper_pass");
 
-    // submit_btn.addEventListener('click', () => {
-    // 	modal_wrapper_pass.style.display = "block";
-    // 	const overlay_pass = document.querySelector('.overlay_pass');
-    // 	const modal_content_wrapper = document.querySelector('.modal_content_wrapper');
-    // 	overlay_pass.addEventListener('click', () => {
-    // 		modal_wrapper_pass.style.display = "none";
-    // 	})
-    // })
 
     submit_btn.addEventListener("click", () => {
       collectedSettingsData["full_name"] =
-        document.querySelector(".fullname").value ?? null;
+        this.escapeHTML(document.querySelector(".fullname").value) ?? null;
       collectedSettingsData["username"] =
-        document.querySelector(".username").value ?? null;
+        this.escapeHTML(document.querySelector(".username").value) ?? null;
       collectedSettingsData["email"] =
-        document.querySelector(".email").value ?? null;
-      // collectedSettingsData["password"] = document.querySelector('.pass').value ?? null;
+        this.escapeHTML(document.querySelector(".email").value) ?? null;
       console.log(JSON.stringify(collectedSettingsData));
 
       const baseUrl = `${ips.baseUrl}`;
@@ -235,6 +237,22 @@ export default class Settings extends HTMLElement {
       email_input.disabled = true;
       email_input.value = this.user.email;
     });
+
+	const delete_user = document.querySelector(".delete_user");
+
+	delete_user.addEventListener("click", async () => {
+		const response = await fetch(`${ips.baseUrl}/api/user/${Http.user.id}`, {
+			method: "DELETE",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			credentials: "include",
+			});
+
+		if (response.ok) {
+			Link.navigateTo("/");
+		}
+	});
   }
   render() {
     this.innerHTML = /*html*/ `
@@ -333,6 +351,19 @@ height: 35px;
 .modal_wrapper_pass{
 	display: none;
 }
+.delete_user{
+	background: red;
+    border: none;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 9px;
+	cursor: pointer;
+}
+.delete_user_wrapper{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
 		</style>
 	<div class="setting_wrapper_">
 		<div class="left_side_settings_wrapper">
@@ -367,8 +398,13 @@ height: 35px;
 						Security
 					</span>
 				</div>
+				<div class="delete_user_wrapper">
+					<button class="delete_user">Delete Account</button>
+				</div>
+				
 
 			</div>
+
 		</div>
 
 		<div class="right_side_settings_wrapper">
