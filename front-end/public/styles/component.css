@@ -185,10 +185,15 @@
     gap: 2rem;
 }
 
+.toast_wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .toast-icon {
-	width: 2.5rem;
-	height: 2.5rem;
+	width: 40px;
+	height: 40px;
 	border-radius: 50%;
 	display: flex;
 	align-items: center;
@@ -719,7 +724,7 @@ width: 20rem;
     background-color: rgba(27, 167, 160, 0.05);
     border: 0.6px solid #778FB8;
     border-radius: 1rem;
-    height: 100%;
+    height: 60vh;
     text-align: center;
 }
 
@@ -748,7 +753,8 @@ width: 20rem;
     background-color: rgb(47, 23, 71);
 }
 
-#online{
+#online,
+#local{
     height: 50px;
   font-size: 14px;
   border-radius: 8px;
@@ -756,12 +762,24 @@ width: 20rem;
 
 .matches{
     display: flex;
-    justify-content: center;
     align-items: center;
     flex-direction: column;
     height: 100%;
 }
 
 .matches > h1{
+    padding: 25px 0;
+}
+
+.no_matches{
+    height: 100%;
+  justify-content: center;
+  align-content: center;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.no_matches h1{
     padding: 25px 0;
 }

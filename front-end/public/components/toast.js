@@ -35,7 +35,9 @@ export default class Toast extends HTMLElement {
 		this.innerHTML = /*HTML*/ `
 		<div class="toast ">
 			<div class="toast-wrapper ${this.type}">
-				<label for="t-help" class="toast-icon ${this.type} icon-help"></label>
+				<div class="toast_wrapper">
+					<label for="t-help" class="toast-icon ${this.type} icon-help"></label>
+				</div>
 				<div>
 						<label for="t-help" class="close"></label>
 						<h3>${this.type}!</h3>

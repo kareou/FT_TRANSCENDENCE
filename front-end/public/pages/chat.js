@@ -188,7 +188,7 @@ export default class Chat extends HTMLElement {
               const username = userElement.getAttribute("name");
               this.querySelector(".infos_con_user_wrapper").setAttribute(
                 "href",
-                `/dashboard/profile/?user=${username}`
+                `/dashboard/profile/${username}`
               );
               this.querySelector(".name_user_con").innerHTML =
                 userElement.getAttribute("name");
@@ -725,12 +725,12 @@ export default class Chat extends HTMLElement {
                   <div class="first_wrapper_info_user_chat_wrapper">
                       <div class="first_side_wrapper_con_chat__">
                           <img src="../assets/pdp.png" alt="logo_user" class="logo_chat_user">
-                          <div class="infos_con_user_wrapper">
-                              <h3 class="name_user_con" id="username">
+                          <a class="infos_con_user_wrapper" style="cursor:pointer">
+                              <h3  class="name_user_con" id="username">
 
                               </h3>
 
-                          </div>
+                          </a>
                       </div>
                       <div class="second_side_wrapper_con_chat__">
                           <button class='play_invite'>

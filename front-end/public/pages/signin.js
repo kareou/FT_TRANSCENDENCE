@@ -14,8 +14,12 @@ export default class SignIn extends HTMLElement {
       .replace(/>/g, "&gt;");
   }
   connectedCallback() {
-    this.render();
 
+    this.render();
+    if (document.cookie.indexOf('error') != -1) {
+      Http.website_stats.notify("toast", { type: "error", message: "Problem in login, Please try again, with correct credentials !" });
+      document.cookie = "error=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
     const signInButton = this.querySelector(".intra_login");
     const otp_container = this.querySelector(".otp_container");
     const modal_wrapper_otp = this.querySelector(".modal_wrapper_otp");
@@ -23,22 +27,23 @@ export default class SignIn extends HTMLElement {
       e.preventDefault();
       try {
         window.location.replace(`${ips.baseUrl}/api/user/oauth2/authorize/42/`);
+
       } catch (error) {
         console.log(error);
       }
-      Http.getData("GET", "api/user/oauth2/authorize/42/").then((res) => {
-        Http.user = res.user;
-        console.log(res);
-      });
-      Http.openSocket();
-      Http.notification_socket.send(
-        JSON.stringify({
-          type: "status_update",
-          sender: Http.user.id,
-          message: "offline",
-          receiver: 0,
-        })
-      );
+      // Http.getData("GET", "api/user/oauth2/authorize/42/").then((res) => {
+      //   Http.user = res.user;
+      //   console.log(res);
+      // });
+      // Http.openSocket();
+      // Http.notification_socket.send(
+      //   JSON.stringify({
+      //     type: "status_update",
+      //     sender: Http.user.id,
+      //     message: "offline",
+      //     receiver: 0,
+      //   })
+      // );
     });
     this.querySelector("form").addEventListener("submit", (e) => {
       e.preventDefault();
@@ -48,7 +53,9 @@ export default class SignIn extends HTMLElement {
         email: email,
         password: pwd,
       };
+      let res_msg = null
       Http.login(data, "api/user/login/").then((res) => {
+        
         if (res.message == "'otp'") {
           otp_container.style.display = "block";
           modal_wrapper_otp.style.display = "block";
@@ -65,6 +72,7 @@ export default class SignIn extends HTMLElement {
                 });
               }
             });
+            res_msg = res.message
         }
         if (res.error)
         {
@@ -72,6 +80,10 @@ export default class SignIn extends HTMLElement {
         }
         if (res.user) {
           Link.navigateTo("/dashboard");
+        }
+        else
+        {
+          Http.website_stats.notify("toast", { type: "error", message: "Problem in login, Please try again, with correct credentials !" });
         }
       });
     });

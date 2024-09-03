@@ -12,6 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action, permission_classes
+from django.http import HttpResponseRedirect
 
 #send email
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -242,7 +243,7 @@ class UserAction(ModelViewSet):
         generate_qr(user.username, 'ft_transcendence')
         user._2fa_enabled = True
         user.save()
-        return Response({'message': '2FA enabled', 'detail': 'scan the qrcode \'ft_transcendence/back-end/user/'+user.username+'_2fa.png\''}, status=status.HTTP_200_OK)
+        return Response({'message': '2FA enabled', 'detail': 'scan the qrcode in the path below', '2fa_url': 'http://localhost:8000/media/2fa/'+user.username+'_2fa.png'}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def disable_2fa(self, request):
@@ -272,7 +273,9 @@ class UserAction(ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def oauth2_authorize(self, request, provider):
         if provider not in self.OAuth2_providers:
-            return Response({'message': 'Provider not implemented'}, status=status.HTTP_400_BAD_REQUEST)    
+            response = HttpResponseRedirect('http://localhost:3000/auth/login')
+            response.set_cookie('error', '')  # Set the cookie
+            return response
         provider_data = self.OAuth2_providers[provider]
         # generate a random string for the state parameter
         if 'oauth2_state' not in request.session:
@@ -293,15 +296,21 @@ class UserAction(ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def oauth2_callback(self, request, provider):
         if provider not in self.OAuth2_providers:
-            return Response({'message': 'Provider not implemented'}, status=status.HTTP_400_BAD_REQUEST)
+            response = HttpResponseRedirect('http://localhost:3000/auth/login')
+            response.set_cookie('error', '')  # Set the cookie
+            return response
         provider_data = self.OAuth2_providers[provider]
         # check the state parameter
         if 'oauth2_state' not in request.session or 'state' not in request.GET or 'oauth2_state' not in request.session:
-            return Response({'message': 'Invalid state parameter'}, status=status.HTTP_400_BAD_REQUEST)
+            response = HttpResponseRedirect('http://localhost:3000/auth/login')
+            response.set_cookie('error', '')  # Set the cookie
+            return response
         # get the authorization code from the query string
         code = request.GET.get('code')
         if not code:
-            return Response({'message': 'Authorization code not provided'}, status=status.HTTP_400_BAD_REQUEST)
+            response = HttpResponseRedirect('http://localhost:3000/auth/login')
+            response.set_cookie('error', '')  # Set the cookie
+            return response
         # prepare the data for the token request
         data = {
             'client_id': provider_data['client_id'],
@@ -316,12 +325,16 @@ class UserAction(ModelViewSet):
             return Response({'message': 'Failed to obtain access token'}, status=status.HTTP_400_BAD_REQUEST)
         token_data = resp.json()
         if 'access_token' not in token_data:
-            return Response({'message': 'Access token not provided'}, status=status.HTTP_400_BAD_REQUEST)
+            response = HttpResponseRedirect('http://localhost:3000/auth/login')
+            response.set_cookie('error', '')  # Set the cookie
+            return response
         # send a request to the user endpoint
         headers = {'Authorization': 'Bearer ' + token_data['access_token']}
         resp = requests.get(provider_data['user_url'], headers=headers)
         if resp.status_code != 200:
-            return Response({'message': 'Failed to obtain user data'}, status=status.HTTP_400_BAD_REQUEST)
+            response = HttpResponseRedirect('http://localhost:3000/auth/login')
+            response.set_cookie('error', '')  # Set the cookie
+            return response
         user_data = resp.json()
         # create a new user in the database
         user = User.objects.filter(email=user_data['email']).first()
@@ -331,11 +344,14 @@ class UserAction(ModelViewSet):
             user.save()
         refresh_token = RefreshToken.for_user(user)
         access_token = str(refresh_token.access_token)
-        response  = Response({'message': 'Login successfully'}, status=status.HTTP_200_OK)
-        response.data = UserSerializer(user).data
+        response = Response({'message': 'Login successfully'}, status=status.HTTP_200_OK)
+        response.data = {"user": UserSerializer(user).data}
         response.set_cookie(key='refresh', value=str(refresh_token), httponly=True)
         response.set_cookie(key='access', value=access_token, httponly=True)
-        return response
+        origin = "http://localhost:3000/"
+        redirect_response = redirect(f'{origin}dashboard')
+        redirect_response.cookies = response.cookies
+        return redirect_response
 
 class CustomTokenVerifyView(TokenVerifyView):
     serializer_class = CustomVerifyTokenSerializer
