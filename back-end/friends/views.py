@@ -1,14 +1,10 @@
-from django.shortcuts import render
-from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.response import Response
 from .models import friendList
 from .serializer import friendListSerializer
 from django.db.models import Q
 from rest_framework.decorators import action
-from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 
 class friends_viewset(viewsets.ModelViewSet):
     queryset = friendList.objects.all()
@@ -64,6 +60,16 @@ class friends_viewset(viewsets.ModelViewSet):
             if serializer.is_valid():
                 user1 = serializer.validated_data['user1']
                 user2 = serializer.validated_data['user2']
+                # remove anny pending invitation
+                pendingInvitation = friendList.objects.filter(
+                    (Q(user1=user1) & Q(user2_invited_user1=True)) |
+                    (Q(user2=user1) & Q(user1_invited_user2=True)) |
+                    (Q(user2=user2) & Q(user1_invited_user2=True)) |
+                    (Q(user1=user2) & Q(user2_invited_user1=True))
+                ).first()
+
+                if pendingInvitation:
+                    pendingInvitation.delete()
                 # if the user is friend with the other user
                 friendShip = friendList.objects.filter(Q(user1=user1, user2=user2)).first()
                 if friendShip:
