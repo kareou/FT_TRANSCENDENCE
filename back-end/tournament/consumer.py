@@ -1,8 +1,6 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import TournamentParticipant
 from channels.db import database_sync_to_async
-from datetime import timedelta, datetime
-from django.utils import timezone
 from game.models import Match
 from user.models import User
 from django.shortcuts import get_object_or_404
@@ -10,7 +8,6 @@ from rest_framework_simplejwt.tokens import UntypedToken
 import asyncio
 import json
 import copy
-import pytz
 
 
 class TournamentConsumer(AsyncWebsocketConsumer):
