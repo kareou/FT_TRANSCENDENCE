@@ -23,6 +23,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 env = environ.Env()
 
+Front_HOST = env('Front_HOST')
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-@&4lya)5687y1@z@yf0%=(exz2sxgwn#(m+0(w^-hiq_*gzjev'
 

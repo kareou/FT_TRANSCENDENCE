@@ -1,4 +1,4 @@
 export const ips = {
-    baseUrl: "http://localhost:8000",
-    socketUrl: "ws://localhost:8000",
+    baseUrl: "https://localhost:8443",
+    socketUrl: "wss://localhost:8443",
 };

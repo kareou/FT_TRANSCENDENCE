@@ -142,6 +142,10 @@ def update_game_state(state: GameState):
             state.game_progress = "end"
         else:
             state.game_progress = "pause"
+    if state.ballx > state.p2x and state.bally < state.p2y  and state.bally > state.p2y + 100:
+        state.ballx = state.p2x
+    elif state.ballx < state.p1x + 10 and state.bally < state.p1y  and state.bally > state.p1y + 100:
+        state.ballx = state.p1x
     if state.ballvx > 0 :
         if state.ballx + 10 > state.p2x and state.p2y < state.bally  and state.bally < state.p2y + 100:
             state.ballvx *= -1
@@ -182,6 +186,8 @@ class GameConsumer(AsyncWebsocketConsumer):
     game_users_data = {}
     game_state_ = {}
 
+        
+
     async def check_second_player_join(self):
         await asyncio.sleep(30)
         if GameConsumer.game_users_count[self.game_id] == 1:
@@ -201,6 +207,10 @@ class GameConsumer(AsyncWebsocketConsumer):
                     "state": GameConsumer.game_state_[self.game_id].__json__()
                 }
             )
+        try:
+            await self.checkerp2.cancel()
+        except Exception as e:
+            print("Task already cancelled or Finished", flush=True)
 
     async def connect(self):
         self.user,self.user_id = await GetUser(self.scope)
@@ -224,9 +234,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.accept()
         await self.send(text_data=json.dumps({"role": role}))
         if role == "player1":
-            asyncio.create_task(self.check_second_player_join())
-        if GameConsumer.game_users_count[self.game_id] == 2:
             GameConsumer.game_state_[self.game_id] = GameState()
+            self.checkerp2 =  asyncio.create_task(self.check_second_player_join())
+        if GameConsumer.game_users_count[self.game_id] == 2:
             await startGame(self.game_id)
             await self.channel_layer.group_send(
                 self.game_id,

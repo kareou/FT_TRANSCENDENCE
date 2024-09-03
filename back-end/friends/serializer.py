@@ -6,6 +6,7 @@ class friendListSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendList
         fields = '__all__'
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['user1'] = UserSerializer(instance.user1).data

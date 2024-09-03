@@ -1,6 +1,8 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import TournamentParticipant
 from channels.db import database_sync_to_async
+from datetime import timedelta, datetime
+from django.utils import timezone
 from game.models import Match
 from user.models import User
 from django.shortcuts import get_object_or_404
@@ -8,6 +10,8 @@ from rest_framework_simplejwt.tokens import UntypedToken
 import asyncio
 import json
 import copy
+import pytz
+
 
 class TournamentConsumer(AsyncWebsocketConsumer):
     tournament_max_participants = 4
@@ -195,12 +199,15 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, code):
         print(code, flush=True)
-        user = await self.get_user_from_scope(self.scope)
-        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-        if code != 1800:
-            if user and user.id in self.participants_data.keys() and code != 1800:
-                await self.change_participant_status(user.id)
-            print(f"User id desconnect=--=--=-=-=-=-=-=--=--==-=-=-=->: {user.id}", flush=True)
+        try:
+            user = await self.get_user_from_scope(self.scope)
+            await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+            if code != 1800:
+                if user and user.id in self.participants_data.keys() and code != 1800:
+                    await self.change_participant_status(user.id)
+                print(f"User id desconnect=--=--=-=-=-=-=-=--=--==-=-=-=->: {user.id}", flush=True)
+        except Exception as e:
+            print(f"Error in disconnect: {e}", flush=True)
         await self.close()
 
     async def receive(self, text_data):
@@ -239,12 +246,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         print(f'waiting players len +++++> {len(players)}', flush=True)
         print(f' self.tournament_max_participants +++++> {self.tournament_max_participants}', flush=True)
         if len(players) == self.tournament_max_participants:
+            
             if self.tournament_max_participants == 1:
                 for i in range(len(self.tournament_data['second_round'])):
                     if player.id == self.tournament_data['second_round'][i]['id']:
                         self.tournament_data['second_round'][i]['win'] = True
                 await asyncio.sleep(3)
-                print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>TOURNAMENT ENDS<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<", flush=True)
+                print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>TOURNAMENT ENDS<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<", flush=True)
                 try:
                     self.check_players_status__.cancel()
                     await self.check_players_status__
@@ -274,6 +282,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 self.send_state_task.cancel()
             except Exception as e:
                 print("Task already cancelled or Finished", flush=True)
+            self.update_match_status_task = asyncio.create_task(self.update_match_status())
             self.send_state_task = asyncio.create_task(self.check_match_status())
     ################################################################## background-tasks ############################################################
     async def check_match_status(self):
@@ -327,3 +336,29 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 print(f"Error in check_for_players_status_changes: {e}", flush=True)
             if self.player_channels.__len__() == 0:
                 break
+
+    @database_sync_to_async
+    def _update_match_status_(self, match_id):
+        try:
+            # Fetch the match object, raise 404 if not found
+            match = get_object_or_404(Match, id=match_id)
+            print(f"Current status: {match.status}", flush=True)
+
+            if match.status == 'pending':
+                match.status = 'end'
+                match.winner = match.player1
+                match.save()
+        except Exception as e:
+            print(f"Error: {e}", flush=True)
+            
+
+    async def update_match_status(self):
+        await asyncio.sleep(120)
+        matchs = await self.get_all_matches()
+        matchs = [match for match in matchs if match.id in self.matchs.keys()]
+        try:
+            print("whiiiiiiiling" , flush=True)
+            for value in matchs:
+                await self._update_match_status_(value.id)
+        except Exception as e:
+            print(f"An error occurred: {e}", flush=True)

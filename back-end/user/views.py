@@ -22,6 +22,8 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from django.conf import settings
+
 
 env = environ.Env()
 
@@ -118,7 +120,7 @@ class UserAction(ModelViewSet):
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
                 token = account_activation_token.make_token(user)
                 # Construct the verification URL
-                verification_url = f"http://{current_site.domain}{reverse('account_activate', kwargs={'uidb64': uid, 'token': token})}"
+                verification_url = f"https://{current_site.domain}{reverse('account_activate', kwargs={'uidb64': uid, 'token': token})}"
                 mail_subject = 'ft_transcendence Email verification'
                 message = render_to_string('confirmation_email.html', {
                     'user': user,
@@ -151,11 +153,11 @@ class UserAction(ModelViewSet):
         if user is not None and account_activation_token.check_token(user, token):
             user.is_email_verified = True
             user.save()
-            return redirect('http://localhost:3000/login')
+            return redirect('https://{settings.Front_HOST}/login')
             # return Response({'message': 'Account activated successfullyly'}, status=status.HTTP_200_OK)
         else:
             return Response({'message': 'Activation link is invalid!'}, status=status.HTTP_400_BAD_REQUEST)
-            # return redirect('http://localhost:3000/activation-failed')
+            # return redirect('https://{settings.Front_HOST}/activation-failed')
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def reset_password(self, request):
@@ -168,7 +170,7 @@ class UserAction(ModelViewSet):
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = account_activation_token.make_token(user)
         #Construct the reset password URL
-        reset_password_url = f"http://{current_site.domain}{reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})}"
+        reset_password_url = f"https://{current_site.domain}{reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})}"
         mail_subject = 'ft_transcendence password reset'
         message = render_to_string('password_reset_email.html', {
                 'user': user,
@@ -195,7 +197,7 @@ class UserAction(ModelViewSet):
         account_activation_token = PasswordResetTokenGenerator()
         if request.method =='GET':
             if user is not None and account_activation_token.check_token(user, token):
-                reset_password_url = f"http://{request.get_host()}{reverse('password_reset_confirm', kwargs={'uidb64': uidb64, 'token': token})}"
+                reset_password_url = f"https://{request.get_host()}{reverse('password_reset_confirm', kwargs={'uidb64': uidb64, 'token': token})}"
                 return render(request, 'password_reset_confirm.html', {'reset_password_url': reset_password_url})
             else:
                 return Response({'message': 'Password reset link is invalid'}, status=status.HTTP_400_BAD_REQUEST)
@@ -243,7 +245,7 @@ class UserAction(ModelViewSet):
         generate_qr(user.username, 'ft_transcendence')
         user._2fa_enabled = True
         user.save()
-        return Response({'message': '2FA enabled', 'detail': 'scan the qrcode in the path below', '2fa_url': 'http://localhost:8000/media/2fa/'+user.username+'_2fa.png'}, status=status.HTTP_200_OK)
+        return Response({'message': '2FA enabled', 'detail': 'scan the qrcode in the path below', '2fa_url': 'https://localhost:8000/media/2fa/'+user.username+'_2fa.png'}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def disable_2fa(self, request):
@@ -273,7 +275,7 @@ class UserAction(ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def oauth2_authorize(self, request, provider):
         if provider not in self.OAuth2_providers:
-            response = HttpResponseRedirect('http://localhost:3000/auth/login')
+            response = HttpResponseRedirect('https://{settings.Front_HOST}/auth/login')
             response.set_cookie('error', '')  # Set the cookie
             return response
         provider_data = self.OAuth2_providers[provider]
@@ -284,7 +286,7 @@ class UserAction(ModelViewSet):
         # create a query string with all the OAuth2 parameters
         qs = urlencode({
             'client_id': provider_data['client_id'],
-            'redirect_uri': 'http://localhost:8000/api/user/oauth2/callback/' + provider + '/',
+            'redirect_uri': 'https://localhost:8000/api/user/oauth2/callback/' + provider + '/',
             'response_type': 'code',
             'scope': ' '.join(provider_data['scopes']),
             'state': request.session['oauth2_state'],
@@ -296,19 +298,19 @@ class UserAction(ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def oauth2_callback(self, request, provider):
         if provider not in self.OAuth2_providers:
-            response = HttpResponseRedirect('http://localhost:3000/auth/login')
+            response = HttpResponseRedirect('https://{settings.Front_HOST}/auth/login')
             response.set_cookie('error', '')  # Set the cookie
             return response
         provider_data = self.OAuth2_providers[provider]
         # check the state parameter
         if 'oauth2_state' not in request.session or 'state' not in request.GET or 'oauth2_state' not in request.session:
-            response = HttpResponseRedirect('http://localhost:3000/auth/login')
+            response = HttpResponseRedirect('https://{settings.Front_HOST}/auth/login')
             response.set_cookie('error', '')  # Set the cookie
             return response
         # get the authorization code from the query string
         code = request.GET.get('code')
         if not code:
-            response = HttpResponseRedirect('http://localhost:3000/auth/login')
+            response = HttpResponseRedirect('https://{settings.Front_HOST}/auth/login')
             response.set_cookie('error', '')  # Set the cookie
             return response
         # prepare the data for the token request
@@ -317,7 +319,7 @@ class UserAction(ModelViewSet):
             'client_secret': provider_data['client_secret'],
             'code': code,
             'grant_type': 'authorization_code',
-            'redirect_uri': 'http://localhost:8000/api/user/oauth2/callback/' + provider + '/',
+            'redirect_uri': 'https://localhost:8000/api/user/oauth2/callback/' + provider + '/',
         }
         # send the token request
         resp = requests.post(provider_data['token_url'], data=data, headers={'Accept': 'application/json'})
@@ -325,14 +327,14 @@ class UserAction(ModelViewSet):
             return Response({'message': 'Failed to obtain access token'}, status=status.HTTP_400_BAD_REQUEST)
         token_data = resp.json()
         if 'access_token' not in token_data:
-            response = HttpResponseRedirect('http://localhost:3000/auth/login')
+            response = HttpResponseRedirect('https://{settings.Front_HOST}/auth/login')
             response.set_cookie('error', '')  # Set the cookie
             return response
         # send a request to the user endpoint
         headers = {'Authorization': 'Bearer ' + token_data['access_token']}
         resp = requests.get(provider_data['user_url'], headers=headers)
         if resp.status_code != 200:
-            response = HttpResponseRedirect('http://localhost:3000/auth/login')
+            response = HttpResponseRedirect('https://{settings.Front_HOST}/auth/login')
             response.set_cookie('error', '')  # Set the cookie
             return response
         user_data = resp.json()
@@ -348,7 +350,7 @@ class UserAction(ModelViewSet):
         response.data = {"user": UserSerializer(user).data}
         response.set_cookie(key='refresh', value=str(refresh_token), httponly=True)
         response.set_cookie(key='access', value=access_token, httponly=True)
-        origin = "http://localhost:3000/"
+        origin = "https://{settings.Front_HOST}/"
         redirect_response = redirect(f'{origin}dashboard')
         redirect_response.cookies = response.cookies
         return redirect_response

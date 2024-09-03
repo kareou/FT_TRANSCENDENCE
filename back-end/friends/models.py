@@ -16,3 +16,4 @@ class FriendList(models.Model):
 
     def __str__(self):
         return self.user1.username
+ 

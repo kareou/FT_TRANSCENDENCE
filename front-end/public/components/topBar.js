@@ -43,7 +43,7 @@ export default class TopBar extends HTMLElement {
           console.log(this.user);
 
           e.preventDefault();
-          fetch(`http://localhost:8000/api/user/`, {
+          fetch(`${ips.baseUrl}/api/user/`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",

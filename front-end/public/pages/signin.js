@@ -138,7 +138,7 @@ export default class SignIn extends HTMLElement {
         }
       </style>
       <div id="signin" class="container sign_in_up">
-        <form class="container_form" action="localhost:8000/api/user/login/">
+        <form class="container_form" action="l${ips.baseUrl}/api/user/login/">
             <h1 class="welcome-text">Welcome back</h1>
             <div class="modal_wrapper_otp">
             <div class="overlay_otp"></div>

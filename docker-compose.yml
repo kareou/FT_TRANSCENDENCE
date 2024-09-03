@@ -14,10 +14,8 @@ services:
     container_name: back-end
     build: "./back-end"
     restart: on-failure
-    volumes:
-      - ./back-end:/back-end
     ports:
-      - "8000:8000"
+      - "8443:8443"
     depends_on:
       - db
     networks:
