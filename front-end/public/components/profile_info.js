@@ -57,7 +57,6 @@ export default class ProfileInfo extends HTMLElement {
 
       if (response.ok) {
         const conversation = await response.json();
-        console.log("Fetched or created conversation:", conversation);
         return conversation;
       } else {
         const errorData = await response.json();
@@ -83,7 +82,47 @@ export default class ProfileInfo extends HTMLElement {
       console.log("WebSocket connection closed.");
     });
   }
-  h;
+  ;
+
+  async fetchOrCreateConversationAndVerifyBlock(senderId, receiverId) {
+    try {
+      const response = await fetch(
+        `${ips.baseUrl}/chat/conversations/fetch_or_create/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.token}`,
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            sender: senderId,
+            receiver: receiverId,
+          }),
+        }
+      );
+
+      const responseData = await response.json();
+
+      switch (responseData.case) {
+        case "missing_data":
+          return 0;
+        case "user_not_found":
+          return 0;
+        case "sender_blocked_receiver":
+          return 0;
+        case "receiver_blocked_sender":
+          return 0;
+        case "conversation_created":
+          return 1;
+        case "conversation_fetched":
+          return 1;
+      }
+      return 1;
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
 
   async sendMessage() {
     try {
@@ -91,6 +130,18 @@ export default class ProfileInfo extends HTMLElement {
         Http.user.id,
         this.user.id
       );
+      const checkConversation =
+        await this.fetchOrCreateConversationAndVerifyBlock(
+          Http.user.id,
+          this.user.id
+        );
+
+      if (checkConversation === 0) {
+        // console.log(
+        //   "Action aborted: User is blocked or conversation could not be created."
+        // );
+        return;
+      }
       const messageContent = document.querySelector(".message-input").value;
       const messageData = {
         sender: Http.user.id,
@@ -116,8 +167,8 @@ export default class ProfileInfo extends HTMLElement {
           type: "message",
           message: data.message,
           sender: data.sender,
+          timestamp: data.timestamp
         };
-        console.log("Message saved:", data);
         this.websocket.send(JSON.stringify(dataWs));
         document.querySelector(".message-input").value = "";
       } else {
@@ -141,7 +192,6 @@ export default class ProfileInfo extends HTMLElement {
     const remove_friend = document.querySelector(".remove_friend");
 
     if (add_friend !== null) {
-      console.log("add friend is not null");
       add_friend.addEventListener("click", async () => {
         let apiUrl = `${ips.baseUrl}/api/friends/`;
 
@@ -157,7 +207,7 @@ export default class ProfileInfo extends HTMLElement {
           }),
         })
           .then((response) => {
-            console.log(response);
+
             if (response.ok) {
               Http.notification_socket.send(
                 JSON.stringify({
@@ -214,8 +264,6 @@ export default class ProfileInfo extends HTMLElement {
     }
 
     buttonClose.addEventListener("click", () => {
-      console.log("button close pressed");
-
       msgPrompt.classList.remove("visible");
       msgPrompt.classList.add("hidden");
     });
