@@ -92,14 +92,18 @@ class Http {
         },
         body: JSON.stringify(data),
       });
+      const res = await response.json();
       if (response.status !== 201) {
-        const res = await response.json();
-        this.website_stats.notify("toast", { type: "error", message: "something wrong happened" });
+        Object.keys(res).forEach(key => {
+          this.website_stats.notify("toast", { type: "error", message: key+" : "+res[key] });
+        });
         return res;
       }
-      const res = await response.json();
-      this.website_stats.notify("toast", { type: "info", message: res.message });
-      return res;
+      else
+      {
+        this.website_stats.notify("toast", { type: "info", message: res.message });
+        return res;
+      }
     } catch (e) {
       return { error: e.message };
     }

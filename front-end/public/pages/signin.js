@@ -7,7 +7,12 @@ export default class SignIn extends HTMLElement {
     super();
     document.title = "signin";
   }
-
+  escapeHTML(html) {
+    return html
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
   connectedCallback() {
     this.render();
 
@@ -37,8 +42,8 @@ export default class SignIn extends HTMLElement {
     });
     this.querySelector("form").addEventListener("submit", (e) => {
       e.preventDefault();
-      const email = this.querySelector("#email").value;
-      const pwd = this.querySelector("#pwd").value;
+      const email = this.escapeHTML(this.querySelector("#email").value);
+      const pwd = this.escapeHTML(this.querySelector("#pwd").value);
       const data = {
         email: email,
         password: pwd,
@@ -61,12 +66,17 @@ export default class SignIn extends HTMLElement {
               }
             });
         }
+        if (res.error)
+        {
+          Http.website_stats.notify("toast", {type: "error", message: "Incorrect email or password"});
+        }
         if (res.user) {
           Link.navigateTo("/dashboard");
         }
       });
     });
   }
+
 
   render() {
     this.innerHTML = /*HTML*/ `
