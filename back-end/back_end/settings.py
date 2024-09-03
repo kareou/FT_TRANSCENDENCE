@@ -75,6 +75,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
+    'localhost'
 ]
 
 
@@ -120,6 +121,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://127.0.0.1:8443",
     "https://localhost",
     "https://127.0.0.1",
+    "http://localhost:3000",
 ]
 
 ROOT_URLCONF = 'back_end.urls'

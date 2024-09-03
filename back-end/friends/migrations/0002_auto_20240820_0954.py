@@ -11,12 +11,12 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='friendlist',
+            model_name='FriendList',
             name='user1_invited_user2',
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='friendlist',
+            model_name='FriendList',
             name='user2_invited_user1',
             field=models.BooleanField(default=False),
         ),

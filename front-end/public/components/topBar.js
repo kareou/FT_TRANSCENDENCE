@@ -14,7 +14,7 @@ export default class TopBar extends HTMLElement {
   checkAndRender() {
     const path = window.location.pathname;
     this.initURLChangeDetection();
-    if (path === "/" || path.startsWith("/auth"))
+    if (path === "/" || path.startsWith("/auth") || path.startsWith("/game"))
       this.innerHTML = "";
     else
       this.render();

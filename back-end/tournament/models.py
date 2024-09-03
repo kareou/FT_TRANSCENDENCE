@@ -8,6 +8,3 @@ class TournamentParticipant(models.Model):
     id = models.IntegerField(primary_key=True, default=0)
     username = models.CharField(max_length=100, default='')
     image = models.CharField(max_length=100, default='')
-
-class Tournament(models.Model):
-    Match = models.ForeignKey(Match, on_delete=models.CASCADE)

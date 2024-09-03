@@ -124,6 +124,8 @@ def update_game_state(state: GameState):
         state.p2score += 1
         state.ballx = state.screen_width / 2
         state.bally = state.screen_height / 2
+        state.p1y = state.screen_height / 2 - 50
+        state.p2y = state.screen_height / 2 - 50
         state.ballvx *= -1
         if check_game_end(state):
             state.game_progress = "end"
@@ -133,15 +135,23 @@ def update_game_state(state: GameState):
         state.p1score += 1
         state.ballx = state.screen_width / 2
         state.bally = state.screen_height / 2
+        state.p1y = state.screen_height / 2 - 50
+        state.p2y = state.screen_height / 2 - 50
         state.ballvx *= -1
         if check_game_end(state):
             state.game_progress = "end"
         else:
             state.game_progress = "pause"
-    if state.ballx <= 40 + 10 and state.p1y <= state.bally <= state.p1y + 100:
-        state.ballvx *= -1
-    if state.ballx >= state.screen_width - 40 - 10 and state.p2y <= state.bally <= state.p2y + 100:
-        state.ballvx *= -1
+    if state.ballvx > 0 :
+        if state.ballx + 10 > state.p2x and state.p2y < state.bally  and state.bally < state.p2y + 100:
+            state.ballvx *= -1
+    else:
+        if state.ballx - 10 < state.p1x + 10 and state.p1y < state.bally  and state.bally < state.p1y + 100:
+            state.ballvx *= -1
+    # if state.ballx <= 40 + 10 and state.p1y <= state.bally <= state.p1y + 100:
+    #     state.ballvx *= -1
+    # if state.ballx >= state.screen_width - 40 - 10 and state.p2y <= state.bally <= state.p2y + 100:
+    #     state.ballvx *= -1
     return state
 
 @database_sync_to_async
@@ -214,9 +224,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.accept()
         await self.send(text_data=json.dumps({"role": role}))
         if role == "player1":
-            GameConsumer.game_state_[self.game_id] = GameState()
             asyncio.create_task(self.check_second_player_join())
         if GameConsumer.game_users_count[self.game_id] == 2:
+            GameConsumer.game_state_[self.game_id] = GameState()
             await startGame(self.game_id)
             await self.channel_layer.group_send(
                 self.game_id,
