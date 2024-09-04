@@ -117,7 +117,6 @@ export default class Settings extends HTMLElement {
         this.escapeHTML(document.querySelector(".username").value) ?? null;
       collectedSettingsData["email"] =
         this.escapeHTML(document.querySelector(".email").value) ?? null;
-      console.log(JSON.stringify(collectedSettingsData));
 
       const baseUrl = `${ips.baseUrl}`;
       const endPoint = "/api/user/update/";

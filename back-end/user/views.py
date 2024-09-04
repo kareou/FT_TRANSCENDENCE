@@ -231,7 +231,6 @@ class UserAction(ModelViewSet):
         try:
             email = request.data['email']
             password = request.data['password']
-            print((email, password), flush=True)
             user = User.objects.filter(email=email).first()
             if not user or not user.check_password(password):
                 return Response({'message': 'incorrect email or password'}, status=status.HTTP_401_UNAUTHORIZED)

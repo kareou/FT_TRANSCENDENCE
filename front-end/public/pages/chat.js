@@ -1,5 +1,6 @@
 import Http from "../http/http.js";
 import { ips } from "../http/ip.js";
+import Link from "../components/link.js";
 
 export default class Chat extends HTMLElement {
   constructor() {
@@ -157,6 +158,28 @@ export default class Chat extends HTMLElement {
 
   addUserClickListeners() {
     const userElements = this.querySelectorAll(".chat_bulles_wrapper");
+    const invite = this.querySelector(".play_invite");
+
+    if (invite) {
+      invite.addEventListener("click", () => {
+        const data = {
+          player1: this.user.id,
+          player2: this.receiverId,
+          winner: this.user.id,
+        }
+          Http.getData("POST", "api/matche/", data).then((data) => {
+            Http.notification_socket.send(JSON.stringify({
+              type: "tournament_match",
+              sender: this.user.id,
+              receiver: this.receiverId,
+              message: data.id
+            }));
+            Link.navigateTo(`/game/online/?game_id=${data.id}`);
+          }
+        );
+
+      });
+    }
 
     userElements.forEach((userElement) => {
       const receiverId = userElement.id;

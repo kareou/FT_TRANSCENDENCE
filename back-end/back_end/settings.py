@@ -78,7 +78,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'localhost',
-    f'{Front_HOST}'
+    f'{FRONT_HOST}'
 ]
 
 

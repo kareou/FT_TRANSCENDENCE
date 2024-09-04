@@ -7,7 +7,7 @@ from django.db.models import Q
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        print(f"Connecting .......")
+        
         self.user_id = int(self.scope['url_route']['kwargs']['user_id'])
         self.receiver_id = int(self.scope['url_route']['kwargs']['receiver_id'])
         self.room_name = f"private_chat_{min(self.user_id, self.receiver_id)}_{max(self.user_id, self.receiver_id)}"
@@ -19,14 +19,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.accept()
-        print(f"WebSocket connection established for {self.channel_name}")
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
-        print(f"WebSocket connection closed for {self.channel_name}")
 
     async def receive(self, text_data):
         try:

@@ -26,7 +26,6 @@ export default class Friends extends HTMLElement {
     const friends_wrapper = document.querySelector(".friend_online_wrapper");
 
     const online_friend = document.querySelector(".online_friend");
-    console.log("refriends => :", Http.friends);
     // console.log("friends => :", Http.friends.length, Http.friends);
     if (Http.friends) {
         for (let i in Http.friends) {

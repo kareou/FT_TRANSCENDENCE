@@ -36,8 +36,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         return match
 
     async def save_match(self, player1, player2):
-        print(f'player=0=id====>[{player1.id}]', flush=True)
-        print(f'player=1=id====>[{player2.id}]', flush=True)
+
 
         p1 = await self.get_player_by_id(player1.id)
         p2 = await self.get_player_by_id(player2.id)
@@ -46,8 +45,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def sent_match_data(self, user1_id, user2_id=None):
         for match in self.matchs.values():
             if user2_id is not None and user1_id == match.player1.id and user2_id == match.player2.id:
-                print(f"player1=={user1_id}-----player2=={user2_id}----joined the match", flush=True)
-                print(f"player1=={user1_id}-----player2=={user2_id}", flush=True)
                 await self.channel_layer.group_send(
                     f'notification_{match.player1.id}',
                     {
@@ -127,11 +124,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
     async def remove_player_from_participants(self, player):
         try:
-            print(f"Player {player.id} removed.", flush=True)
             await database_sync_to_async(player.delete)()
             await self.disconnect(1800)
         except TournamentParticipant.DoesNotExist:
-            print(f"Failed to remove player {player.id}.", flush=True)
             return False
 
     async def change_participant_status(self, user_id, online=False):
@@ -139,13 +134,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             if self.tournament_data['first_round'][i]['id'] == user_id:
                 if online == True:
                     self.tournament_data['first_round'][i]['online'] = True
-                    print(f"Player {user_id} back to the tournament.", flush=True)
                 else:
                     self.tournament_data['first_round'][i]['online'] = False
-                    print(f"Player {user_id} removed from tournament.", flush=True)
 
     async def sent_participants_data(self):
-        print("about to sent users data 222222222222222", flush=True)
         for player in self.tournament_data['first_round']:
             await self.channel_layer.group_send(
                 f'notification_{player["id"]}',
@@ -184,25 +176,20 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.room_group_name = "tournament"
         user = await self.get_user_from_scope(self.scope)
         if user is None:
-            print("User not found", flush=True)
             self.close()
             return
         if self.get_player_by_id(user.id) is None:
-            print("User not found", flush=True)
             self.close()
             return
-        print(f"User id: {user.id}", flush=True)
         await self.accept()
 
     async def disconnect(self, code):
-        print(code, flush=True)
         try:
             user = await self.get_user_from_scope(self.scope)
             await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
             if code != 1800:
                 if user and user.id in self.participants_data.keys() and code != 1800:
                     await self.change_participant_status(user.id)
-                print(f"User id desconnect=--=--=-=-=-=-=-=--=--==-=-=-=->: {user.id}", flush=True)
         except Exception as e:
             print(f"Error in disconnect: {e}", flush=True)
         await self.close()
@@ -213,14 +200,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if command == "join":
             user = await self.get_user_from_scope(self.scope)
             if self.matchs.__len__() > 0:
-                print('#####################tournament is full, please wait.....', flush=True)
                 await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
             elif user.id in self.participants_data.keys():
-                print("#####################Player exist and he is about to join a match", flush=True)
                 await self.channel_layer.group_add(self.room_group_name, self.channel_name)
                 await self.change_participant_status(user.id, online=True)
             elif user.id not in self.participants_data.keys():
-                print("#####################Player not exist and he is about to join a match", flush=True)
                 await self.join_match(user.id)
     ################################################################## MATCH METHODS ############################################################
     async def join_match(self, player_id):
@@ -232,7 +216,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if len(self.player_channels) == 1:
             self.check_players_status__ = asyncio.create_task(self.check_for_players_status_changes())
             ###############collect player data################
-        print(f"========>player id: {user.id} joined", flush=True)
         player, created = await database_sync_to_async(TournamentParticipant.objects.get_or_create)(player=user, id=user.id, username=user.username, image=user.profile_pic_url)
 
         await database_sync_to_async(player.save)()
@@ -240,8 +223,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         players = [p for p in players if p.id in self.participants_data.keys()]
 
         await self.serialize_players_data(player)
-        print(f'waiting players len +++++> {len(players)}', flush=True)
-        print(f' self.tournament_max_participants +++++> {self.tournament_max_participants}', flush=True)
         if len(players) == self.tournament_max_participants:
             
             if self.tournament_max_participants == 1:
@@ -249,7 +230,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     if player.id == self.tournament_data['second_round'][i]['id']:
                         self.tournament_data['second_round'][i]['win'] = True
                 await asyncio.sleep(3)
-                print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>TOURNAMENT ENDS<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<", flush=True)
                 try:
                     self.check_players_status__.cancel()
                     await self.check_players_status__
@@ -263,7 +243,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 await self.delete_all_participants()
                 await self.disconnect(300)
                 return
-            print(">>>>>>>>>>>>>>>>>>>>>>joined<<<<<<<<<<<<<<<<<<<<<<", flush=True)
             self.matchs.clear()
             await asyncio.sleep(10)
             for i in range(0, len(players), 2):
@@ -271,7 +250,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 self.matchs[match.id] = match
 
                 if players[i].id not in self.player_channels.keys() or players[i+1].id not in self.player_channels.keys():
-                    print("Player not in channel", flush=True)
                     break
                 await self.sent_match_data(players[i].id, players[i+1].id)
             self.tournament_max_participants //= 2
@@ -311,7 +289,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def check_for_players_status_changes(self):
         while True:
             try:
-                print("Checking for players status changes...", flush=True)
                 await asyncio.sleep(2)
                 if len(self.old_tournament_data['first_round']) != len(self.tournament_data['first_round']):
                     await self.sent_participants_data()
@@ -339,7 +316,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         try:
             # Fetch the match object, raise 404 if not found
             match = get_object_or_404(Match, id=match_id)
-            print(f"Current status: {match.status}", flush=True)
 
             if match.status == 'pending':
                 match.status = 'end'
@@ -354,7 +330,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         matchs = await self.get_all_matches()
         matchs = [match for match in matchs if match.id in self.matchs.keys()]
         try:
-            print("whiiiiiiiling" , flush=True)
             for value in matchs:
                 await self._update_match_status_(value.id)
         except Exception as e:
