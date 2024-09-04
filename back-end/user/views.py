@@ -260,7 +260,7 @@ class UserAction(ModelViewSet):
         generate_qr(user.username, 'ft_transcendence')
         user._2fa_enabled = True
         user.save()
-        return Response({'message': '2FA enabled', 'detail': 'scan the qrcode in the path below', '2fa_url': 'https://localhost:8443/media/2fa/'+user.username+'_2fa.png'}, status=status.HTTP_200_OK)
+        return Response({'message': '2FA enabled', 'detail': 'scan the qrcode in the path below', '2fa_url': f'https://{settings.FRONT_HOST}:8443/media/2fa/'+user.username+'_2fa.png'}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def disable_2fa(self, request):
@@ -301,7 +301,7 @@ class UserAction(ModelViewSet):
         # create a query string with all the OAuth2 parameters
         qs = urlencode({
             'client_id': provider_data['client_id'],
-            'redirect_uri': 'https://localhost:8443/api/user/oauth2/callback/' + provider + '/',
+            'redirect_uri': f'https://{settings.FRONT_HOST}:8443/api/user/oauth2/callback/' + provider + '/',
             'response_type': 'code',
             'scope': ' '.join(provider_data['scopes']),
             'state': request.session['oauth2_state'],
@@ -334,7 +334,7 @@ class UserAction(ModelViewSet):
             'client_secret': provider_data['client_secret'],
             'code': code,
             'grant_type': 'authorization_code',
-            'redirect_uri': 'https://localhost:8443/api/user/oauth2/callback/' + provider + '/',
+            'redirect_uri': f'https://{settings.FRONT_HOST}:8443/api/user/oauth2/callback/' + provider + '/',
         }
         # send the token request
         resp = requests.post(provider_data['token_url'], data=data, headers={'Accept': 'application/json'})
