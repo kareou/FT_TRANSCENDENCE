@@ -22,6 +22,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 env = environ.Env()
+FRONT_HOST = env('FRONT_HOST')
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -123,10 +124,10 @@ CORS_ALLOWED_ORIGINS = [
     "https://127.0.0.1:8443",
     "https://localhost",
     "https://127.0.0.1",
-    f"https://{Front_HOST}",
-    f"http://{Front_HOST}",
-    f"https://{Front_HOST}:443",
-    f"http://{Front_HOST}:3000",
+    f"https://{FRONT_HOST}",
+    f"http://{FRONT_HOST}",
+    f"https://{FRONT_HOST}:443",
+    f"http://{FRONT_HOST}:3000",
     "http://localhost:3000",
 ]
 
@@ -255,4 +256,3 @@ EMAIL_HOST_USER = env('EMAIL_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_PASSWORD')
 EMAIL_PORT = '587'
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
-FRONT_HOST = env('FRONT_HOST')
