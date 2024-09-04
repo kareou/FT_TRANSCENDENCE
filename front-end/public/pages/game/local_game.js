@@ -204,6 +204,7 @@ export default class Game extends HTMLElement {
   }
 
   #movePaddels(e) {
+    console.log(e.code);
     if (e.code == "KeyW") this.player1.movePlayer("up");
     else if (e.code == "KeyS") this.player1.movePlayer("down");
     if (e.code == "ArrowUp") this.player2.movePlayer("up");

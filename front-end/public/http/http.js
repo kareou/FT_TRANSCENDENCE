@@ -31,7 +31,10 @@ class Http {
 
   notifyStats(data) {
     if (data.type === "game_invite")
-      this.website_stats.notify("toast", data);
+    {
+      console.log(data);
+      this.website_stats.notify("toast", {type: "game_invite", message: data.message, id: data.message, sender: data.sender});
+    }
     else if (data.type === "FRQ") {
       this.website_stats.notify("friend_request", data);
     }

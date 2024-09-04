@@ -186,7 +186,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, code):
         try:
             user = await self.get_user_from_scope(self.scope)
-            await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+            # await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
             if code != 1800:
                 if user and user.id in self.participants_data.keys() and code != 1800:
                     await self.change_participant_status(user.id)
@@ -200,15 +200,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if command == "join":
             user = await self.get_user_from_scope(self.scope)
             if self.matchs.__len__() > 0:
-                await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+                pass
             elif user.id in self.participants_data.keys():
-                await self.channel_layer.group_add(self.room_group_name, self.channel_name)
                 await self.change_participant_status(user.id, online=True)
             elif user.id not in self.participants_data.keys():
                 await self.join_match(user.id)
     ################################################################## MATCH METHODS ############################################################
     async def join_match(self, player_id):
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         self.participants_data[player_id] = "is_waiting"
             ###############collect player data################
         user = await self.get_player_by_id(player_id)

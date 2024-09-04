@@ -168,13 +168,13 @@ export default class Chat extends HTMLElement {
           winner: this.user.id,
         }
           Http.getData("POST", "api/matche/", data).then((data) => {
+            console.log(data);
             Http.notification_socket.send(JSON.stringify({
-              type: "tournament_match",
+              type: "game_invite",
               sender: this.user.id,
               receiver: this.receiverId,
               message: data.id
             }));
-            Link.navigateTo(`/game/online/?game_id=${data.id}`);
           }
         );
 
@@ -207,11 +207,9 @@ export default class Chat extends HTMLElement {
                 `/dashboard/profile/${username}`
               );
               this.querySelector(".name_user_con").innerHTML =
-                userElement.getAttribute("name");
+                this.escapeHTML(userElement.getAttribute("name"));
               this.querySelector(".logo_chat_user").src =
                 userElement.querySelector(".avatar_icon").src;
-              this.querySelector(".name_user_con").innerHTML =
-                userElement.getAttribute("name");
               this.querySelector(".find_conv").style.display = "none";
               this.querySelector(".second_section_wrapper_chat").style.display =
                 "block";

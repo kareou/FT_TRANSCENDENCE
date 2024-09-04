@@ -56,7 +56,7 @@ export default class Settings extends HTMLElement {
     this.querySelector(".fa-edit").addEventListener("click", () => {
       const input = document.createElement("input");
       input.type = "file";
-      input.accept = "image/*";
+    //   input.accept = "image/*";
       input.click();
       input.onchange = async () => {
         const file = input.files[0];
@@ -64,7 +64,7 @@ export default class Settings extends HTMLElement {
         formData.append("profile_pic", file);
         const baseUrl = `${ips.baseUrl}`;
         const endPoint = "/api/user/update/";
-        const rs = fetch(baseUrl + endPoint, {
+        fetch(baseUrl + endPoint, {
           method: "PUT",
           credentials: "include",
           body: formData,
@@ -72,7 +72,7 @@ export default class Settings extends HTMLElement {
           .then((response) => {
 			if (response.ok)
 			{
-				// this.website_stats.notify("toast", { type: "success", message: "updated successfully" });
+				Http.website_stats.notify("toast", {type: "success", message: "Profile picture updated"});
 				return response.json();
 			}
           })
@@ -129,7 +129,16 @@ export default class Settings extends HTMLElement {
         body: JSON.stringify(collectedSettingsData),
       })
         .then((response) => {
-          return response.json();
+			if (response.ok)
+			{
+				Http.website_stats.notify("toast", {type: "success", message: "updated successfully"});
+				return response.json();
+			}
+			else
+			{
+				const res = response.json();
+				Http.website_stats.notify("toast", {type: "error", message: res.message});
+			}
         })
         
     });
@@ -345,6 +354,11 @@ height: 35px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	bottom: 0;
+	position: absolute;
+	left: 50%;
+	transform: translate(-50% , -36%);
+	width: 100%;
 }
 		</style>
 	<div class="setting_wrapper_">

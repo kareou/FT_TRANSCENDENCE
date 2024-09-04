@@ -26,7 +26,7 @@ FRONT_HOST = env('FRONT_HOST')
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@&4lya)5687y1@z@yf0%=(exz2sxgwn#(m+0(w^-hiq_*gzjev'
+SECRET_KEY = env('SECRET_KEY')
 
 
 # JWT settings
@@ -160,9 +160,9 @@ WSGI_APPLICATION = 'back_end.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'libftPong',
-        'USER' : 'root',
-        'PASSWORD' : 'root',
+        'NAME': env('POSTGRES_DB'),
+        'USER' : env('POSTGRES_USER'),
+        'PASSWORD' : env('POSTGRES_PASSWORD'),
         'HOST' : 'db',
         'PORT' : '5432',
     }

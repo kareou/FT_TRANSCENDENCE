@@ -66,8 +66,6 @@ class UserAction(ModelViewSet):
             self.permission_classes = [IsAuthenticated,]
         return super(UserAction, self).get_permissions()
 
-    # def list(self, request):
-    #     return Response({'detail': 'forbidden.'}, status=status.HTTP_403_FORBIDDEN)
 
     def destroy(self, request, *args, **kwargs):
         try:
@@ -98,11 +96,14 @@ class UserAction(ModelViewSet):
         user = request.user
         if "password" in request.data:
             return Response({'message': 'Password cannot be updated using this endpoint'}, status=status.HTTP_400_BAD_REQUEST)
-        serializer = UserSerializer(user, data=request.data, context={'partial': True})
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'message': 'User updated successfullyly'}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            serializer = UserSerializer(user, data=request.data, context={'partial': True})
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'message': 'User updated successfullyly'}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, **kwargs):
         return Response({'message': 'Method \"PATCH\" not allowed.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -365,6 +366,7 @@ class UserAction(ModelViewSet):
         response.set_cookie(key='refresh', value=str(refresh_token), httponly=True)
         response.set_cookie(key='access', value=access_token, httponly=True)
         origin = f"https://{settings.FRONT_HOST}/"
+        print(origin, flush=True)
         redirect_response = redirect(f'{origin}dashboard')
         redirect_response.cookies = response.cookies
         return redirect_response
