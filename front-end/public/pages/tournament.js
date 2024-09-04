@@ -14,7 +14,6 @@ export default class Tournament extends HTMLElement {
     this.render();
     if (Http.tournament_data)
       this.updateBracket(Http.tournament_data);
-    console.log("The tournament data is => ", Http.tournament_data);
   }
 
   update(data) {
@@ -56,22 +55,7 @@ export default class Tournament extends HTMLElement {
     first_round.forEach((bracket) => {
       if (data["first_round"].length == counter) checker = false;
       if (checker) {
-        console.log("the length is => ", data["first_round"].length);
-        console.log("the counter is => ", counter);
-        // if (!data["first_round"][counter].online && data["second_round"])
-        // {
-        //   data["second_round"].forEach((second_round) => {
-        //     if (second_round.id == data["first_round"][counter].id)
-        //     {
-        //       bracket.style.borderLeft = "5px solid green";
-        //       bracket.style.opacity = "1";
-        //       bracket.querySelector(".name_wrapper").textContent = second_round.username;
-        //       bracket.querySelector(".img_user img").src = second_round.image;
-        //     }
-        //   });
-        // }
-        // if (data["first_round"][counter].online)
-        // {
+
         if (!data["first_round"][counter].win) {
           bracket.style.borderLeft = "5px solid red";
           bracket.style.opacity = "0.5";
@@ -101,8 +85,6 @@ export default class Tournament extends HTMLElement {
     second_round.forEach((bracket) => {
       if (data["second_round"].length == counter) checker = false;
       if (checker) {
-        console.log("the length is => ", data["second_round"].length);
-        console.log("the counter is => ", counter);
         bracket.querySelector(".name_wrapper").textContent =
           data["second_round"][counter].username;
         bracket.querySelector(".img_user img").src =
@@ -129,7 +111,6 @@ export default class Tournament extends HTMLElement {
 
     this.socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log("Message from server: ", data);
       document.getElementById(
         "status"
       ).innerHTML = `Match ${data.match_id} created between Player ${data.player1_id} and Player ${data.player2_id} player1_username: ${data.player1_username} player2_username: ${data.player2_username} player1_image: ${data.player1_image} player2_image: ${data.player2_image}`;

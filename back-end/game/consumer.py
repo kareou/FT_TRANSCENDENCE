@@ -64,8 +64,8 @@ def updateUserStats(user, winner, goals_scored, goals_conceded):
 
 class GameState():
     def __init__(self):
-        self.screen_width = 800
-        self.screen_height = 600
+        self.screen_width = 1600
+        self.screen_height = 1040
         self.p1x = 40
         self.p1y = self.screen_height / 2 - 50
         self.p2x = self.screen_width - 50

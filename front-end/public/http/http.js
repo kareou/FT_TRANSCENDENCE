@@ -22,7 +22,6 @@ class Http {
           this.friends[friend.user2.id] = {...friend.user2, friendship_id: friend.id};
       }
     })
-    console.log(this.friends.length);
   }
 
   async getFriends() {
@@ -40,6 +39,7 @@ class Http {
       setTimeout(() => {
         Link.navigateTo(`/game/online/?game_id=${data.message}`);
       }, 5000);
+      this.website_stats.notify("toast", { type: "info", message: "Your match will start soon be ready" });
     }
     else if (data.type === "status_update") {
       if (data.user_id !== this.user.id) {
@@ -61,23 +61,8 @@ class Http {
       this.website_stats.notify("remove_friend", data);
     }
     else if (data.type === "players_status_changed") {
-      let current_location = window.location.pathname
-       this.tournament_data = data.message;
-      if ( current_location !== "/dashboard/tournament") {
-        if(current_location !== "/game/online"){
-          Link.navigateTo("/dashboard/tournament");
-        }else {
-          const interval = setInterval(() => {
-            current_location = window.location.pathname;
-            if (window.location.pathname === "/dashboard") {
-              clearInterval(interval);
-              Link.navigateTo("/dashboard/tournament");
-            }
-          }, 500);
-        }
-      }else{
-        this.website_stats.notify("players_status_changed", this.tournament_data);
-      }
+      this.tournament_data = data.message;
+      this.website_stats.notify("players_status_changed", this.tournament_data);
     }
     else
       this.website_stats.notify("notification", data);
@@ -110,7 +95,6 @@ class Http {
   }
 
   openSocket() {
-    console.log("Opening socket");
     this.notification_socket = new WebSocket(
       `${ips.socketUrl}/ws/notification/${this.user.id}/`
     );
@@ -158,7 +142,6 @@ class Http {
         },
         credentials: "include",
       });
-      console.log(response.status);
       if (response.ok) {
         this.notification_socket.close(3001);
         this.notification_socket = null;
@@ -238,7 +221,6 @@ class Http {
       if (response.ok) {
         const res = await response.json();
         this.user = res.user;
-        console.log(this.user);
         await this.getFriends();
         if (!this.notification_socket) {
           this.openSocket();

@@ -14,7 +14,6 @@ export default class Settings extends HTMLElement {
       .replace(/>/g, "&gt;");
   }
   connectedCallback() {
-    console.log(this.user);
     this.render();
 
     document.querySelectorAll(".theme").forEach((e) => {
@@ -24,13 +23,11 @@ export default class Settings extends HTMLElement {
 
     document.querySelectorAll(".paddle").forEach((e) => {
       e.checked = false;
-      console.log(e.id == Http.user.paddle_type);
       if (e.id == Http.user.paddle_type) e.checked = true;
     });
 
     this.querySelectorAll(".paddle_label").forEach((e) => {
       e.addEventListener("click", () => {
-        console.log(e);
         this.querySelectorAll(".paddle").forEach((input) => {
           input.checked = false;
         });
@@ -44,9 +41,7 @@ export default class Settings extends HTMLElement {
       Http.getData("PUT", `api/user/update/`, {
         paddle_type: paddle,
         table_theme: table,
-      }).then((data) => {
-        console.log(data);
-      });
+      })
     });
 
     this.querySelectorAll(".theme").forEach((e) => {
@@ -104,7 +99,7 @@ export default class Settings extends HTMLElement {
           if (idx != idx_btn) e.classList.add("d-none");
           else e.classList.remove("d-none");
         });
-        console.log(key_obj);
+        
 
         old_lws = e;
       });
@@ -137,10 +132,7 @@ export default class Settings extends HTMLElement {
         .then((response) => {
           return response.json();
         })
-        .then((data) => {
-          console.log(data);
-          console.log(collectedSettingsData);
-        });
+        
     });
 
     const update_pass = document.querySelector(".update_pass");
@@ -174,26 +166,19 @@ export default class Settings extends HTMLElement {
         .then((response) => {
           return response.json();
         })
-        .then((data) => {
-          console.log(data);
-          console.log(dataPs);
-        });
     });
 
     const enable_2fa = document.querySelector(".enable_2fa");
     const disable_2fa = document.querySelector(".disable_2fa");
     const qr = document.querySelector("._2fa_qrcode");
 
-    Http.getData("/api/user/" + this.user.username).then((data) => {
-      console.log(data);
-    });
+ 
     const _2fa_container = document.querySelector("._2fa_container");
     const modal_wrapper_2fa = document.querySelector(".modal_wrapper_2fa");
     enable_2fa.addEventListener("click", () => {
       const baseUrl = `${ips.baseUrl}`;
       const endPoint = "api/user/enable_2fa/";
       Http.getData("POST", endPoint).then((data) => {
-		console.log(data);
 		qr.src = data["2fa_url"];
         _2fa_container.style.display = "block";
         modal_wrapper_2fa.style.display = "block";
@@ -207,8 +192,6 @@ export default class Settings extends HTMLElement {
     // Assuming modal_wrapper_chat is the modal element
     modal_wrapper_2fa.addEventListener("click", function (event) {
       // Check if the click is outside the modal
-      console.log(event.target);
-      console.log(overlay);
       if (event.target === overlay) {
         modal_wrapper_2fa.style.display = "none"; // Or any other code to close the modal
       }

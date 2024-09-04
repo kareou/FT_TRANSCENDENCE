@@ -41,8 +41,6 @@ export default class TopBar extends HTMLElement {
       search_chat.addEventListener('input', (e) => {
         const card = document.querySelector(".search_wrapper_");
 
-          console.log(this.user);
-
           e.preventDefault();
           fetch(`${ips.baseUrl}/api/user/`, {
             method: "GET",
@@ -53,16 +51,14 @@ export default class TopBar extends HTMLElement {
           })
             .then((response) => response.json())
             .then((data) => {
-              console.log("The data in user listaa =>");
-              console.log(data);
+
               card.innerHTML = "";
               let counter = 0;
               let count_data = count_data_include_search(e.target.value, data);
               let border_ = "";
               
               for (let user in data) {
-                console.log(counter)
-                console.log(e.target.value)
+
                 border_ = "border-bottom: none!important"
                 if (e.target.value && data[user].username.includes(e.target.value))
                 {
@@ -92,7 +88,6 @@ export default class TopBar extends HTMLElement {
             {
               card.innerHTML = "";
               card.classList.remove('active')
-              console.log(card.classList)
             }
 
       });

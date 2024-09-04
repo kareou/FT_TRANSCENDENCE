@@ -359,3 +359,4 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 await self._update_match_status_(value.id)
         except Exception as e:
             print(f"An error occurred: {e}", flush=True)
+

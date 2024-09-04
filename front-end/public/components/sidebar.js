@@ -56,7 +56,6 @@ export default class SideBar extends HTMLElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    console.log(name, oldValue, newValue);
   }
 
   disconnectedCallback() {

@@ -15,11 +15,6 @@ export class ClassicPaddle{
 	}
 
 	draw(){
-		this.ctx.fillStyle = this.color;
-		let new_y = this.y + this.velocityY;
-		if(new_y > 0 && new_y < this.ctx.canvas.height - this.height){
-			this.y = new_y;
-		}
 		let radius = (this.game_theme === "classic" ? 0 : 5);
 		this.ctx.beginPath();
         this.ctx.roundRect(this.x, this.y, this.width, this.height, radius);
@@ -65,10 +60,6 @@ export class LightSaber extends ClassicPaddle{
 
 	draw(){
 		this.ctx.fillStyle = this.color;
-		let new_y = this.y + this.velocityY;
-		if(new_y > 0 && new_y < this.ctx.canvas.height - this.height){
-			this.y = new_y;
-		}
 		let radius = (this.game_theme === "classic" ? 0 : 5);
 		this.ctx.beginPath();
 		this.ctx.shadowBlur = 20;

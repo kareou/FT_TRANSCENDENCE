@@ -23,7 +23,6 @@ export default class Notification extends HTMLElement {
 
   async getNotification() {
     const data = await Http.getData("GET", "api/notification/");
-    console.log(data);
     const notificationContainer = this.querySelector(".notification_container");
     notificationContainer.innerHTML = "";
     const dropdown = document.querySelector(".notification_dropdown");

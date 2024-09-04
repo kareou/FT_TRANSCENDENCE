@@ -31,19 +31,7 @@ export default class SignIn extends HTMLElement {
       } catch (error) {
         console.log(error);
       }
-      // Http.getData("GET", "api/user/oauth2/authorize/42/").then((res) => {
-      //   Http.user = res.user;
-      //   console.log(res);
-      // });
-      // Http.openSocket();
-      // Http.notification_socket.send(
-      //   JSON.stringify({
-      //     type: "status_update",
-      //     sender: Http.user.id,
-      //     message: "offline",
-      //     receiver: 0,
-      //   })
-      // );
+
     });
     this.querySelector("form").addEventListener("submit", (e) => {
       e.preventDefault();

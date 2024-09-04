@@ -94,7 +94,6 @@ export default class Link extends HTMLAnchorElement {
       }
       route = errorRoute[0];
     }
-    console.log(route);
     // if (!route) route = routes[0];
     try {
       const component = await route.component();
