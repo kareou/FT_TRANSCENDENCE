@@ -44,7 +44,6 @@ export default class PaddleOption extends HTMLElement {
   changeGameState() {
 	const state = localStorage.getItem("state");
 	var data = JSON.parse(state);
-	console.log(data);
 	data[0][this.player].paddle_theme = this.paddles[this.current_paddle];
 	localStorage.setItem("state", JSON.stringify(data));
   }

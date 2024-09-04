@@ -63,7 +63,6 @@ export default class OnlineGame extends HTMLElement {
   connectedCallback() {
     const urlParams = new URLSearchParams(window.location.search);
     const gameid = urlParams.get("game_id");
-    console.log(gameid);
     if (!gameid) {
       Link.navigateTo("/dashboard");
       Http.website_stats.notify("toast", { type: "warning", message: "Game ID not found" });
@@ -85,7 +84,6 @@ export default class OnlineGame extends HTMLElement {
       this.websocket.onmessage = (e) => {
         const data = JSON.parse(e.data);
         if (data.winner) {
-          console.log(data.winner)
           this.winner = data.winner;
         }
         if (data.role) {

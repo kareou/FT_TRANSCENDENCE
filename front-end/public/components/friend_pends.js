@@ -8,7 +8,6 @@ export default class FriendPends extends HTMLElement {
     }
 
     update() {
-        console.log("update");
         this.render();
         this.getRequests();
     }
@@ -25,7 +24,6 @@ export default class FriendPends extends HTMLElement {
         fq_wrapper.innerHTML += test
         }
         if (data["detail"] === "No FriendList matches the given query.") {
-        console.log("no friend requests")
         fq_wrapper.style.overflow = "hidden";
         fq_wrapper.innerHTML =
         `

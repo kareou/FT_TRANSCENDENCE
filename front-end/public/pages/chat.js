@@ -64,12 +64,7 @@ export default class Chat extends HTMLElement {
   setupWebSocket() {
     this.conversations.forEach((conversation) => {
       conversation.websocket.addEventListener("open", function (event) {
-        console.log(
-          "WebSocket connection opened with sender " +
-          conversation.senderId +
-          " and reciever : " +
-          conversation.receiverId
-        );
+
       });
 
       conversation.websocket.onmessage = this.handleWebSocketMessage.bind(this);
@@ -182,8 +177,6 @@ export default class Chat extends HTMLElement {
           (conversation) => {
             if (conversation.id != this.conversationId) {
               this.conversationId = conversation.id;
-              console.log("conversation : " + conversation.conversation);
-              console.log("conversation id : " + conversation.id);
               this.fetchMessagesForConversation(conversation.id);
               const username = userElement.getAttribute("name");
               this.querySelector(".infos_con_user_wrapper").setAttribute(
@@ -235,15 +228,12 @@ export default class Chat extends HTMLElement {
       this.querySelector(".block-btn").classList.remove("hidden");
       switch (responseData.case) {
         case "missing_data":
-          console.error("Missing sender or receiver");
           break;
         case "user_not_found":
-          console.error("One of the users does not exist");
           break;
         case "sender_blocked_receiver":
           this.querySelector(".block-message").innerHTML =
             "You have blocked this user and cannot send messages.";
-          console.error("You have blocked this user");
           this.caseBlock();
           this.toggleBlockButton("unblock");
           break;
@@ -256,11 +246,9 @@ export default class Chat extends HTMLElement {
           this.toggleBlockButton("block");
           break;
         case "conversation_created":
-          console.log("Conversation created:", responseData.conversation);
           this.toggleBlockButton("block");
           break;
         case "conversation_fetched":
-          console.log("Fetched conversation:", responseData.conversation);
           this.toggleBlockButton("block");
           break;
         default:
@@ -514,7 +502,6 @@ export default class Chat extends HTMLElement {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("Message saved via api:", data);
           const dataWs = {
             type: "message",
             message: data.message,
@@ -633,8 +620,6 @@ export default class Chat extends HTMLElement {
     const overlay = document.querySelector(".overlay_chat");
 
     modal_wrapper_chat.addEventListener("click", function (event) {
-      console.log(event.target);
-      console.log(overlay);
       if (event.target === overlay) {
         modal_wrapper_chat.style.display = "none";
       }
@@ -647,14 +632,11 @@ export default class Chat extends HTMLElement {
     document.querySelector(".search").addEventListener("input", (e) => {
       Http.getData("GET", "api/friends").then((data) => {
 
-        console.log(data)
         if (e.target.value === "") {
           user_list_wrapper.innerHTML = "";
         } else {
           for (let i = 0; i < data.length; i++) {
             if (data[i].user1.id === Http.user.id) {
-              console.log(e.target.value);
-              console.log(data[i].user2.username);
               if (data[i].user2.username.includes(e.target.value)) {
                 user_list_wrapper.innerHTML += `
                 <div class="user_wrapper_search">
@@ -668,8 +650,6 @@ export default class Chat extends HTMLElement {
               </div>`;
               }
             } else {
-              console.log(e.target.value);
-              console.log(data[i].user2.username);
               if (data[i].user1.username.includes(e.target.value)) {
                 user_list_wrapper.innerHTML += `
                 <div class="user_wrapper_search">

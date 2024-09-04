@@ -11,7 +11,6 @@ export default class MatchHistory extends HTMLElement {
   connectedCallback() {
     Http.getData("GET", `api/matche/history/${this.user}`).then((data) => {
       this.matches = data;
-      console.log(this.matches);
       this.render();
     });
   }

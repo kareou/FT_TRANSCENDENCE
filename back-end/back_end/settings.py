@@ -77,7 +77,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'localhost'
+    'localhost',
+    f'{Front_HOST}'
 ]
 
 
@@ -123,6 +124,10 @@ CORS_ALLOWED_ORIGINS = [
     "https://127.0.0.1:8443",
     "https://localhost",
     "https://127.0.0.1",
+    f"https://{Front_HOST}",
+    f"http://{Front_HOST}",
+    f"https://{Front_HOST}:443",
+    f"http://{Front_HOST}:3000",
     "http://localhost:3000",
 ]
 

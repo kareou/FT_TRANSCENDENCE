@@ -19,7 +19,6 @@ export default class ProfileInfo extends HTMLElement {
           });
         }
         this.user = data;
-        console.log(this.user);
         this.render();
         this.markUnearnedAchievements();
         this.setupEventListeners();
@@ -240,10 +239,8 @@ export default class ProfileInfo extends HTMLElement {
       });
     }
     if (remove_friend != null) {
-      console.log("add friend is not ---- null");
       remove_friend.addEventListener("click", async () => {
-        console.log("remove friend in -");
-        console.log(Http.friends[this.user.id].friendship_id);
+
         Http.getData("DELETE", `api/friends/${Http.friends[this.user.id].friendship_id }`).then(
           (response) => {
             delete Http.friends[this.user.id];
@@ -258,8 +255,7 @@ export default class ProfileInfo extends HTMLElement {
             );
           }
         );
-        console.log("remove friend in -");
-        console.log(this.friendship_id);
+
       })
     }
 

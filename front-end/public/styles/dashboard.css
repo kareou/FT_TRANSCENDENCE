@@ -473,3 +473,8 @@ h1 {
     height: 95vh;
   }
 }
+
+/* .match_history{
+  overflow-y: scroll;
+  height: 500px;
+} */

@@ -16,8 +16,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 100rem;
-  height: 65rem;
+  width: 1600px;
+  height: 1040px;
   border: 0.6px solid rgba(0, 0, 0, 0.2);
 }
 
