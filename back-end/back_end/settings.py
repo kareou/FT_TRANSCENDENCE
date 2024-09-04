@@ -23,7 +23,6 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 env = environ.Env()
 
-Front_HOST = env('Front_HOST')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-@&4lya)5687y1@z@yf0%=(exz2sxgwn#(m+0(w^-hiq_*gzjev'
@@ -177,7 +176,10 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
-    )
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
 }
 
 # Password validation
@@ -253,3 +255,4 @@ EMAIL_HOST_USER = env('EMAIL_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_PASSWORD')
 EMAIL_PORT = '587'
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
+FRONT_HOST = env('FRONT_HOST')
