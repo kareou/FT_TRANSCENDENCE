@@ -54,6 +54,7 @@ export default class SignIn extends HTMLElement {
         password: pwd,
       };
       let res_msg = null
+      console.log(data);
       Http.login(data, "api/user/login/").then((res) => {
         
         if (res.message == "'otp'") {

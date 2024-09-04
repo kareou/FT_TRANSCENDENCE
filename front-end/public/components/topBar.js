@@ -1,4 +1,5 @@
 import Link from "./link.js";
+import { ips } from "../http/ip.js";
 
 export default class TopBar extends HTMLElement {
   constructor() {

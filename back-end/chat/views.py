@@ -81,22 +81,25 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
-        user = self.request.user
+        try:
+            user = self.request.user
+            if user is not None:
+                conversations = Conversation.objects.filter(
+                    Q(sender=user) | Q(receiver=user)
+                ).order_by('-last_message_time')
 
-        conversations = Conversation.objects.filter(
-            Q(sender=user) | Q(receiver=user)
-        ).order_by('-last_message_time')
+                ordered_user_ids = []
+                for conversation in conversations:
+                    if conversation.sender.id != user.id:
+                        ordered_user_ids.append(conversation.sender.id)
+                    if conversation.receiver.id != user.id:
+                        ordered_user_ids.append(conversation.receiver.id)
 
-        ordered_user_ids = []
-        for conversation in conversations:
-            if conversation.sender.id != user.id:
-                ordered_user_ids.append(conversation.sender.id)
-            if conversation.receiver.id != user.id:
-                ordered_user_ids.append(conversation.receiver.id)
+                preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(ordered_user_ids)])
 
-        preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(ordered_user_ids)])
+                active_users = User.objects.filter(id__in=ordered_user_ids).order_by(preserved_order)
 
-        active_users = User.objects.filter(id__in=ordered_user_ids).order_by(preserved_order)
-
-        return active_users
+                return active_users
+        except Exception as e:
+            pass
 
