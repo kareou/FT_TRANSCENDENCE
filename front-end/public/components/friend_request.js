@@ -15,9 +15,22 @@ export default class FriendRequest extends HTMLElement {
   connectedCallback() {
     this.render();
     this.querySelector(".accept").addEventListener("click", () => {
-      console.log("accept");
       Http.getData("POST", `api/friends/accept/`).then((response) => {
+        if (response.user1.id != Http.user.id) {
+          Http.friends[response.user1.id] = {...response.user1, friendship_id: response.id};
+        }
+        else{
+            Http.friends[response.user2.id] = {...response.user2, friendship_id: response.id};
+        }
         Http.website_stats.notify("friends");
+        Http.notification_socket.send(
+          JSON.stringify({
+            type: "add_friend",
+            message: response,
+            receiver: this.user_id,
+            sender: Http.user.id,
+          })
+        );
       });
     });
   }

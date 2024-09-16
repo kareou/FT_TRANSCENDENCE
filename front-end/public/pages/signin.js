@@ -1,45 +1,50 @@
 import Link from "../components/link.js";
 import Http from "../http/http.js";
+import { ips } from "../http/ip.js";
+
 export default class SignIn extends HTMLElement {
   constructor() {
     super();
     document.title = "signin";
   }
-
+  escapeHTML(html) {
+    return html
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
   connectedCallback() {
-    this.render();
 
+    this.render();
+    if (document.cookie.indexOf('error') != -1) {
+      Http.website_stats.notify("toast", { type: "error", message: "Problem in login, Please try again, with correct credentials !" });
+      document.cookie = "error=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
     const signInButton = this.querySelector(".intra_login");
     const otp_container = this.querySelector(".otp_container");
     const modal_wrapper_otp = this.querySelector(".modal_wrapper_otp");
-    signInButton.addEventListener("click", (e) => {
+    signInButton.addEventListener("click", async (e) => {
       e.preventDefault();
-      // fetch("${ip.sbaseUrl}/api/user/oauth2/authorize/42/")
-      // .then (res => res.json())
-      // .then (res => {
-      //   console.log(res);
-      //   window.open(res.url, '_blank');
-      // })
-      window.location.href = `${ips.baseUrl}/api/user/oauth2/authorize/42/`;
-      Http.openSocket();
-      Http.notification_socket.send(
-        JSON.stringify({
-          type: "status_update",
-          sender: Http.user.id,
-          message: "offline",
-          receiver: 0,
-        })
-      );
+      try {
+        window.location.replace(`${ips.baseUrl}/api/user/oauth2/authorize/42/`);
+
+      } catch (error) {
+        console.log(error);
+      }
+
     });
     this.querySelector("form").addEventListener("submit", (e) => {
       e.preventDefault();
-      const email = this.querySelector("#email").value;
-      const pwd = this.querySelector("#pwd").value;
+      const email = this.escapeHTML(this.querySelector("#email").value);
+      const pwd = this.escapeHTML(this.querySelector("#pwd").value);
       const data = {
         email: email,
         password: pwd,
       };
+      let res_msg = null
+      console.log(data);
       Http.login(data, "api/user/login/").then((res) => {
+        
         if (res.message == "'otp'") {
           otp_container.style.display = "block";
           modal_wrapper_otp.style.display = "block";
@@ -56,13 +61,23 @@ export default class SignIn extends HTMLElement {
                 });
               }
             });
+            res_msg = res.message
+        }
+        if (res.error)
+        {
+          Http.website_stats.notify("toast", {type: "error", message: "Incorrect email or password"});
         }
         if (res.user) {
           Link.navigateTo("/dashboard");
         }
+        else
+        {
+          Http.website_stats.notify("toast", { type: "error", message: "Problem in login, Please try again, with correct credentials !" });
+        }
       });
     });
   }
+
 
   render() {
     this.innerHTML = /*HTML*/ `
@@ -112,7 +127,7 @@ export default class SignIn extends HTMLElement {
         }
       </style>
       <div id="signin" class="container sign_in_up">
-        <form class="container_form" action="localhost:8000/api/user/login/">
+        <form class="container_form" action="${ips.baseUrl}/api/user/login/">
             <h1 class="welcome-text">Welcome back</h1>
             <div class="modal_wrapper_otp">
             <div class="overlay_otp"></div>

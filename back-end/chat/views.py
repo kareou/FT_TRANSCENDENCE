@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 User = get_user_model()
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
-from friends.models import friendList
+from friends.models import FriendList
 
 class UserConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
@@ -39,12 +39,12 @@ class UserConversationViewSet(viewsets.ModelViewSet):
             return Response({"detail": "One of the users does not exist", "case": "user_not_found"}, status=status.HTTP_400_BAD_REQUEST)
 
         if conversation:       
-            if friendList.objects.filter(
+            if FriendList.objects.filter(
                 (Q(user1=receiver, user2=sender, user1_blocked_user2=True) |
                 Q(user1=sender, user2=receiver, user2_blocked_user1=True))
             ).exists():
                 return Response({"detail": "You are blocked by this user", "case": "receiver_blocked_sender", "conversation": ConversationSerializer(conversation).data}, status=status.HTTP_200_OK)
-            if friendList.objects.filter(
+            if FriendList.objects.filter(
                 (Q(user1=sender, user2=receiver, user1_blocked_user2=True) |
                 Q(user1=receiver, user2=sender, user2_blocked_user1=True))
             ).exists():
@@ -81,22 +81,25 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
-        user = self.request.user
+        try:
+            user = self.request.user
+            if user is not None:
+                conversations = Conversation.objects.filter(
+                    Q(sender=user) | Q(receiver=user)
+                ).order_by('-last_message_time')
 
-        conversations = Conversation.objects.filter(
-            Q(sender=user) | Q(receiver=user)
-        ).order_by('-last_message_time')
+                ordered_user_ids = []
+                for conversation in conversations:
+                    if conversation.sender.id != user.id:
+                        ordered_user_ids.append(conversation.sender.id)
+                    if conversation.receiver.id != user.id:
+                        ordered_user_ids.append(conversation.receiver.id)
 
-        ordered_user_ids = []
-        for conversation in conversations:
-            if conversation.sender.id != user.id:
-                ordered_user_ids.append(conversation.sender.id)
-            if conversation.receiver.id != user.id:
-                ordered_user_ids.append(conversation.receiver.id)
+                preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(ordered_user_ids)])
 
-        preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(ordered_user_ids)])
+                active_users = User.objects.filter(id__in=ordered_user_ids).order_by(preserved_order)
 
-        active_users = User.objects.filter(id__in=ordered_user_ids).order_by(preserved_order)
-
-        return active_users
+                return active_users
+        except Exception as e:
+            pass
 

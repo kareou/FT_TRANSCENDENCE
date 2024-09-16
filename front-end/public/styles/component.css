@@ -185,10 +185,15 @@
     gap: 2rem;
 }
 
+.toast_wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .toast-icon {
-	width: 2.5rem;
-	height: 2.5rem;
+	width: 40px;
+	height: 40px;
 	border-radius: 50%;
 	display: flex;
 	align-items: center;
@@ -232,6 +237,7 @@
 .toast-icon.error:before {
     content: "+";
     transform: translate(-50%, -50%) rotate(45deg);
+    padding-bottom: 5px;
 }
 
 .toast-icon.success:before {
@@ -271,7 +277,7 @@
     */
 .toast-wrapper.info:before{
     background: radial-gradient(circle at 0% 50%, #0070e0, #fff0 5rem), radial-gradient(circle at -50% 50%, #05478a, #fff0 5rem);
-    
+
 }
 
 .toast-wrapper.success:before{
@@ -396,8 +402,7 @@
 .win_rate {
     display: flex;
     justify-content: space-between;
-    background-color: #085E6D;
-    gap: 1rem;
+    background-color: #471F6A;    gap: 1rem;
     padding: 1rem;
     width: 100%;
     height: 10rem;
@@ -451,10 +456,12 @@
     color: white;
     display: grid;
     font-family: "Coolvetica";
-    background-color: rgba(27, 167, 160);
+    background-color: rgb(110, 27, 167);
     padding: 1rem;
     width: 100%;
-}
+    box-shadow: 1px 1px 12px 1px #000;
+    border-radius: 8px;
+  }
 
 .steps {
     display: flex;
@@ -624,6 +631,37 @@ width: 20rem;
 
 }
 
+.notification_container{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.notification_content{
+    display: flex;
+    justify-content: space-around;
+
+    align-items: center;
+    gap: 1rem;
+}
+
+.notification_user_image{
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: 0.1rem solid white;
+}
+
+.notification_action{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: .5rem;
+    background-color: transparent;
+    color: white;
+    border: none;
+}
+
 #player_type{
     font-size: 1.5rem;
     text-align: center;
@@ -686,7 +724,7 @@ width: 20rem;
     background-color: rgba(27, 167, 160, 0.05);
     border: 0.6px solid #778FB8;
     border-radius: 1rem;
-    height: 100%;
+    height: 60vh;
     text-align: center;
 }
 
@@ -713,4 +751,36 @@ width: 20rem;
 
 .not_found_wrapper a:hover {
     background-color: rgb(47, 23, 71);
+}
+
+#online,
+#local{
+    height: 50px;
+  font-size: 14px;
+  border-radius: 8px;
+}
+
+.matches{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    height: 450px;
+    overflow-y: scroll;
+}
+
+.matches > h1{
+    padding: 25px 0;
+}
+
+.no_matches{
+    height: 100%;
+  justify-content: center;
+  align-content: center;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.no_matches h1{
+    padding: 25px 0;
 }

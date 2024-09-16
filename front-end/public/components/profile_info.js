@@ -7,7 +7,6 @@ export default class ProfileInfo extends HTMLElement {
     super();
     this.user = Http.user;
     this.username = this.getAttribute("user");
-    console.log("id : " + this.username);
   }
   connectedCallback() {
     if (this.username != this.user.username) {
@@ -20,7 +19,6 @@ export default class ProfileInfo extends HTMLElement {
           });
         }
         this.user = data;
-        console.log(this.user);
         this.render();
         this.markUnearnedAchievements();
         this.setupEventListeners();
@@ -28,7 +26,6 @@ export default class ProfileInfo extends HTMLElement {
     } else {
       this.render();
       this.markUnearnedAchievements();
-      this.setupEventListeners();
       this.setupEventListeners();
     }
   }
@@ -59,7 +56,6 @@ export default class ProfileInfo extends HTMLElement {
 
       if (response.ok) {
         const conversation = await response.json();
-        console.log("Fetched or created conversation:", conversation);
         return conversation;
       } else {
         const errorData = await response.json();
@@ -85,7 +81,47 @@ export default class ProfileInfo extends HTMLElement {
       console.log("WebSocket connection closed.");
     });
   }
-  h;
+  ;
+
+  async fetchOrCreateConversationAndVerifyBlock(senderId, receiverId) {
+    try {
+      const response = await fetch(
+        `${ips.baseUrl}/chat/conversations/fetch_or_create/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.token}`,
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            sender: senderId,
+            receiver: receiverId,
+          }),
+        }
+      );
+
+      const responseData = await response.json();
+
+      switch (responseData.case) {
+        case "missing_data":
+          return 0;
+        case "user_not_found":
+          return 0;
+        case "sender_blocked_receiver":
+          return 0;
+        case "receiver_blocked_sender":
+          return 0;
+        case "conversation_created":
+          return 1;
+        case "conversation_fetched":
+          return 1;
+      }
+      return 1;
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
 
   async sendMessage() {
     try {
@@ -93,7 +129,18 @@ export default class ProfileInfo extends HTMLElement {
         Http.user.id,
         this.user.id
       );
-      // console.log("id : "+conversation.conversation.id);
+      const checkConversation =
+        await this.fetchOrCreateConversationAndVerifyBlock(
+          Http.user.id,
+          this.user.id
+        );
+
+      if (checkConversation === 0) {
+        // console.log(
+        //   "Action aborted: User is blocked or conversation could not be created."
+        // );
+        return;
+      }
       const messageContent = document.querySelector(".message-input").value;
       const messageData = {
         sender: Http.user.id,
@@ -119,8 +166,8 @@ export default class ProfileInfo extends HTMLElement {
           type: "message",
           message: data.message,
           sender: data.sender,
+          timestamp: data.timestamp
         };
-        console.log("Message saved:", data);
         this.websocket.send(JSON.stringify(dataWs));
         document.querySelector(".message-input").value = "";
       } else {
@@ -141,6 +188,7 @@ export default class ProfileInfo extends HTMLElement {
     const msgPrompt = document.querySelector(".msg-prompt");
     const buttonSend = document.querySelector(".send-button");
     const add_friend = document.querySelector(".add_friend");
+    const remove_friend = document.querySelector(".remove_friend");
 
     if (add_friend !== null) {
       add_friend.addEventListener("click", async () => {
@@ -158,7 +206,7 @@ export default class ProfileInfo extends HTMLElement {
           }),
         })
           .then((response) => {
-            console.log(response);
+
             if (response.ok) {
               Http.notification_socket.send(
                 JSON.stringify({
@@ -179,20 +227,39 @@ export default class ProfileInfo extends HTMLElement {
     }
     if (buttonNew) {
       buttonNew.addEventListener("click", () => {
-        console.log("button message pressed");
+        
         if (msgPrompt.classList.contains("hidden")) {
           msgPrompt.classList.remove("hidden");
           msgPrompt.classList.add("visible");
+          document.querySelector(".message-input").focus();
         } else {
           msgPrompt.classList.remove("visible");
           msgPrompt.classList.add("hidden");
         }
       });
     }
+    if (remove_friend != null) {
+      remove_friend.addEventListener("click", async () => {
+
+        Http.getData("DELETE", `api/friends/${Http.friends[this.user.id].friendship_id }`).then(
+          (response) => {
+            delete Http.friends[this.user.id];
+            Http.website_stats.notify("friends");
+            Http.notification_socket.send(
+              JSON.stringify({
+                type: "remove_friend",
+                message: this.friendship_id,
+                receiver: this.user.id,
+                sender: Http.user.id,
+              })
+            );
+          }
+        );
+
+      })
+    }
 
     buttonClose.addEventListener("click", () => {
-      console.log("button close pressed");
-
       msgPrompt.classList.remove("visible");
       msgPrompt.classList.add("hidden");
     });
@@ -218,6 +285,7 @@ export default class ProfileInfo extends HTMLElement {
         width:150px;
         height:150px;
         margin: 0 25px ;
+        object-fit: cover;
       }
       .av_img{
         width: 40px;
@@ -242,18 +310,19 @@ export default class ProfileInfo extends HTMLElement {
           this.username === Http.user.username
             ? ""
             : `<div class="wallet_data_wrapper">
-        <span>
-        <i class="fa-sharp fa-light fa-coins" style="color: #04BF8A;"></i>
-        </span>
-        <span id="user_coins">2300$
-        </span>
-        <button class="new-msg send_msg no_style">
-                <i class="fa-regular fa-message"></i>
-              </button>
-          <button class="add_friend no_style">
-          <i class="fa fa-user-plus" aria-hidden="true"></i>
-          </button>
-        </div>`
+                <button class="new-msg send_msg no_style">
+                  <i class="fa-regular fa-message"></i>
+                </button>
+                ${
+                  Http.friends.hasOwnProperty(this.user.id)
+                    ? `<button class="remove_friend no_style">
+                         <i class="fa fa-user-minus" aria-hidden="true"></i>
+                       </button>`
+                    : `<button class="add_friend no_style">
+                         <i class="fa fa-user-plus" aria-hidden="true"></i>
+                       </button>`
+                }
+              </div>`
         }
       </div>
         <div class="achievement">

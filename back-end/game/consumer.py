@@ -64,8 +64,8 @@ def updateUserStats(user, winner, goals_scored, goals_conceded):
 
 class GameState():
     def __init__(self):
-        self.screen_width = 800
-        self.screen_height = 600
+        self.screen_width = 1600
+        self.screen_height = 1040
         self.p1x = 40
         self.p1y = self.screen_height / 2 - 50
         self.p2x = self.screen_width - 50
@@ -124,6 +124,8 @@ def update_game_state(state: GameState):
         state.p2score += 1
         state.ballx = state.screen_width / 2
         state.bally = state.screen_height / 2
+        state.p1y = state.screen_height / 2 - 50
+        state.p2y = state.screen_height / 2 - 50
         state.ballvx *= -1
         if check_game_end(state):
             state.game_progress = "end"
@@ -133,15 +135,27 @@ def update_game_state(state: GameState):
         state.p1score += 1
         state.ballx = state.screen_width / 2
         state.bally = state.screen_height / 2
+        state.p1y = state.screen_height / 2 - 50
+        state.p2y = state.screen_height / 2 - 50
         state.ballvx *= -1
         if check_game_end(state):
             state.game_progress = "end"
         else:
             state.game_progress = "pause"
-    if state.ballx <= 40 + 10 and state.p1y <= state.bally <= state.p1y + 100:
-        state.ballvx *= -1
-    if state.ballx >= state.screen_width - 40 and state.p2y <= state.bally <= state.p2y + 100:
-        state.ballvx *= -1
+    if state.ballx > state.p2x and state.bally < state.p2y  and state.bally > state.p2y + 100:
+        state.ballx = state.p2x
+    elif state.ballx < state.p1x + 10 and state.bally < state.p1y  and state.bally > state.p1y + 100:
+        state.ballx = state.p1x
+    if state.ballvx > 0 :
+        if state.ballx + 10 > state.p2x and state.p2y < state.bally  and state.bally < state.p2y + 100:
+            state.ballvx *= -1
+    else:
+        if state.ballx - 10 < state.p1x + 10 and state.p1y < state.bally  and state.bally < state.p1y + 100:
+            state.ballvx *= -1
+    # if state.ballx <= 40 + 10 and state.p1y <= state.bally <= state.p1y + 100:
+    #     state.ballvx *= -1
+    # if state.ballx >= state.screen_width - 40 - 10 and state.p2y <= state.bally <= state.p2y + 100:
+    #     state.ballvx *= -1
     return state
 
 @database_sync_to_async
@@ -172,6 +186,8 @@ class GameConsumer(AsyncWebsocketConsumer):
     game_users_data = {}
     game_state_ = {}
 
+        
+
     async def check_second_player_join(self):
         await asyncio.sleep(30)
         if GameConsumer.game_users_count[self.game_id] == 1:
@@ -191,6 +207,10 @@ class GameConsumer(AsyncWebsocketConsumer):
                     "state": GameConsumer.game_state_[self.game_id].__json__()
                 }
             )
+        try:
+            await self.checkerp2.cancel()
+        except Exception as e:
+            print("Task already cancelled or Finished", flush=True)
 
     async def connect(self):
         self.user,self.user_id = await GetUser(self.scope)
@@ -214,9 +234,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.accept()
         await self.send(text_data=json.dumps({"role": role}))
         if role == "player1":
-            asyncio.create_task(self.check_second_player_join())
-        if GameConsumer.game_users_count[self.game_id] == 2:
             GameConsumer.game_state_[self.game_id] = GameState()
+            self.checkerp2 =  asyncio.create_task(self.check_second_player_join())
+        if GameConsumer.game_users_count[self.game_id] == 2:
             await startGame(self.game_id)
             await self.channel_layer.group_send(
                 self.game_id,

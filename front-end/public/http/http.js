@@ -6,14 +6,35 @@ class Http {
   constructor() {
     this.baseUrl = ips.baseUrl;
     this.user = null;
+    this.friends = {};
     this.website_stats = new Observer();
+    this.tournament_data = null;
     this.notification_socket = null;
   }
 
+  serializeFriends(friends) {
+    friends.forEach((friend) => {
+      if (friend.user1.id != this.user.id) {
+          this.friends[friend.user1.id] = {...friend.user1, friendship_id: friend.id};
+
+      }
+      else{
+          this.friends[friend.user2.id] = {...friend.user2, friendship_id: friend.id};
+      }
+    })
+  }
+
+  async getFriends() {
+    const data =  await this.getData("GET", "api/friends/")
+    this.serializeFriends(data);
+  }
+
   notifyStats(data) {
-    console.log(data);
     if (data.type === "game_invite")
-      this.website_stats.notify("toast", data);
+    {
+      console.log(data);
+      this.website_stats.notify("toast", {type: "game_invite", message: data.message, id: data.message, sender: data.sender});
+    }
     else if (data.type === "FRQ") {
       this.website_stats.notify("friend_request", data);
     }
@@ -21,14 +42,30 @@ class Http {
       setTimeout(() => {
         Link.navigateTo(`/game/online/?game_id=${data.message}`);
       }, 5000);
+      this.website_stats.notify("toast", { type: "info", message: "Your match will start soon be ready" });
     }
     else if (data.type === "status_update") {
       if (data.user_id !== this.user.id) {
+        this.friends[data.user_id].online = !this.friends[data.user_id].online;
         this.website_stats.notify("status_update", data);
       }
     }
+    else if (data.type === "add_friend") {
+      if (data.message.user1.id != this.user.id) {
+          this.friends[data.message.user1.id] = {...data.message.user1, friendship_id: data.message.id};
+      }
+      else{
+          this.friends[data.message.user2.id] = {...data.message.user2, friendship_id: data.message.id};
+      }
+      this.website_stats.notify("friends", data);
+    }
     else if (data.type === "remove_friend") {
+      delete this.friends[data.sender];
       this.website_stats.notify("remove_friend", data);
+    }
+    else if (data.type === "players_status_changed") {
+      this.tournament_data = data.message;
+      this.website_stats.notify("players_status_changed", this.tournament_data);
     }
     else
       this.website_stats.notify("notification", data);
@@ -43,19 +80,24 @@ class Http {
         },
         body: JSON.stringify(data),
       });
+      const res = await response.json();
       if (response.status !== 201) {
-        const res = await response.json();
+        Object.keys(res).forEach(key => {
+          this.website_stats.notify("toast", { type: "error", message: key+" : "+res[key] });
+        });
         return res;
       }
-      const res = await response.json();
-      return res;
+      else
+      {
+        this.website_stats.notify("toast", { type: "info", message: res.message });
+        return res;
+      }
     } catch (e) {
       return { error: e.message };
     }
   }
 
   openSocket() {
-    console.log("Opening socket");
     this.notification_socket = new WebSocket(
       `${ips.socketUrl}/ws/notification/${this.user.id}/`
     );
@@ -78,13 +120,15 @@ class Http {
         body: JSON.stringify(data),
         credentials: "include",
       });
-      if (response.status === 200) {
+      if (response.ok) {
         const res = await response.json();
         this.user = res.user;
+        await this.getFriends();
         this.openSocket();
         return res;
       } else {
         res = await response.json();
+        this.website_stats.notify("toast", { type: "error", message: res.message });
         return res;
       }
     } catch (e) {
@@ -101,11 +145,8 @@ class Http {
         },
         credentials: "include",
       });
-      console.log(response.status);
-      if (response.status === 200) {
-        console.log("response.status");
+      if (response.ok) {
         this.notification_socket.close(3001);
-        console.log("response.status");
         this.notification_socket = null;
         const res = await response.json();
         this.user = null;
@@ -127,19 +168,25 @@ class Http {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: method === "POST" ? JSON.stringify(data) : null,
+        body: (method === "POST" || method === "PUT") ? JSON.stringify(data) : null,
       });
-      if (response.status === 200) {
+      if (response.ok) {
         const res = await response.json();
+        if (method === "POST" || method === "PUT")
+          this.website_stats.notify("toast", { type: "success", message: res.message });
         return res;
       } else if (response.status === 401 && retries < 1) {
         await this.refreshToken();
         return this.getData(method, url, data, retries + 1);
       } else{
         const res = await response.json();
+        if (method === "POST" || method === "PUT")
+          this.website_stats.notify("toast", { type: "error", message: res.message });
         return { error: res };
       };
     } catch (e) {
+      if (method === "POST" || method === "PUT")
+        this.website_stats.notify("toast", { type: "error", message: e.message });
       return { error: e.message };
     }
   }
@@ -153,7 +200,7 @@ class Http {
         },
         credentials: "include",
       });
-      if (response.status === 200) {
+      if (response.ok) {
         const res = await response.json();
         return res;
       } else {
@@ -174,9 +221,10 @@ class Http {
         },
         credentials: "include",
       });
-      if (response.status === 200) {
+      if (response.ok) {
         const res = await response.json();
         this.user = res.user;
+        await this.getFriends();
         if (!this.notification_socket) {
           this.openSocket();
         } else if (this.notification_socket.readyState === 3) {

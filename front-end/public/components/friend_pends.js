@@ -8,7 +8,6 @@ export default class FriendPends extends HTMLElement {
     }
 
     update() {
-        console.log("update");
         this.render();
         this.getRequests();
     }
@@ -17,7 +16,6 @@ export default class FriendPends extends HTMLElement {
         const fq_wrapper = document.querySelector(".friend_online_wrapper_requests")
         Http.getData("GET", "api/friends/accept/")
         .then (response =>{
-        console.log(response)
             return (response)
         })
         .then(data => {
@@ -25,8 +23,7 @@ export default class FriendPends extends HTMLElement {
         const test = `<friend-request profile_pic="${data[i].user1.profile_pic}"  full_name="${data[i].user1.full_name}" user_id="${ data[i].user1.id}"></friend-request>`
         fq_wrapper.innerHTML += test
         }
-        if (data["detail"] === "No friendList matches the given query.") {
-        console.log("no friend requests")
+        if (data["detail"] === "No FriendList matches the given query.") {
         fq_wrapper.style.overflow = "hidden";
         fq_wrapper.innerHTML =
         `

@@ -22,9 +22,11 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 env = environ.Env()
+FRONT_HOST = env('FRONT_HOST')
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@&4lya)5687y1@z@yf0%=(exz2sxgwn#(m+0(w^-hiq_*gzjev'
+SECRET_KEY = env('SECRET_KEY')
 
 
 # JWT settings
@@ -75,6 +77,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
+    'localhost',
+    f'{FRONT_HOST}'
 ]
 
 
@@ -120,6 +124,11 @@ CORS_ALLOWED_ORIGINS = [
     "https://127.0.0.1:8443",
     "https://localhost",
     "https://127.0.0.1",
+    f"https://{FRONT_HOST}",
+    f"http://{FRONT_HOST}",
+    f"https://{FRONT_HOST}:443",
+    f"http://{FRONT_HOST}:3000",
+    "http://localhost:3000",
 ]
 
 ROOT_URLCONF = 'back_end.urls'
@@ -151,9 +160,9 @@ WSGI_APPLICATION = 'back_end.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'libftPong',
-        'USER' : 'root',
-        'PASSWORD' : 'root',
+        'NAME': env('POSTGRES_DB'),
+        'USER' : env('POSTGRES_USER'),
+        'PASSWORD' : env('POSTGRES_PASSWORD'),
         'HOST' : 'db',
         'PORT' : '5432',
     }
@@ -168,7 +177,10 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
-    )
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
 }
 
 # Password validation

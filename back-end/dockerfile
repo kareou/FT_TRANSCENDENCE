@@ -6,11 +6,11 @@ COPY requirements.txt requirements.txt
 
 COPY . .
 
-RUN chmod +x start.sh
-
 RUN pip install -r requirements.txt
 
 ENV DJANGO_SETTINGS_MODULE=back_end.settings
+
+RUN chmod +x start.sh
 
 EXPOSE 8443
 

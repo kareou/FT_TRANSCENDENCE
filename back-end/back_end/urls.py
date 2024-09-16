@@ -22,7 +22,6 @@ from user.views import CustomTokenVerifyView, CustomTokenRefreshView
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('api/', include('user.urls')),
     path('api/token/verify', CustomTokenVerifyView.as_view(), name='token_verify'),
     path('api/token/refresh', CustomTokenRefreshView.as_view(), name='token_refresh'),

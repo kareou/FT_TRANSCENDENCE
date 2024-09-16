@@ -61,8 +61,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 		receiver = notification['receiver'] or None
 		sender = notification['sender'] or None
 		self.group_name = f"notification_{receiver}"
-		print(notification, flush=True)
-		if notification_type != "game_invite" and notification_type != "remove_friend" and notification_type != "status_update":
+		if notification_type != "game_invite" and notification_type != "remove_friend" and notification_type != "status_update" and notification_type != "tournament_match":
 			try:
 				receiver_obj = await database_sync_to_async(User.objects.get)(id=receiver)
 				sender_obj = await database_sync_to_async(User.objects.get)(id=sender)
@@ -76,6 +75,16 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 				'user_id': sender
 				}
 			)
+		if notification_type == "game_invite":
+			await self.channel_layer.group_send(
+				self.group_name,{
+				'type': 'gameInvite',
+				'message': message,
+				'notification_type': notification_type,
+				'receiver': receiver,
+				'sender': sender
+				}
+			)
 		else:
 			await self.channel_layer.group_send(
 				self.group_name,{
@@ -85,6 +94,20 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 				'receiver': receiver
 				}
 			)
+
+	async def gameInvite(self, event):
+		message = event['message']
+		notification_type = event['notification_type']
+		receiver = event['receiver']
+		sender = event['sender']
+
+		await self.send(text_data=json.dumps({
+			'message': message,
+			'type': notification_type,
+			'receiver': receiver,
+			'sender': sender
+		})
+		)
 
 	async def notification_message(self, event):
 		message = event['message']
@@ -112,7 +135,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 		try:
 			user =	User.objects.get(id=self.user_id)
 			user.online = False
-			print(user.online, flush=True)
 			user.save()
 		except User.DoesNotExist:
 			return

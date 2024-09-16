@@ -1,5 +1,6 @@
 import Http from "../http/http.js";
 import { ips } from "../http/ip.js";
+import Link from "../components/link.js";
 
 export default class Chat extends HTMLElement {
   constructor() {
@@ -10,7 +11,6 @@ export default class Chat extends HTMLElement {
     this.conversationId = null;
     this.chatContainer = null;
     this.conversations = [];
-    // this.activeConversationId = this.getAttribute();
   }
 
   connectedCallback() {
@@ -63,15 +63,9 @@ export default class Chat extends HTMLElement {
   }
 
   setupWebSocket() {
-    // console.log("size = " +this.conversations.length);
     this.conversations.forEach((conversation) => {
       conversation.websocket.addEventListener("open", function (event) {
-        console.log(
-          "WebSocket connection opened with sender " +
-            conversation.senderId +
-            " and reciever : " +
-            conversation.receiverId
-        );
+
       });
 
       conversation.websocket.onmessage = this.handleWebSocketMessage.bind(this);
@@ -111,7 +105,6 @@ export default class Chat extends HTMLElement {
 
       if (response.ok) {
         const users = await response.json();
-        console.log("All users:", users);
         this.displayUsers(users);
       } else {
         console.error("Error fetching users:", response.statusText);
@@ -127,9 +120,8 @@ export default class Chat extends HTMLElement {
         <div class="first_profile_wrapper_chat">
             <div class="pdp_warpper">
                 <img src="${ips.baseUrl}${this.user.profile_pic}" class="pfp_logo" alt="profile picture" loading="lazy">
-            </div>
+                </div>
             <div class="icon_wrapper_">
-                <i class="fa-solid fa-circle-ellipsis fa-2xl" style="color: #ffffff;"></i>
             </div>
         </div>
         `;
@@ -166,6 +158,28 @@ export default class Chat extends HTMLElement {
 
   addUserClickListeners() {
     const userElements = this.querySelectorAll(".chat_bulles_wrapper");
+    const invite = this.querySelector(".play_invite");
+
+    if (invite) {
+      invite.addEventListener("click", () => {
+        const data = {
+          player1: this.user.id,
+          player2: this.receiverId,
+          winner: this.user.id,
+        }
+          Http.getData("POST", "api/matche/", data).then((data) => {
+            console.log(data);
+            Http.notification_socket.send(JSON.stringify({
+              type: "game_invite",
+              sender: this.user.id,
+              receiver: this.receiverId,
+              message: data.id
+            }));
+          }
+        );
+
+      });
+    }
 
     userElements.forEach((userElement) => {
       const receiverId = userElement.id;
@@ -186,20 +200,16 @@ export default class Chat extends HTMLElement {
           (conversation) => {
             if (conversation.id != this.conversationId) {
               this.conversationId = conversation.id;
-              console.log("conversation : " + conversation.conversation);
-              console.log("conversation id : " + conversation.id);
               this.fetchMessagesForConversation(conversation.id);
               const username = userElement.getAttribute("name");
               this.querySelector(".infos_con_user_wrapper").setAttribute(
                 "href",
-                `/dashboard/profile/?user=${username}`
+                `/dashboard/profile/${username}`
               );
               this.querySelector(".name_user_con").innerHTML =
-                userElement.getAttribute("name");
+                this.escapeHTML(userElement.getAttribute("name"));
               this.querySelector(".logo_chat_user").src =
                 userElement.querySelector(".avatar_icon").src;
-              this.querySelector(".name_user_con").innerHTML =
-                userElement.getAttribute("name");
               this.querySelector(".find_conv").style.display = "none";
               this.querySelector(".second_section_wrapper_chat").style.display =
                 "block";
@@ -218,8 +228,6 @@ export default class Chat extends HTMLElement {
   }
 
   async fetchOrCreateConversation(senderId, receiverId) {
-    // console.log("sender : " +senderId);
-    // console.log("receiver : " +receiverId);
     try {
       const response = await fetch(
         `${ips.baseUrl}/chat/conversations/fetch_or_create/`,
@@ -238,21 +246,16 @@ export default class Chat extends HTMLElement {
       );
 
       const responseData = await response.json();
-
-      console.error("Case:", responseData.case);
+      this.querySelector(".block-btn").classList.remove("hidden");
       switch (responseData.case) {
         case "missing_data":
-          console.error("Missing sender or receiver");
           break;
         case "user_not_found":
-          console.error("One of the users does not exist");
           break;
         case "sender_blocked_receiver":
           this.querySelector(".block-message").innerHTML =
             "You have blocked this user and cannot send messages.";
-          console.error("You have blocked this user");
           this.caseBlock();
-          // this.querySelector('.block-btn').classList.remove('hidden');
           this.toggleBlockButton("unblock");
           break;
         case "receiver_blocked_sender":
@@ -260,16 +263,13 @@ export default class Chat extends HTMLElement {
             "You are blocked by this user and cannot send messages.";
           console.error("You are blocked by this user");
           this.caseBlock();
-          // this.querySelector('.block-btn').style.display = 'none';
           this.querySelector(".block-btn").classList.add("hidden");
           this.toggleBlockButton("block");
           break;
         case "conversation_created":
-          console.log("Conversation created:", responseData.conversation);
           this.toggleBlockButton("block");
           break;
         case "conversation_fetched":
-          console.log("Fetched conversation:", responseData.conversation);
           this.toggleBlockButton("block");
           break;
         default:
@@ -282,8 +282,6 @@ export default class Chat extends HTMLElement {
     }
   }
   async fetchOrCreateConversationAndVerifyBlock(senderId, receiverId) {
-    // console.log("sender : " +senderId);
-    // console.log("receiver : " +receiverId);
     try {
       const response = await fetch(
         `${ips.baseUrl}/chat/conversations/fetch_or_create/`,
@@ -303,7 +301,6 @@ export default class Chat extends HTMLElement {
 
       const responseData = await response.json();
 
-      console.error("Case:", responseData.case);
       switch (responseData.case) {
         case "missing_data":
           return 0;
@@ -340,7 +337,6 @@ export default class Chat extends HTMLElement {
 
       if (response.ok) {
         const messages = await response.json();
-        console.log("Fetched messages for conversation:", messages);
         this.displayMessages(messages);
       } else {
         const errorData = await response.json();
@@ -373,9 +369,8 @@ export default class Chat extends HTMLElement {
                         ${message_time}
                     </div >
                 </div>
-                <img src="${
-                  this.querySelector(".logo_chat_user").src
-                }" class="user_pic_msg_right" alt="profile picture" loading="lazy">
+                <img src="${this.querySelector(".logo_chat_user").src
+        }" class="user_pic_msg_right" alt="profile picture" loading="lazy">
             </div>
         </div>
     `;
@@ -399,24 +394,19 @@ export default class Chat extends HTMLElement {
         `;
     }
     const userElements = this.querySelectorAll(".chat_bulles_wrapper");
-    // console.log("log iser : " +this.user.id);
     userElements.forEach((userElement) => {
-      // console.log("id : " +userElement.getAttribute("id")+ " rec : " + data.sender);
       if (userElement.getAttribute("id") == data.sender) {
-        // console.log("test " +userElement.getAttribute("id"));
         userElement.querySelector(".last_msg").innerHTML = data.message;
       }
     });
 
     this.chatContainer.innerHTML += messageHTML;
-    this.chatContainer.scrollTop = this.chatContainer.scrollHeight; // this for showing the very last messages of the conversation
+    this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
   }
 
   displayMessages(messages) {
     this.chatContainer = this.querySelector(".slots_messages_container__");
     this.chatContainer.innerHTML = "";
-    // console.log('pic = '+this.user.profile_pic);
-    // const receiverImg = this.querySelector(".logo_chat_user").src;
     messages.forEach((message) => {
       const message_time = this.isToday(message.timestamp)
         ? this.formatTime(message.timestamp)
@@ -450,13 +440,11 @@ export default class Chat extends HTMLElement {
                                     ${message_time}
                                 </div >
                             </div>
-                            <img src="${
-                              this.querySelector(".logo_chat_user").src
-                            }" class="user_pic_msg_right" alt="profile picture" loading="lazy">
+                            <img src="${this.querySelector(".logo_chat_user").src
+          }" class="user_pic_msg_right" alt="profile picture" loading="lazy">
                         </div>
                     </div>
                 `;
-        //
       } else {
         messageHTML = `
                     <div class="slot_message_container___">
@@ -479,12 +467,8 @@ export default class Chat extends HTMLElement {
 
       this.chatContainer.innerHTML += messageHTML;
 
-      // console.log('1->'+receiverImg);
-      // this.querySelector(".user_pic_msg_right").src = '';
-      // this.querySelector(".user_pic_msg_right").src = receiverImg;
-      // console.log('2->'+this.querySelector(".user_pic_msg_right").src);
     });
-    this.chatContainer.scrollTop = this.chatContainer.scrollHeight; // this for showing the very last messages of the conversation
+    this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
   }
 
   displayMessage(message) {
@@ -513,20 +497,18 @@ export default class Chat extends HTMLElement {
         timestamp: new Date().toISOString(),
         conversation: this.conversationId,
       };
-      // console.log("result = "+this.fetchOrCreateConversationAndVerifyBlock(this.user.id, this.receiverId));
 
       const checkConversation =
         await this.fetchOrCreateConversationAndVerifyBlock(
           this.user.id,
           this.receiverId
         );
-      console.log("result = " + checkConversation);
 
       if (checkConversation === 0) {
         console.log(
           "Action aborted: User is blocked or conversation could not be created."
         );
-        return; // Stop further execution
+        return;
       }
       try {
         const response = await fetch(`${ips.baseUrl}/chat/messages/`, {
@@ -541,7 +523,6 @@ export default class Chat extends HTMLElement {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("Message saved via api:", data);
           const dataWs = {
             type: "message",
             message: data.message,
@@ -560,7 +541,6 @@ export default class Chat extends HTMLElement {
                 " receiver : ",
                 this.receiverId
               );
-              console.log("Message sent via ws:", dataWs);
               document.querySelector(".message-input").value = "";
             }
           });
@@ -645,6 +625,68 @@ export default class Chat extends HTMLElement {
     blockButton.addEventListener("click", () => {
       this.blockOrUnblockUser();
     });
+
+    const find_friends = document.querySelector(".find_friends");
+    const modal_wrapper_chat = document.querySelector(".modal_wrapper_chat");
+    find_friends.addEventListener("click", () => {
+      modal_wrapper_chat.style.display = "block";
+    });
+    
+
+    const colseButton = document.querySelector("#close-btn");
+    colseButton.addEventListener("click", () => {
+      modal_wrapper_chat.style.display = "none";
+    });
+
+    const overlay = document.querySelector(".overlay_chat");
+
+    modal_wrapper_chat.addEventListener("click", function (event) {
+      if (event.target === overlay) {
+        modal_wrapper_chat.style.display = "none";
+      }
+    });
+
+    const user_list_wrapper = document.querySelector(
+      ".users_search_list_wrapper"
+    );
+
+    document.querySelector(".search").addEventListener("input", (e) => {
+      Http.getData("GET", "api/friends").then((data) => {
+
+        if (e.target.value === "") {
+          user_list_wrapper.innerHTML = "";
+        } else {
+          for (let i = 0; i < data.length; i++) {
+            if (data[i].user1.id === Http.user.id) {
+              if (data[i].user2.username.includes(e.target.value)) {
+                user_list_wrapper.innerHTML += `
+                <div class="user_wrapper_search">
+                <a is="co-link" href="/dashboard/profile/${data[i].user2.username}" style="
+    display: flex;
+">
+
+                <img src="${ips.baseUrl}${data[i].user2.profile_pic}" alt="" width="30" height="30" class="user_img_search">
+                <div class="fullname_search">${data[i].user2.full_name}</div>
+                </a>
+              </div>`;
+              }
+            } else {
+              if (data[i].user1.username.includes(e.target.value)) {
+                user_list_wrapper.innerHTML += `
+                <div class="user_wrapper_search">
+                <a is="co-link" href="/dashboard/profile/${data[i].user1.username}" style="
+    display: flex;
+">
+                <img src="${ips.baseUrl}${data[i].user1.profile_pic}" alt="" width="30" height="30" class="user_img_search">
+                <div class="fullname_search">${data[i].user1.full_name}</div>
+                </a>
+              </div>`;
+              }
+            }
+          }
+        }
+      });
+    });
   }
   toggleBlockButton(state) {
     if (state == "block") this.querySelector(".block-btn").innerHTML = "block";
@@ -656,31 +698,19 @@ export default class Chat extends HTMLElement {
 
         <div class="chat_wrapper_">
         <div class="modal_wrapper_chat">
-        <div class="overlay_chat"></div>
-        <div class="modal_content_wrapper">
-            <div class="search_input_wrapper_">
-                <input type="text" name="search" id="search" class="search" placeholder="What are you looking for ?">
-            </div>
-            <div class="users_search_list_wrapper">
-                <div class="user_wrapper_search">
-                    <img src="bg_img.png" alt="" width="30" height="30" class="user_img_search">
-                    <div class="fullname_search">Full Name</div>
-                    <div class="user_name_search">User Name</div>
-                </div>
+          <div class="overlay_chat"></div>
+            <div class="modal_content_wrapper">
+                <div class="search_input_wrapper_" style="display:flex;">
+                  <input type="text" name="search" id="search" class="search" placeholder="What are you looking for ?">
 
-                <div class="user_wrapper_search">
-                    <img src="bg_img.png" alt="" width="30" height="30" class="user_img_search">
-                    <div class="fullname_search">Full Name</div>
-                    <div class="user_name_search">User Name</div>
+                  <i class="fa-regular fa-circle-xmark fa-2x" id="close-btn" style="margin-left:10px; padding:5px; color: red;" ></i>
+
                 </div>
-                <div class="user_wrapper_search">
-                    <img src="bg_img.png" alt="" width="30" height="30" class="user_img_search">
-                    <div class="fullname_search">Full Name</div>
-                    <div class="user_name_search">User Name</div>
+                <div class="users_search_list_wrapper">
+
                 </div>
             </div>
-        </div>
-    </div>
+          </div>
             <div class="first_section_wrapper_chat">
 
             </div>
@@ -696,16 +726,12 @@ export default class Chat extends HTMLElement {
                   <div class="first_wrapper_info_user_chat_wrapper">
                       <div class="first_side_wrapper_con_chat__">
                           <img src="../assets/pdp.png" alt="logo_user" class="logo_chat_user">
-                          <div class="infos_con_user_wrapper">
-                              <h3 class="name_user_con" id="username">
+                          <a class="infos_con_user_wrapper" style="cursor:pointer">
+                              <h3  class="name_user_con" id="username">
 
                               </h3>
 
-                              <p class="status_user_con">
-                                  Online
-                              </p>
-
-                          </div>
+                          </a>
                       </div>
                       <div class="second_side_wrapper_con_chat__">
                           <button class='play_invite'>
@@ -725,7 +751,7 @@ export default class Chat extends HTMLElement {
                         </div>
                         <div style="display: flex; justify-content: center; width: 100%;">
                             <div id="blocked-user-message" class="blocked-user-message">
-                                <p class="block-message">You are blocked and cannot send messages.</p>
+                                <p class="block-message"></p>
                             </div>
                             <div class="input_conv_container__chat">
                                 <textarea name="" id="" class="send_msg_input message-input" rows="1" placeholder="Message"></textarea>
@@ -736,7 +762,7 @@ export default class Chat extends HTMLElement {
                         </div>
                 </div>
             </div>
-            
+
         </div>
     `;
 

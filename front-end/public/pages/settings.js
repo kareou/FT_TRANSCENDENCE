@@ -1,40 +1,88 @@
 import Http from "../http/http.js";
-import {ips} from "../http/ip.js";
+import { ips } from "../http/ip.js";
+import Link from "../components/link.js";
 
 export default class Settings extends HTMLElement {
   constructor() {
     super();
     this.user = Http.user;
   }
+  escapeHTML(html) {
+    return html
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
   connectedCallback() {
-    console.log(this.user);
     this.render();
 
-	this.querySelector(".fa-edit").addEventListener("click", () => {
-		const input = document.createElement("input");
-		input.type = "file";
-		input.accept = "image/*";
-		input.click();
-		input.onchange = async () => {
-			const file = input.files[0];
-			const formData = new FormData();
-			formData.append("profile_pic", file);
-			const baseUrl = `${ips.baseUrl}`;
-			const endPoint = "/api/user/update/";
-			const rs = fetch(baseUrl + endPoint, {
-				method: "PUT",
-				credentials: "include",
-				body: formData,
-			})
-				.then((response) => {
-					return response.json();
-				})
-				.then((data) => {
-					console.log(data);
-					this.querySelector(".img_user_settings").src = `${ips.baseUrl}${data.profile_pic}`;
-				});
-		};
-	});
+    document.querySelectorAll(".theme").forEach((e) => {
+      e.classList.remove("selected_theme");
+      if (e.id == Http.user.table_theme) e.classList.add("selected_theme");
+    });
+
+    document.querySelectorAll(".paddle").forEach((e) => {
+      e.checked = false;
+      if (e.id == Http.user.paddle_type) e.checked = true;
+    });
+
+    this.querySelectorAll(".paddle_label").forEach((e) => {
+      e.addEventListener("click", () => {
+        this.querySelectorAll(".paddle").forEach((input) => {
+          input.checked = false;
+        });
+        e.previousElementSibling.checked = true;
+      });
+    });
+
+    document.getElementById("start_btn").addEventListener("click", () => {
+      const paddle = this.querySelector(".paddle:checked").id;
+      const table = this.querySelector(".selected_theme").id;
+      Http.getData("PUT", `api/user/update/`, {
+        paddle_type: paddle,
+        table_theme: table,
+      })
+    });
+
+    this.querySelectorAll(".theme").forEach((e) => {
+      e.addEventListener("click", () => {
+        this.querySelectorAll(".theme").forEach((input) => {
+          input.classList.remove("selected_theme");
+        });
+        e.classList.add("selected_theme");
+      });
+    });
+
+    this.querySelector(".fa-edit").addEventListener("click", () => {
+      const input = document.createElement("input");
+      input.type = "file";
+    //   input.accept = "image/*";
+      input.click();
+      input.onchange = async () => {
+        const file = input.files[0];
+        const formData = new FormData();
+        formData.append("profile_pic", file);
+        const baseUrl = `${ips.baseUrl}`;
+        const endPoint = "/api/user/update/";
+        fetch(baseUrl + endPoint, {
+          method: "PUT",
+          credentials: "include",
+          body: formData,
+        })
+          .then((response) => {
+			if (response.ok)
+			{
+				Http.website_stats.notify("toast", {type: "success", message: "Profile picture updated"});
+				return response.json();
+			}
+          })
+          .then((data) => {
+            this.querySelector(
+              ".img_user_settings"
+            ).src = URL.createObjectURL(file);
+          });
+      };
+    });
 
     const lws = document.querySelectorAll(".link_wrapper_settings");
     let old_lws = lws[0];
@@ -51,7 +99,7 @@ export default class Settings extends HTMLElement {
           if (idx != idx_btn) e.classList.add("d-none");
           else e.classList.remove("d-none");
         });
-        console.log(key_obj);
+        
 
         old_lws = e;
       });
@@ -61,24 +109,14 @@ export default class Settings extends HTMLElement {
     const btn_confirm = document.querySelector(".btn_confirm");
     const modal_wrapper_pass = document.querySelector(".modal_wrapper_pass");
 
-    // submit_btn.addEventListener('click', () => {
-    // 	modal_wrapper_pass.style.display = "block";
-    // 	const overlay_pass = document.querySelector('.overlay_pass');
-    // 	const modal_content_wrapper = document.querySelector('.modal_content_wrapper');
-    // 	overlay_pass.addEventListener('click', () => {
-    // 		modal_wrapper_pass.style.display = "none";
-    // 	})
-    // })
 
     submit_btn.addEventListener("click", () => {
       collectedSettingsData["full_name"] =
-        document.querySelector(".fullname").value ?? null;
+        this.escapeHTML(document.querySelector(".fullname").value) ?? null;
       collectedSettingsData["username"] =
-        document.querySelector(".username").value ?? null;
+        this.escapeHTML(document.querySelector(".username").value) ?? null;
       collectedSettingsData["email"] =
-        document.querySelector(".email").value ?? null;
-      // collectedSettingsData["password"] = document.querySelector('.pass').value ?? null;
-      console.log(JSON.stringify(collectedSettingsData));
+        this.escapeHTML(document.querySelector(".email").value) ?? null;
 
       const baseUrl = `${ips.baseUrl}`;
       const endPoint = "/api/user/update/";
@@ -91,12 +129,18 @@ export default class Settings extends HTMLElement {
         body: JSON.stringify(collectedSettingsData),
       })
         .then((response) => {
-          return response.json();
+			if (response.ok)
+			{
+				Http.website_stats.notify("toast", {type: "success", message: "updated successfully"});
+				return response.json();
+			}
+			else
+			{
+				const res = response.json();
+				Http.website_stats.notify("toast", {type: "error", message: res.message});
+			}
         })
-        .then((data) => {
-          console.log(data);
-          console.log(collectedSettingsData);
-        });
+        
     });
 
     const update_pass = document.querySelector(".update_pass");
@@ -130,63 +174,44 @@ export default class Settings extends HTMLElement {
         .then((response) => {
           return response.json();
         })
-        .then((data) => {
-          console.log(data);
-          console.log(dataPs);
-        });
     });
 
     const enable_2fa = document.querySelector(".enable_2fa");
     const disable_2fa = document.querySelector(".disable_2fa");
     const qr = document.querySelector("._2fa_qrcode");
 
-    Http.getData("/api/user/" + this.user.username).then((data) => {
-      console.log(data);
-    });
+ 
     const _2fa_container = document.querySelector("._2fa_container");
     const modal_wrapper_2fa = document.querySelector(".modal_wrapper_2fa");
     enable_2fa.addEventListener("click", () => {
       const baseUrl = `${ips.baseUrl}`;
-      const endPoint = "/api/user/enable_2fa/";
-      const rs = fetch(baseUrl + endPoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      })
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          _2fa_container.style.display = "block";
-          modal_wrapper_2fa.style.display = "block";
-          qr.src = data["2fa_url"];
+      const endPoint = "api/user/enable_2fa/";
+      Http.getData("POST", endPoint).then((data) => {
+		qr.src = data["2fa_url"];
+        _2fa_container.style.display = "block";
+        modal_wrapper_2fa.style.display = "block";
+        enable_2fa.style.display = "none";
+        disable_2fa.style.display = "block";
+      });
+    });
 
-          console.log(data["2fa_url"]);
-          enable_2fa.style.display = "none";
-          disable_2fa.style.display = "block";
-        });
+    const overlay = document.querySelector(".overlay_2fa");
+
+    // Assuming modal_wrapper_chat is the modal element
+    modal_wrapper_2fa.addEventListener("click", function (event) {
+      // Check if the click is outside the modal
+      if (event.target === overlay) {
+        modal_wrapper_2fa.style.display = "none"; // Or any other code to close the modal
+      }
     });
 
     disable_2fa.addEventListener("click", () => {
       const baseUrl = `${ips.baseUrl}`;
-      const endPoint = "/api/user/disable_2fa/";
-      const rs = fetch(baseUrl + endPoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      })
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          console.log(data);
-          enable_2fa.style.display = "block";
-          disable_2fa.style.display = "none";
-        });
+      const endPoint = "api/user/disable_2fa/";
+      Http.getData("POST", endPoint).then((data) => {
+        enable_2fa.style.display = "block";
+        disable_2fa.style.display = "none";
+      });
     });
 
     if (this.user._2fa_enabled) {
@@ -196,6 +221,29 @@ export default class Settings extends HTMLElement {
       enable_2fa.style.display = "block";
       disable_2fa.style.display = "none";
     }
+
+    const email_input = document.querySelector(".email");
+
+    email_input.addEventListener("input", () => {
+      email_input.disabled = true;
+      email_input.value = this.user.email;
+    });
+
+	const delete_user = document.querySelector(".delete_user");
+
+	delete_user.addEventListener("click", async () => {
+		const response = await fetch(`${ips.baseUrl}/api/user/${Http.user.id}`, {
+			method: "DELETE",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			credentials: "include",
+			});
+
+		if (response.ok) {
+			Link.navigateTo("/");
+		}
+	});
   }
   render() {
     this.innerHTML = /*html*/ `
@@ -294,6 +342,24 @@ height: 35px;
 .modal_wrapper_pass{
 	display: none;
 }
+.delete_user{
+	background: red;
+    border: none;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 9px;
+	cursor: pointer;
+}
+.delete_user_wrapper{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	bottom: 0;
+	position: absolute;
+	left: 50%;
+	transform: translate(-50% , -36%);
+	width: 100%;
+}
 		</style>
 	<div class="setting_wrapper_">
 		<div class="left_side_settings_wrapper">
@@ -306,12 +372,7 @@ height: 35px;
 					<i class="fa fa-edit"></i>
 				</div>
 				<div class="infos_details_wrapper">
-					<div class="bold_txt">
-						${this.user.fullname}
-					</div>
-					<div class="under_txt">
-						Art Director
-					</div>
+
 				</div>
 			</div>
 			<div class="links_wrapper_swapper">
@@ -333,8 +394,13 @@ height: 35px;
 						Security
 					</span>
 				</div>
+				<div class="delete_user_wrapper">
+					<button class="delete_user">Delete Account</button>
+				</div>
+				
 
 			</div>
+
 		</div>
 
 		<div class="right_side_settings_wrapper">
@@ -364,7 +430,7 @@ height: 35px;
 								</lable>
 								<input type="email" name="email" id="email" class="email" value="${
                   this.user.email
-                }">
+                }" disabled>
 							</div>
 							<!-- <div class="input_settings_wrapper">
 								<div class="label_txt">
@@ -392,22 +458,6 @@ height: 35px;
 								</div>
 							</div>
 						</div>
-						<h1 class="info_h">Blockes</h1>
-						<div class="bolcked_users">
-							<div class="blocked_users_list">
-								<div>
-									<h1 class="info_h">
-										blocked users list
-									</h1>
-									<p class="info_p">
-										view all blocked users
-									</p>
-								</div>
-								<button class="view_blocked_users">
-									View list
-								</button>
-							</div>
-						</div>
 
 
 					</div>
@@ -416,7 +466,14 @@ height: 35px;
 						<div class="players_info_ setting_1">
 							<div class="player1">
 								<div class="bold_txt_white">Paddle Theme</div>
-								<paddle-option player="player1" class="player1_paddle"></paddle-option>
+								<div class="paddle_wraper">
+									<input type="radio" name="classic" id="classic" class="paddle" checked>
+									<label for="classic" class="paddle_label"></label>
+									<input type="radio" name="blossom" id="blossom" class="paddle" checked>
+									<label for="blossom" class="paddle_label"></label>
+									<input type="radio" name="lightsaber" id="lightsaber" class="paddle" checked>
+									<label for="lightsaber" class="paddle_label"> </label>
+								</div>
 							</div>
 						</div>
 						<div class="game_theme setting_2">
@@ -428,7 +485,7 @@ height: 35px;
 							</div>
 						</div>
 						<div class="start_game_ setting_3">
-							<button id="start_btn" disabled>Update Info</button>
+							<button id="start_btn" >Update Info</button>
 						</div>
 					</div>
 					<div class="three set d-none">

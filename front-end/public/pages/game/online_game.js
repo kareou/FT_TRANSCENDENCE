@@ -5,6 +5,16 @@ import Http from "../../http/http.js";
 import Link from "../../components/link.js";
 import {ips} from "../../http/ip.js";
 
+const getPlayerObject = (paddle_name, player_num, ctx, theme) => {
+  if (paddle_name === "classic")
+    return new ClassicPaddle(player_num, ctx, theme);
+  else if (paddle_name === "blossom")
+    return new BlossomPaddle(player_num, ctx, theme);
+  else if (paddle_name === "lightsaber")
+    return new LightSaber(player_num, ctx, theme);
+}
+
+
 export default class OnlineGame extends HTMLElement {
   constructor() {
     super();
@@ -19,7 +29,7 @@ export default class OnlineGame extends HTMLElement {
     this.role = null;
     this.game_started = false;
     this.keyStates = {};
-    this.game_progress = "playing";
+    this.game_progress = "Joining";
   }
 
   updateGameStats(newstate) {
@@ -53,7 +63,6 @@ export default class OnlineGame extends HTMLElement {
   connectedCallback() {
     const urlParams = new URLSearchParams(window.location.search);
     const gameid = urlParams.get("game_id");
-    console.log(gameid);
     if (!gameid) {
       Link.navigateTo("/dashboard");
       Http.website_stats.notify("toast", { type: "warning", message: "Game ID not found" });
@@ -61,26 +70,26 @@ export default class OnlineGame extends HTMLElement {
     }
     else{
       this.websocket = new WebSocket(
-        `${ips.ockerUrl}/ws/gamematch/${gameid}/`
+        `${ips.socketUrl}/ws/gamematch/${gameid}/`
       );
       this.render();
       const canvas = this.querySelector(".board");
       canvas.width = canvas.clientWidth;
       canvas.height = canvas.clientHeight;
       const ctx = canvas.getContext("2d");
-      this.player1 = new ClassicPaddle(0, ctx, "mod");
-      this.player2 = new ClassicPaddle(1, ctx, "mod");
-      this.ball = new Ball(ctx, "sky");
-      this.board = new Board(ctx, "mod");
+      this.player1 = getPlayerObject(Http.user.paddle_type, 0, ctx, this.theme);
+      this.player2 = getPlayerObject(Http.user.paddle_type, 1, ctx, this.theme);
+      this.ball = new Ball(ctx, Http.user.table_theme);
+      this.board = new Board(ctx, Http.user.table_theme);
       this.websocket.onmessage = (e) => {
         const data = JSON.parse(e.data);
         if (data.winner) {
-          console.log(data.winner)
           this.winner = data.winner;
         }
         if (data.role) {
           this.role = data.role;
           Http.website_stats.notify("gameusers", { [this.role]: Http.user });
+          this.waitingPlayers(ctx);
         }
         if (data.state){
           this.updateGameStats(data.state);
@@ -166,6 +175,19 @@ export default class OnlineGame extends HTMLElement {
       }, 1000);
   }
 
+  waitingPlayers(ctx) {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    this.board.draw();
+    this.#drawPaddles(ctx);
+    this.ball.draw();
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.font = "50px Arial";
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.fillText("Waiting for players", ctx.canvas.width / 2, ctx.canvas.height / 2);
+  }
+
   async #update(ctx) {
     var id = requestAnimationFrame(() => this.#update(ctx));
     if (this.game_progress === "end") {
@@ -180,6 +202,8 @@ export default class OnlineGame extends HTMLElement {
       this.#drawPaddles(ctx);
       this.ball.draw();
       this.#updatePlayerPositions();
+    }else if (this.game_progress === "Joining") {
+      
     }
   }
 

@@ -5,16 +5,20 @@ from game.models import Match
 from user.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import UntypedToken
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
 import asyncio
 import json
+import copy
+
 
 class TournamentConsumer(AsyncWebsocketConsumer):
     tournament_max_participants = 4
     player_channels = {}
     participants_data = {}
-    tournamen_data = {
+    tournament_data = {
+        "first_round": [],
+        "second_round": []
+    }
+    old_tournament_data = {
         "first_round": [],
         "second_round": []
     }
@@ -31,20 +35,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         match.save()
         return match
 
-    async def delete_all_matches(self):
-        try:
-            matches = await self.get_all_matches()
-            if matches is not None:
-                for match in matches:
-                    print(f"Match {match.id} removed.", flush=True)
-                    await database_sync_to_async(match.delete)()
-                return True
-        except Match.DoesNotExist:
-            return False
-
     async def save_match(self, player1, player2):
-        print(f'player=0=id====>[{player1.id}]', flush=True)
-        print(f'player=1=id====>[{player2.id}]', flush=True)
+
 
         p1 = await self.get_player_by_id(player1.id)
         p2 = await self.get_player_by_id(player2.id)
@@ -53,16 +45,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def sent_match_data(self, user1_id, user2_id=None):
         for match in self.matchs.values():
             if user2_id is not None and user1_id == match.player1.id and user2_id == match.player2.id:
-                print(f"player1=={user1_id}-----player2=={user2_id}----joined the match", flush=True)
-                print(f"player1=={user1_id}-----player2=={user2_id}", flush=True)
                 await self.channel_layer.group_send(
                     f'notification_{match.player1.id}',
                     {
                         'type': 'notification_message',
                         'message': match.id,
                         'notification_type': "tournament_match",
-                        'receiver': match.player1.id
-                    }
+                        'receiver': match.player1.id,
+                        'sender': match.player1.id                    }
                 )
                 await self.channel_layer.group_send(
                     f'notification_{match.player2.id}',
@@ -70,8 +60,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                         'type': 'notification_message',
                         'message': match.id,
                         'notification_type': "tournament_match",
-                        'receiver': match.player2.id
-                    }
+                        'receiver': match.player2.id,
+                        'sender': match.player1.id                    }
                 )
                 return
             elif not user2_id and (user1_id == match.player1.id or user1_id == match.player2.id):
@@ -82,7 +72,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                             'type': 'notification_message',
                             'message': match.id,
                             'notification_type': "tournament_match",
-                            'receiver': match.player1.id
+                            'receiver': match.player1.id,
+                            'sender': match.player1.id
                         }
                     )
                     return
@@ -93,7 +84,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                             'type': 'notification_message',
                             'message': match.id,
                             'notification_type': "tournament_match",
-                            'receiver': match.player2.id
+                            'receiver': match.player2.id,
+                            'sender': match.player1.id
                         }
                     )
                     return
@@ -101,7 +93,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     #################################### PARTICIPANT TOOLS ##############################
     @database_sync_to_async
     def get_player_by_id(self, player_id):
-        return User.objects.get(pk=player_id)
+        try:
+            return User.objects.get(pk=player_id)
+        except User.DoesNotExist:
+            return None
 
     @database_sync_to_async
     def get_user_from_scope(self, scope):
@@ -129,70 +124,74 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
     async def remove_player_from_participants(self, player):
         try:
-            print(f"Player {player.id} removed.", flush=True)
             await database_sync_to_async(player.delete)()
             await self.disconnect(1800)
         except TournamentParticipant.DoesNotExist:
-            print(f"Failed to remove player {player.id}.", flush=True)
             return False
 
     async def change_participant_status(self, user_id, online=False):
-        for i in range(0, len(self.tournamen_data['first_round']), 1):
-            if self.tournamen_data['first_round'][i]['id'] == user_id:
+        for i in range(0, len(self.tournament_data['first_round']), 1):
+            if self.tournament_data['first_round'][i]['id'] == user_id:
                 if online == True:
-                    self.tournamen_data['first_round'][i]['online'] = True
-                    print(f"Player {user_id} back to the tournament.", flush=True)
+                    self.tournament_data['first_round'][i]['online'] = True
                 else:
-                    self.tournamen_data['first_round'][i]['online'] = False
-                    print(f"Player {user_id} removed from tournament.", flush=True)
-                await self.sent_participants_data()
+                    self.tournament_data['first_round'][i]['online'] = False
 
     async def sent_participants_data(self):
-        print("about to sent users data 222222222222222", flush=True)
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'players_status_changed',
-                'players_data': self.tournamen_data
-            }
-        )
+        for player in self.tournament_data['first_round']:
+            await self.channel_layer.group_send(
+                f'notification_{player["id"]}',
+                {
+                    'type': 'notification_message',
+                    'message': self.tournament_data,
+                    'notification_type': "players_status_changed",
+                    'receiver': player["id"],
+                    'sender': player["id"]
+                }
+            )
+
+        self.old_tournament_data = copy.deepcopy(self.tournament_data)
 
     async def serialize_players_data(self, player):
-        self.participants_data[player.id] = "in_waiting"
-        player_data = {
-            'id': player.id,
-            'username': player.username,
-            'image': player.image,
-            'win': False,
-            'online': True
-        }
-        self.tournamen_data['first_round'].append(player_data)
-            # elif self.participants_data.__len__() >= 4 and player.id in self.participants_data:
-            #     self.participants_data[player.id]['round'] = 'second_round'
-            #     self.participants_data[player.id]['winner'] = True
-
-    async def players_status_changed(self, event):
-        await self.send(text_data=json.dumps({
-            'type': 'players_status_changed',
-            'players_data': event['players_data']
-        }))
+        if self.tournament_max_participants == 2:
+            player_data_second_round = {
+                'id': player.id,
+                'username': player.username,
+                'image': player.image,
+                'online': True,
+                'win': False
+            }
+            self.tournament_data['second_round'].append(player_data_second_round)
+        else:
+            player_data_first_round = {
+                'id': player.id,
+                'username': player.username,
+                'image': player.image,
+                'online': True,
+                'win': False
+            }
+            self.tournament_data['first_round'].append(player_data_first_round)
     ################################################################## WEBSOCKET METHODS ############################################################
     async def connect(self):
-        # self.match_id = self.scope['url_route']['kwargs'].get('match_id')
         self.room_group_name = "tournament"
         user = await self.get_user_from_scope(self.scope)
-        print(f"User id: {user.id}", flush=True)
+        if user is None:
+            self.close()
+            return
+        if self.get_player_by_id(user.id) is None:
+            self.close()
+            return
         await self.accept()
 
-
     async def disconnect(self, code):
-        print(code, flush=True)
-        user = await self.get_user_from_scope(self.scope)
-        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-        if code != 1800:
-            if user.id in self.participants_data.keys() and code != 1800:
-                await self.change_participant_status(user.id)
-            print(f"User id desconnet=--=--=-=-=-=-=-=--=--==-=-=-=->: {user.id}", flush=True)
+        try:
+            user = await self.get_user_from_scope(self.scope)
+            # await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+            if code != 1800:
+                if user and user.id in self.participants_data.keys() and code != 1800:
+                    await self.change_participant_status(user.id)
+        except Exception as e:
+            print(f"Error in disconnect: {e}", flush=True)
         await self.close()
 
     async def receive(self, text_data):
@@ -200,105 +199,137 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         command = data.get('command')
         if command == "join":
             user = await self.get_user_from_scope(self.scope)
-            print(f'about to join match ========================{user.id}', flush=True)
             if self.matchs.__len__() > 0:
-                print('turnament is full please wait...')
-                await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+                pass
             elif user.id in self.participants_data.keys():
-                print("#####################Player exist and he is about to join match", flush=True)
-                await self.channel_layer.group_add(self.room_group_name, self.channel_name)
                 await self.change_participant_status(user.id, online=True)
             elif user.id not in self.participants_data.keys():
-                print("#####################Player not exist and he is about to join match", flush=True)
                 await self.join_match(user.id)
-            else:
-                print('none of theas conditions :(', flush=True)
     ################################################################## MATCH METHODS ############################################################
     async def join_match(self, player_id):
-        self.participants_data[player_id] = "in_waiting"
-        if self.tournament_max_participants < 2:
-            self.participants_data.clear()
-            self.matchs.clear()
-            self.tournamen_data['first_round'].clear()
-            self.tournamen_data['second_round'].clear()
-            await self.delete_all_participants()
-            await self.disconnect()
-            return
+        self.participants_data[player_id] = "is_waiting"
             ###############collect player data################
         user = await self.get_player_by_id(player_id)
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         self.player_channels[user.id] = self.channel_name
+        if len(self.player_channels) == 1:
+            self.check_players_status__ = asyncio.create_task(self.check_for_players_status_changes())
             ###############collect player data################
-        print(f"========>player id: {user.id} joined", flush=True)
         player, created = await database_sync_to_async(TournamentParticipant.objects.get_or_create)(player=user, id=user.id, username=user.username, image=user.profile_pic_url)
 
-        if created:
-            await database_sync_to_async(player.save)()
+        await database_sync_to_async(player.save)()
         players = await self.get_all_participants()
         players = [p for p in players if p.id in self.participants_data.keys()]
 
         await self.serialize_players_data(player)
-
-        print('about to sent users data ========================', flush=True)
-        await self.sent_participants_data()
-
-        print(f'waiting players len +++++> {len(players)}', flush=True)
-        print(f' self.tournament_max_participants +++++> {self.tournament_max_participants}', flush=True)
         if len(players) == self.tournament_max_participants:
-            print(">>>>>>>>>>>>>>>>>>>>>>joined<<<<<<<<<<<<<<<<<<<<<<", flush=True)
+            
+            if self.tournament_max_participants == 1:
+                for i in range(len(self.tournament_data['second_round'])):
+                    if player.id == self.tournament_data['second_round'][i]['id']:
+                        self.tournament_data['second_round'][i]['win'] = True
+                await asyncio.sleep(3)
+                try:
+                    self.check_players_status__.cancel()
+                    await self.check_players_status__
+                except Exception as e:
+                    print("Task already cancelled or Finished", flush=True)
+                self.participants_data.clear()
+                self.matchs.clear()
+                self.tournament_data['second_round'].clear()
+                self.tournament_data['first_round'].clear()
+                self.player_channels.clear()
+                await self.delete_all_participants()
+                await self.disconnect(300)
+                return
+            self.matchs.clear()
             await asyncio.sleep(10)
             for i in range(0, len(players), 2):
-                print(f'-------------------------------------->{i}', flush=True)
                 match = await self.save_match(players[i], players[i+1])
                 self.matchs[match.id] = match
 
                 if players[i].id not in self.player_channels.keys() or players[i+1].id not in self.player_channels.keys():
-                    print("Player not in channel", flush=True)
                     break
-                # await asyncio.sleep(4)
                 await self.sent_match_data(players[i].id, players[i+1].id)
-            # async_to_sync(channel_layer.send)('background-tasks', {'type': 'check.match.status'})
-            self.tournament_max_participants /= 2
-            print(">>>>>>>>>>>>>>>>>>>>>>..........CHECKING222222222PLAYERS.............<<<<<<<<<<<<<<<<<<<<<<", flush=True)
+            self.tournament_max_participants //= 2
+            try:
+                self.send_state_task.cancel()
+            except Exception as e:
+                print("Task already cancelled or Finished", flush=True)
+            self.update_match_status_task = asyncio.create_task(self.update_match_status())
             self.send_state_task = asyncio.create_task(self.check_match_status())
-    ################################################################## background-task ############################################################
+    ################################################################## background-tasks ############################################################
     async def check_match_status(self):
-        print(">>>>>>>>>>>>>>>>>>>>>>..........CHECKING11111111PLAYERS.............<<<<<<<<<<<<<<<<<<<<<<", flush=True)
         end = False
-        old_winner = None
+        old_winner_id = None
         count = self.tournament_max_participants
         self.participants_data.clear()
 
         while not end:
             await asyncio.sleep(3)
-            print("Checking match status.........................>?>?>?>?", flush=True)
             matchs = await self.get_all_matches()
             matchs = [match for match in matchs if match.id in self.matchs.keys()]
             for match in matchs:
                 match_status = await database_sync_to_async(lambda: match.status)()
-                print(f"match status=>>>>>>>>>{match_status}", flush=True)
                 if match_status == 'end':
-                   winner = await database_sync_to_async(lambda: match.winner)()
-                   if old_winner is not winner:
-                        print(f">>>>>>>>>>>PLAYER {winner.username} WON!<<<<<<<<<<<<<<", flush=True)
-                        old_winner = winner
-                        # player1 = await database_sync_to_async(lambda: match.player1)()
-                        # player2 = await database_sync_to_async(lambda: match.player2)()
-                        # if player1.id != winner.id:
-                        #     await self.remove_player_from_participants(player1)
-                        # else:
-                        #     await self.remove_player_from_participants(player2)
+                    winner = await database_sync_to_async(lambda: match.winner)()
+                    if old_winner_id != winner.id:
+                        old_winner_id = winner.id
+                        if self.tournament_max_participants == 2:
+                            for i in range(len(self.tournament_data['first_round'])):
+                                if winner.id == self.tournament_data['first_round'][i]['id']:
+                                    self.tournament_data['first_round'][i]['win'] = True
                         await self.join_match(winner.id)
                         count -= 1
                         if not count:
                             end = True
                             break
-        ################################clear data##################################
-        # await asyncio.sleep(3)
-        self.matchs.clear()
-        try:
-            self.send_state_task.cancel()
-        except Exception as e:
-            print("Task already cancelled or Finished", flush=True)
 
+    async def check_for_players_status_changes(self):
+        while True:
+            try:
+                await asyncio.sleep(2)
+                if len(self.old_tournament_data['first_round']) != len(self.tournament_data['first_round']):
+                    await self.sent_participants_data()
+                else:
+                    for i in range(0, len(self.tournament_data['first_round']), 1):
+                        if self.old_tournament_data['first_round'][i]['online'] != self.tournament_data['first_round'][i]['online']:
+                            await self.sent_participants_data()
+                        if self.old_tournament_data['first_round'][i]['win'] != self.tournament_data['first_round'][i]['win']:
+                            await self.sent_participants_data()
+                if len(self.old_tournament_data['second_round']) != len(self.tournament_data['second_round']):
+                    await self.sent_participants_data()
+                else:
+                    for i in range(0, len(self.tournament_data['second_round']), 1):
+                        if self.old_tournament_data['second_round'][i]['online'] != self.tournament_data['second_round'][i]['online']:
+                            await self.sent_participants_data()
+                        if self.old_tournament_data['second_round'][i]['win'] != self.tournament_data['second_round'][i]['win']:
+                            await self.sent_participants_data()
+            except Exception as e:
+                print(f"Error in check_for_players_status_changes: {e}", flush=True)
+            if self.player_channels.__len__() == 0:
+                break
+
+    @database_sync_to_async
+    def _update_match_status_(self, match_id):
+        try:
+            # Fetch the match object, raise 404 if not found
+            match = get_object_or_404(Match, id=match_id)
+
+            if match.status == 'pending':
+                match.status = 'end'
+                match.winner = match.player1
+                match.save()
+        except Exception as e:
+            print(f"Error: {e}", flush=True)
             
+
+    async def update_match_status(self):
+        await asyncio.sleep(120)
+        matchs = await self.get_all_matches()
+        matchs = [match for match in matchs if match.id in self.matchs.keys()]
+        try:
+            for value in matchs:
+                await self._update_match_status_(value.id)
+        except Exception as e:
+            print(f"An error occurred: {e}", flush=True)
+

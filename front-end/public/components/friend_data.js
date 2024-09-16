@@ -16,7 +16,9 @@ export default class FriendData extends HTMLElement {
     this.querySelector(".remove_friend").addEventListener("click", () => {
       Http.getData("DELETE", `api/friends/${this.friendship_id}`).then(
         (response) => {
-          console.log(response);
+          Http.getData("GET", "api/friends/").then((data) => {
+          })
+          delete Http.friends[this.id];
           Http.website_stats.notify("friends");
           Http.notification_socket.send(
             JSON.stringify({
@@ -28,8 +30,7 @@ export default class FriendData extends HTMLElement {
           );
         }
       );
-      console.log("remove friend");
-      console.log(this.friendship_id);
+
     });
   }
   render() {
@@ -40,9 +41,7 @@ export default class FriendData extends HTMLElement {
     <p class="user_name_wrapper">${this.full_name}</p>
     </div>
     <div class="icons_wrapper" style="display: flex;align-content: center;">
-      <button class="send_msg no_style">
-        <i class="fa-regular fa-message"></i>
-      </button>
+
       <button class="remove_friend no_style">
         <i class="fa fa-ban" aria-hidden="true"></i>
       </button>
